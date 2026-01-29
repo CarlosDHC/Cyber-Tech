@@ -7,9 +7,9 @@ import { db } from "../../../FirebaseConfig";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
 export default function Notas() {
-  const [alunos, setAlunos] = useState([]); 
+  const [alunos, setAlunos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [collapsed, setCollapsed] = useState(false); 
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
     const buscarNotas = async () => {
@@ -28,7 +28,7 @@ export default function Notas() {
             agrupamento[emailAluno] = {
               uid: dados.uid,
               // Tenta pegar 'nome', se não tiver tenta 'usuario', senão usa padrão
-              nome: dados.nome || dados.usuario || "Aluno sem nome", 
+              nome: dados.nome || dados.usuario || "Aluno sem nome",
               email: dados.email,
               respostas: []
             };
@@ -67,7 +67,7 @@ export default function Notas() {
       <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
         <button
           className={styles.toggleBtn}
-          onClick={() => setCollapsed((prev) => !prev)}
+          onClick={() => setCollapsed(!collapsed)}
         >
           <img src="/menu.png" alt="menu" />
         </button>
@@ -94,6 +94,12 @@ export default function Notas() {
             </Link>
           </li>
           <li>
+            <Link to="/admin/newdesafios" data-tooltip="Desafios" className={styles.navLink}>
+              <img src="/desafio.png" alt="Desafios" />
+              <span className={styles.linkText}>Desafios</span>
+            </Link>
+          </li>
+          <li>
             <Link to="/admin/curtidas" className={styles.navLink}>
               <img src="/curti.png" alt="curti" />
               <span className={styles.linkText}>like</span>
@@ -110,7 +116,7 @@ export default function Notas() {
         ) : alunos.length === 0 ? (
           <p>Nenhuma nota registrada ainda.</p>
         ) : (
-          <div className={styles.cards}> 
+          <div className={styles.cards}>
             {alunos.map((aluno) => (
               <div key={aluno.email} className={styles.card} style={{ display: 'block' }}>
                 <div style={{ borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', marginBottom: '15px' }}>
@@ -155,7 +161,7 @@ export default function Notas() {
                             </td>
                             <td style={{ padding: '8px', fontSize: '0.75rem', color: '#777' }}>
                               {formatarData(item.data).split(' às ')[0]}
-                              <br/>
+                              <br />
                               {formatarData(item.data).split(' às ')[1]}
                             </td>
                           </tr>

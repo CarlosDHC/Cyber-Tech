@@ -14,16 +14,22 @@
 }
 
 .mainTitle {
-  font-size: 2.8rem;
+  font-size: 3.5rem;
   font-weight: 800;
-  margin-bottom: 1rem;
-  color: var(--color-primary); 
+  margin-bottom: 0.4rem;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(192, 220, 238, 0.8), 0 0 20px rgba(9, 94, 139, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 100%;
 }
 
 .subtitle {
-  color: var(--text-muted); 
-  font-size: 1.2rem;
+  color: #ffffff;
+  font-size: 1.1rem;
   font-weight: 500;
+  text-shadow: 0 0 8px rgba(192, 220, 238, 0.7), 0 0 15px rgba(9, 94, 139, 0.5), 1px 1px 3px rgba(0, 0, 0, 0.4);
+  max-width: 500px;
+  text-align: center;
 }
 
 .infoText h3 {
@@ -68,32 +74,27 @@
 .slideItem {
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg, #095e8b 0%, #0d4f78 50%, #0a3a55 100%);
 }
 
 .carouselImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Garante que a imagem cubra o fundo sem esticar */
+  display: none;
 }
 
 .overlay {
-  .contentOverlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.15); /* Valor baixo para deixar a imagem clara */
+  background: linear-gradient(to bottom, rgba(9, 94, 139, 0.4) 0%, rgba(5, 65, 97, 0.2) 100%);
   display: flex;
-  background: linear-gradient(to bottom, #095e8b, #0541617c), url(/tec-carro.jpg);
-  background: linear-gradient(to bottom, #095e8b, #0541617c), url(/di-carro.jpg);
-  background: linear-gradient(to bottom, #095e8b, #0541617c), url(/eng-carro.jpg);
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  color: white; /* Se a imagem for MUITO clara, mude para black */
+  color: white;
   z-index: 10;
-} 
+  padding: 1.5rem 2rem;
 }
 
 /* ---------- Seção "O que é um algoritmo?" ---------- */
@@ -161,6 +162,153 @@
 
 .btn-primary:hover {
   background-color: var(--primary-blue);
+}
+
+/* ---------- Carrossel de Cursos ---------- */
+.coursesCarouselSection {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem auto;
+}
+
+.carouselContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, #fdfdfd 0%, #c0dcee 100%);
+  border-radius: 20px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 1120px;
+  gap: 1.2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.carouselImageWrapper {
+  position: relative;
+  width: 60%;
+  max-width: 1050px;
+  flex-shrink: 0;
+}
+
+.coursesImage {
+  width: 100%;
+  height: 260px;
+  border-radius: 25px; 
+}
+
+.carouselBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(9, 124, 219, 0.9);
+  color: white;
+  border: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  font-size: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.carouselBtn:hover {
+  background-color: var(--dark-blue);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.prevBtn {
+  left: 10px;
+}
+
+.nextBtn {
+  right: 10px;
+}
+
+.carouselIndicators {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1.2rem;
+}
+
+.indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(9, 94, 139, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator:hover {
+  background-color: rgba(9, 94, 139, 0.7);
+}
+
+.indicator.active {
+  background-color: var(--primary-blue);
+  transform: scale(1.2);
+}
+
+.topicsWrapper {
+  width: 100%;
+  text-align: center;
+}
+
+.courseTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 0.8rem;
+  text-align: center;
+  font-family: "Playfair Display", "Poppins", sans-serif;
+  letter-spacing: 0.8px;
+}
+
+.topicsList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.topicItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding: 0.9rem 0.7rem;
+  border-radius: 12px;
+  font-weight: 550;
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-family: "Montserrat", "Poppins", sans-serif;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.topicItem:hover {
+  transform: translateY(-5px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-color: var(--primary-blue);
+  box-shadow: 0 8px 20px rgba(9, 94, 139, 0.2);
+  color: var(--primary-blue);
+}
+
+.topicIcon {
+  color: var(--primary-blue);
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
 }
 
 /* ---------- Seção Desafios ---------- */
@@ -241,6 +389,19 @@
     height: auto;
     margin-bottom: 1.5rem;
   }
+
+  .carouselContainer {
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .coursesImage {
+    height: 380px;
+  }
+
+  .topicsList {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Mobile (1 coluna, textos menores) */
@@ -266,5 +427,263 @@
   .challengeCard {
     width: 220; 
     max-width: 320px; 
+  }
+
+  .carouselContainer {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .coursesImage {
+    height: 320px;
+  }
+
+  .courseTitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .topicsList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+
+  .topicItem {
+    padding: 0.7rem 0.6rem;
+    font-size: 0.8rem;
+    border-top: 3px solid var(--primary-blue);
+  }
+
+  .carouselBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .carouselIndicators {
+    gap: 8px;
+    margin-top: 0.8rem;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* ---------- Seção de Introdução ---------- */
+.introductionSection {
+  margin: 2rem 0;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, rgba(9, 94, 139, 0.05) 0%, rgba(192, 220, 238, 0.1) 100%);
+  border-radius: 15px;
+  border-left: 5px solid var(--primary-blue);
+}
+
+.introductionContent {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.introductionTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+.introductionText {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-color);
+  margin-bottom: 1.2rem;
+  text-align: justify;
+}
+
+.introductionCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.introductionCard {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  border-top: 4px solid var(--primary-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.introductionCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(9, 94, 139, 0.15);
+}
+
+.introductionCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 0.4rem;
+}
+
+.introductionCard p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+.conclusionText {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-color);
+  margin-top: 1rem;
+  text-align: justify;
+  font-weight: 600;
+  padding: 1rem;
+  background: rgba(9, 94, 139, 0.08);
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .introductionSection {
+    margin: 2rem 0;
+    padding: 2rem 1.5rem;
+  }
+
+  .introductionTitle {
+    font-size: 1.8rem;
+  }
+
+  .introductionText {
+    font-size: 0.95rem;
+  }
+
+  .introductionCards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+
+
+/* ---------- Responsividade Total para Celulares ---------- */
+
+@media (max-width: 600px) {
+  /* 1. Ajuste Geral de Containers */
+  .home {
+    padding-bottom: 2rem;
+  }
+
+  /* 2. Hero Section (Banner Superior) */
+ .heroSection {
+    height: 190px; /* Altura fixa para não sumir */
+    width: 100vw;  /* Ocupa 100% da largura da janela visual */
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;    /* Remove o espaço interno que afasta o conteúdo */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw; /* Técnica para forçar largura total mesmo dentro de containers */
+    margin-right: -50vw;
+  }
+  .mainTitle {
+    font-size: 1.8rem; /* Título mais amigável ao mobile */
+    line-height: 1.2;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    max-width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  /* 3. Seção "O que é um Algoritmo" */
+  .infoCard {
+    width: 92%;
+    flex-direction: column; /* Empilha vídeo e texto */
+    padding: 1.2rem;
+    gap: 1rem;
+    margin: 2rem auto;
+  }
+
+  .infoVideo {
+    width: 100%; /* Vídeo ocupa toda a largura do card */
+    height: 180px;
+    border-radius: 10px;
+  }
+
+  .infoText h3 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .infoText p {
+    font-size: 0.95rem;
+    text-align: left; /* Melhor leitura em blocos de texto */
+  }
+
+  /* 4. Carrossel de Cursos e Tópicos */
+  .carouselContainer {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .carouselImageWrapper {
+    width: 100%;
+  }
+
+  .coursesImage {
+    height: 160px; /* Imagem mais curta para focar nos nomes dos cursos */
+    border-radius: 12px;
+  }
+
+  .topicsList {
+    grid-template-columns: repeat(2, 1fr); /* Mantém 2 colunas */
+    gap: 0.6rem;
+  }
+
+  .topicItem {
+    padding: 0.8rem 0.4rem;
+    font-size: 0.75rem;
+    min-height: 80px; /* Garante altura mínima para os ícones */
+  }
+
+  /* 5. Seção de Desafios (Cards) */
+  .challengeCardsList {
+    flex-direction: column; /* Cards um embaixo do outro */
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .challengeCard {
+    width: 90%; /* Quase largura total */
+    max-width: 300px;
+    margin: 0;
+  }
+
+  /* 6. Seção de Introdução (Cards Informativos) */
+  .introductionSection {
+    margin: 1.5rem 0.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .introductionCards {
+    grid-template-columns: 1fr; /* Um card por linha */
+  }
+}
+
+/* Ajuste extremo para celulares muito pequenos (iPhone SE / Jelly) */
+@media (max-width: 350px) {
+  .mainTitle {
+    font-size: 1.5rem;
+  }
+
+  .topicsList {
+    grid-template-columns: 1fr; /* Tópicos em lista única */
   }
 }

@@ -6,42 +6,46 @@ import styles from "../Home/Home.module.css";
 function ChallengeList() {
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Nossos Desafios</h1>
+      <h1 className={styles.pageTitle}>Cursos</h1>
       <p className={styles.pageSubtitle}>
-        Teste sua lógica com nossos desafios práticos.
+        Selecione a sua área.
       </p>
 
       <div className={styles.challengeCardsList}>
         {/* Desafio 1 */}
-        <Link to="/desafios/desafio1" className={styles.challengeCard}>
+        <Link to="/desafios/CapitulosTecnologia" className={styles.challengeCard}>
           <img 
-            src="img_desafios/algoritmo.jpg">
+            src="https://imgur.com/A6MA8Ua.jpg"> 
           </img>
-          <p>O que é um algoritmo?</p>
+          <p>Tecnologia </p>
         </Link>
 
         {/* Desafio 2 */}
-        <Link to="/desafios/desafio2" className={styles.challengeCard}>
+        <Link to="/desafios/CapitulosDireito" className={styles.challengeCard}>
           <img
-            src="/img_desafios/operacoes.jpg"
+            src="https://imgur.com/6RTD2WO.jpg"
           ></img>
-          <p>Operações</p>
+          <p>Direito</p> 
         </Link>
 
         {/* Desafio 3 */}
-        <Link to="/desafios/desafio3" className={styles.challengeCard}>
+        <Link to="/desafios/CapitulosEngenharia" className={styles.challengeCard}>
          <img
-            src="/img_desafios/condicionais.jpg"
+            src="https://imgur.com/5KHksLP.jpg"
           ></img>
-          <p>Condicionais</p>
+          <p>Engenharia Civil</p>
         </Link>
-
-        {/* Desafio 4 */}
-        <Link to="/desafios/desafio4" className={styles.challengeCard}>
-          <img
-            src="/img_desafios/funcoes.jpg"
+        <Link to="/desafios/CapitulosMarketing" className={styles.challengeCard}>
+         <img
+            src="https://imgur.com/rjp7qWU.jpg"
           ></img>
-          <p>Funções</p>
+          <p>Marketing Digital</p>
+        </Link>
+        <Link to="/desafios/CapitulosRh" className={styles.challengeCard}>
+         <img
+            src="https://imgur.com/NRn7mwt.jpg"
+          ></img>
+          <p>Recursos Humanos</p>
         </Link>
       </div>
     </div>

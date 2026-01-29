@@ -1,101 +1,94 @@
-/* ===== ChallengeDetail.module.css ===== */
-
-/* Container geral da página */
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 60px 20px;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #007bff 0%, #0a58ca 100%);
-  color: #fff;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #121212;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    color: #fff;
 }
 
-/* Título principal */
-.title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  text-align: center;
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 20px;
 }
 
-/* Subtítulo */
-.subtitle {
-  font-size: 1.1rem;
-  font-weight: 400;
-  text-align: center;
-  max-width: 700px;
-  margin-bottom: 40px;
-  color: #e0e6ff;
+.questionBox {
+    margin-bottom: 30px;
 }
 
-/* Card do desafio */
-.challengeCard {
-  background-color: #ffffff;
-  color: #0a58ca;
-  border-radius: 10px;
-  padding: 30px;
-  width: 90%;
-  max-width: 800px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.questionText {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
-.challengeCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.25);
+.questionImage {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #444;
 }
 
-/* Título do desafio dentro do card */
-.challengeTitle {
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin-bottom: 12px;
+.optionsGrid {
+    display: grid;
+    gap: 15px;
 }
 
-/* Descrição */
-.challengeDescription {
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 20px;
-  line-height: 1.5;
+.optionCard {
+    background: #1e1e1e;
+    border: 2px solid #333;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.2s ease;
 }
 
-/* Botões de ação */
-.buttonGroup {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+.optionCard:hover {
+    background: #2a2a2a;
+    border-color: #007bff;
 }
 
-.button {
-  background-color: #0d6efd;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+.optionCard.selected {
+    background: #004085;
+    border-color: #007bff;
 }
 
-.button:hover {
-  background-color: #084298;
-  transform: translateY(-2px);
+.optionLetter {
+    background: #333;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-  .challengeCard {
-    padding: 20px;
-  }
+.footerActions {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
 
-  .buttonGroup {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.btnNext {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+}
 
-  .button {
-    width: 100%;
-  }
+.btnNext:disabled {
+    background: #555;
+    cursor: not-allowed;
 }

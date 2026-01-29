@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+import { 
+  doc, getDoc, collection, query, where, orderBy, limit, getDocs 
+} from "firebase/firestore";
 import { db } from "../../../FirebaseConfig";
 import "./BlogPost.css";
 
@@ -11,10 +13,29 @@ const PostDinamico = () => {
   const [prevId, setPrevId] = useState(null);
   const [nextId, setNextId] = useState(null);
 
+  // 1. Função que decide para onde o botão "Menu" (Azulejos) vai voltar
+  // Baseado na categoria salva no Firebase
+  const getBackLink = (categoria) => {
+    if (!categoria) return '/blog'; // Se não tiver categoria, volta para o início
+
+    // Normaliza para letras minúsculas para evitar erros (Ex: "Direito" ou "direito")
+    const cat = categoria.toLowerCase();
+
+    switch(cat) {
+      case 'tecnologia': return '/tecnologia';
+      case 'engenharia': return '/engenharia';
+      case 'direito':    return '/direito';
+      case 'marketing':  return '/marketing';
+      case 'rh':         return '/rh';
+      default:           return '/blog';
+    }
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
       try {
+        // Busca o post atual pelo ID da URL
         const docRef = doc(db, "blog", id);
         const docSnap = await getDoc(docRef);
 
@@ -22,19 +43,39 @@ const PostDinamico = () => {
           const currentData = docSnap.data();
           setPost(currentData);
 
-          // Navegação (Anterior/Próximo)
-          if (currentData.dataCriacao) {
+          // 2. Lógica de Navegação (Anterior / Próximo)
+          // Só busca vizinhos que sejam da MESMA categoria
+          if (currentData.dataCriacao && currentData.categoria) {
             const blogRef = collection(db, "blog");
-            const prevQuery = query(blogRef, where("dataCriacao", ">", currentData.dataCriacao), orderBy("dataCriacao", "asc"), limit(1));
-            const nextQuery = query(blogRef, where("dataCriacao", "<", currentData.dataCriacao), orderBy("dataCriacao", "desc"), limit(1));
+            
+            // Post Anterior: Mesma categoria, data mais antiga
+            const prevQuery = query(
+              blogRef, 
+              where("categoria", "==", currentData.categoria),
+              where("dataCriacao", "<", currentData.dataCriacao), // Atenção à direção da seta
+              orderBy("dataCriacao", "desc"), 
+              limit(1)
+            );
+            
+            // Post Próximo: Mesma categoria, data mais recente
+            const nextQuery = query(
+              blogRef, 
+              where("categoria", "==", currentData.categoria),
+              where("dataCriacao", ">", currentData.dataCriacao), // Atenção à direção da seta
+              orderBy("dataCriacao", "asc"), 
+              limit(1)
+            );
 
+            // Executa as buscas em paralelo
             const [prevSnap, nextSnap] = await Promise.all([getDocs(prevQuery), getDocs(nextQuery)]);
-            if (!prevSnap.empty) setPrevId(prevSnap.docs[0].id);
-            if (!nextSnap.empty) setNextId(nextSnap.docs[0].id);
+            
+            // Define os IDs para os botões
+            setPrevId(!prevSnap.empty ? prevSnap.docs[0].id : null);
+            setNextId(!nextSnap.empty ? nextSnap.docs[0].id : null);
           }
         }
       } catch (error) {
-        console.error("Erro:", error);
+        console.error("Erro ao carregar post:", error);
       } finally {
         setLoading(false);
       }
@@ -42,45 +83,81 @@ const PostDinamico = () => {
     fetchPost();
   }, [id]);
 
-  if (loading) return <div className="loading">Carregando...</div>;
-  if (!post) return <div className="loading">Post não encontrado.</div>;
+  if (loading) return <div className="loading-container"><div className="spinner"></div></div>;
+  if (!post) return <div className="error-msg">Post não encontrado.</div>;
+
+  // Calcula o link de volta baseado na categoria carregada
+  const backLink = getBackLink(post.categoria);
 
   return (
     <div className="blog-post-container">
       <header className="blog-post-header">
+        {/* Mostra a TAG da categoria (Ex: DIREITO) */}
+        {post.categoria && (
+          <span className={`categoria-tag tag-${post.categoria.toLowerCase()}`}>
+            {post.categoria}
+          </span>
+        )}
+        
         <h1 className="blog-title">{post.titulo}</h1>
-        {post.resumo && <p className="blog-subtitle">{post.resumo}</p>}
+        
+        <div className="blog-meta-info">
+          <span>{post.dataCriacao ? new Date(post.dataCriacao).toLocaleDateString('pt-BR') : ''}</span>
+          {post.autor && <span> • Por {post.autor}</span>}
+        </div>
+
+        {post.imagemUrl && (
+          <div className="main-image-wrapper">
+             <img src={post.imagemUrl} alt={post.titulo} className="main-post-image" />
+          </div>
+        )}
       </header>
 
-      {/* A imagem de capa foi removida daqui conforme solicitado */}
-
-      <section>
+      <section className="blog-content-body">
+        {/* Renderização do Conteúdo (Suporta texto corrido ou blocos do Admin) */}
         {Array.isArray(post.conteudo) ? (
-          // NOVO FORMATO (BLOCOS)
           post.conteudo.map((bloco, index) => (
-            <div key={index}>
-              {bloco.type === 'paragraph' && <p className="blog-text">{bloco.content}</p>}
-              {bloco.type === 'subtitle' && <h2 className="blog-section-title">{bloco.content}</h2>}
-              {bloco.type === 'image' && (
-                <div className="blog-image-container">
-                  <img src={bloco.content} alt="Imagem do post" className="blog-img" />
-                </div>
-              )}
+            <div key={index} className="content-block">
+              {bloco.type === 'paragraph' && <p>{bloco.content}</p>}
+              {bloco.type === 'subtitle' && <h2>{bloco.content}</h2>}
+              {bloco.type === 'image' && <img src={bloco.content} alt="Detalhe" />}
+              {bloco.type === 'code' && <pre><code>{bloco.content}</code></pre>}
             </div>
           ))
         ) : (
-          post.conteudo && post.conteudo.split("\n").map((paragrafo, index) => (
-            paragrafo.trim() !== "" && <p key={index} className="blog-text">{paragrafo}</p>
-          ))
+          // Fallback para posts antigos (string simples)
+          <div dangerouslySetInnerHTML={{ __html: post.conteudo }} />
         )}
       </section>
 
+      {/* Navegação no Rodapé */}
       <nav className="blog-navigation">
-        {prevId ? <Link to={`/blog/post/${prevId}`} className="blog-nav-link">← Anterior</Link> : <span className="blog-nav-link disabled">← Anterior</span>}
-        <Link to="/blog" className="menu-link2">
-          <img src="/azulejos.png" alt="Menu" className="logo-img" />
-        </Link>
-        {nextId ? <Link to={`/blog/post/${nextId}`} className="blog-nav-link">Próximo →</Link> : <span className="blog-nav-link disabled">Próximo →</span>}
+        <div className="nav-side left">
+          {prevId ? (
+            <Link to={`/blog/post/${prevId}`} className="nav-btn">
+              <span>← Anterior</span>
+            </Link>
+          ) : (
+            <span className="nav-btn disabled">← Anterior</span>
+          )}
+        </div>
+
+        {/* O BOTÃO CENTRAL IMPORTANTE */}
+        <div className="nav-center">
+          <Link to={backLink} className="menu-azulejos" title={`Voltar para ${post.categoria}`}>
+            <img src="/azulejos.png" alt="Menu Categorias" />
+          </Link>
+        </div>
+
+        <div className="nav-side right">
+          {nextId ? (
+            <Link to={`/blog/post/${nextId}`} className="nav-btn">
+              <span>Próximo →</span>
+            </Link>
+          ) : (
+            <span className="nav-btn disabled">Próximo →</span>
+          )}
+        </div>
       </nav>
     </div>
   );
