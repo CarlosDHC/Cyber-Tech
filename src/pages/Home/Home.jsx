@@ -11,6 +11,8 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 
+
+
 // Ícones
 import iconAlgoritmo from "../../assets/icons/icon-algoritmo.png";
 import iconPerson from "../../assets/icons/icon-person.png";
@@ -198,6 +200,49 @@ function Home() {
 
     }
   ];
+  const [currentCurso, setCurrentCurso] = useState(0);
+
+const cursosData = [
+  {
+    titulo: "Direito",
+    imagem: direitoImg,
+    cor: "#1e40af", // Blue-800
+    topicos: [
+      "Legislação: Normas e leis fundamentais",
+      "Justiça: Aplicação do sistema judiciário",
+      "Direitos & Deveres: Cidadania e proteção",
+      "Advocacia: Prática e representação ética",
+      "Constituição, Processo e Jurisprudência"
+    ]
+  },
+  {
+    titulo: "Engenharia Civil",
+    imagem: engenhariaImg,
+    cor: "#2563eb", // Blue-600
+    topicos: [
+      "Projeto Estrutural: Cálculo e estabilidade",
+      "Planejamento Urbano: Organização das cidades",
+      "Infraestrutura: Grandes obras e saneamento",
+      "Geotecnia e Solos: Análise de fundações",
+      "Mecânica dos Solos e Hidráulica"
+    ]
+  },
+  {
+    titulo: "Tecnologia",
+    imagem: tecnologiaImg,
+    cor: "#1e293b", // Slate-800
+    topicos: [
+      "Linguagens: JS, C++, Python e Lógica",
+      "Front-End: HTML, CSS e Interface",
+      "Back-End: Banco de Dados e APIs",
+      "Algoritmos e Estrutura de Dados",
+      "Frameworks: React, Flask e Debug"
+    ]
+  }
+];
+
+const nextCurso = () => setCurrentCurso((prev) => (prev === cursosData.length - 1 ? 0 : prev + 1));
+const prevCurso = () => setCurrentCurso((prev) => (prev === 0 ? cursosData.length - 1 : prev - 1));
 
   return (
     // Fragmento (<>) adicionado para permitir o botão fora da div principal
