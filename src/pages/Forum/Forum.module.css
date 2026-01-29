@@ -189,8 +189,12 @@
   flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; font-size: 0.9rem; background-color: #f8fafc; outline: none; transition: all 0.2s;
 }
 .commentInputGroup input:focus { background-color: white; border-color: #2563EB; }
-.sendBtn { background: none; border: none; color: #2563EB; cursor: pointer; padding: 5px; display: flex; }
-
+.sendBtn { background: none; border: none; color: #2563EB; cursor: pointer; padding: 8px; display: flex; }
+.sendBtn:hover {
+  color: #ffffff; 
+  background-color: #0056b3; 
+  border-radius: 50px;
+}
 /* --- ÁREA DE CRIAÇÃO (MINIMALISTA) --- */
 .newQuestionArea {
   background: white;
@@ -224,7 +228,7 @@
 .submitBtn {
   margin-top: 12px; background-color: #2563EB; color: white; border: none; 
   padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; 
-  float: right; transition: background 0.2s;
+  float: right; transition: all 0.2s;
 }
 .submitBtn:hover { background-color: #1d4ed8; }
 
