@@ -90,7 +90,6 @@ function Direito() {
   return (
     <div className="blog-page">
       <div className='hero-section hero-dir'>
-          <h1>Direito & Legislação</h1>
       </div>
 
       <div className="post-container-blog">

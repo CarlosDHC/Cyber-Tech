@@ -91,7 +91,6 @@ function Engenharia() {
   return (
     <div className="blog-page">
       <div className='hero-section hero-eng'>
-          <h1>Engenharia Civil & Projetos</h1>
       </div>
 
       <div className="post-container-blog">

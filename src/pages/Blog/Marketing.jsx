@@ -90,7 +90,6 @@ function Marketing() {
   return (
     <div className="blog-page">
       <div className='hero-section hero-mkt'>
-          <h1>Marketing & Estratégia</h1>
       </div>
 
       <div className="post-container-blog">

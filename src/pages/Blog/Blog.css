@@ -27,11 +27,21 @@
 }
 
 /* Variantes de cores por área */
-.hero-tec { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); } /* Azul Escuro */
-.hero-eng { background: linear-gradient(135deg, #f12711, #f5af19); }         /* Laranja/Amarelo */
-.hero-dir { background: linear-gradient(135deg, #4b0000, #800000); }         /* Vermelho Vinho */
-.hero-mkt { background: linear-gradient(135deg, #8e44ad, #c0392b); }         /* Roxo */
-.hero-rh  { background: linear-gradient(135deg, #11998e, #38ef7d); }         /* Verde */
+.hero-tec{
+  background: url(Tec-blog.png) no-repeat center center/cover;
+}
+.hero-eng {
+  background: url(Eng-blog.png) no-repeat center center/cover;
+}
+.hero-dir {
+  background: url(Dir-blog.png) no-repeat center center/cover;
+}         
+.hero-mkt {
+  background: url(Mk-blog.png) no-repeat center center/cover;
+}
+.hero-rh  {
+  background: url(Rh-blog.png) no-repeat center center/cover;
+}
 
 /* --- Container dos Posts (Grid) --- */
 .post-container-blog {

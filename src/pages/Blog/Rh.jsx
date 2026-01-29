@@ -90,7 +90,6 @@ function Rh() {
   return (
     <div className="blog-page">
       <div className='hero-section hero-rh'>
-          <h1>Gestão de Pessoas (RH)</h1>
       </div>
 
       <div className="post-container-blog">

@@ -98,7 +98,6 @@ function Tecnologia() {
   return (
     <div className="blog-page">
       <div className='hero-section hero-tec'>
-          <h1>Tecnologia & Inovação</h1>
       </div>
 
       <div className="post-container-blog">
