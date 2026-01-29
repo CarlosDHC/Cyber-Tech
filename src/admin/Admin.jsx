@@ -167,7 +167,7 @@ export default function Admin() {
           <img src="/menu.png" alt="menu" />
         </button>
 
-        <h2 className={styles.title}>Administrador</h2>
+        <h2 className={styles.title}>ADMINISTRADOR</h2>
 
         <ul className={styles.navList}>
           <li>

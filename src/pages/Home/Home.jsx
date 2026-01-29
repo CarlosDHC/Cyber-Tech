@@ -11,6 +11,8 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 
+
+
 // Ícones
 import iconAlgoritmo from "../../assets/icons/icon-algoritmo.png";
 import iconPerson from "../../assets/icons/icon-person.png";
@@ -271,7 +273,7 @@ function Home() {
 
               <div className={styles.introductionCards}>
                 <div className={styles.introductionCard}>
-                  <h3>Engenharia Civil & Tecnologia</h3>
+                  <h3>Engenharia Civil & 5p2Tecnologia</h3>
                   <p>Entenda as bases da construção e infraestrutura integradas às inovações digitais e ferramentas que otimizam processos.</p>
                 </div>
                 
