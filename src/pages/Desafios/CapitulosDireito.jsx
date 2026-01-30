@@ -14,7 +14,7 @@ function ChallengeList() {
         {/* Desafio 1 */}
         <Link to="/desafios/Direito/DesafioDir1" className={styles.challengeCard}>
           <img
-            src="https://imgur.com/oBy3VFB.jpg"
+            src="https://amaerj.org.br/wp-content/uploads/2018/10/CNJ_Balanca-Justica_Arquivo-CNJ.jpg"
           ></img>
           <p>Legislação</p> 
         </Link> 
