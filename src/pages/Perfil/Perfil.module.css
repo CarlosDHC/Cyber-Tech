@@ -12,10 +12,10 @@
 .profileBox {
     width: 100%;
     max-width: 650px; 
-    background-color: #c0dcee;
-    border: 1px solid #ccc;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
+    background-color: whitesmoke;
+    border: 2px solid #095e8b;
+    box-shadow: 0 4px 8px #095e8b;
+    border-radius: 7px;
     margin-top: 50px;
 }
 
@@ -30,7 +30,12 @@
     margin-bottom: 5px;
     font-size: 1.5em;
     font-weight: 400;
-    color: #000000;
+    color: white;
+    text-align: center;
+    background-color: #095e8b;
+    border-radius: 8px;
+    border: solid 1px #084c70;
+    box-shadow: 0 4px 8px #095e8b
 }
 
 .tabs {
@@ -97,7 +102,7 @@
 .inputGroup input,
 .inputGroup select {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #095e8b;
     border-radius: 4px;
     font-size: 1em;
     box-sizing: border-box; 
@@ -125,6 +130,8 @@
     text-align: center;
     transition: background-color 0.2s, opacity 0.2s, border-color 0.2s;
     white-space: nowrap; 
+    margin-left: 200px;
+
 }
 
 /* Estilo para o botão primário (Azul) - Usado em 'Salvar' e 'Alterar senha' */
@@ -134,11 +141,11 @@
 }
 
 .primaryButton:hover:not(:disabled) {
-    background-color: #5f9cda;
+    background-color: #074668;
 }
 
 .primaryButton:disabled {
-    background-color: #a8d0ff;
+    background-color: #074668;
     cursor: not-allowed;
     opacity: 0.8;
 }
@@ -156,7 +163,7 @@
 }
 
 .dangerButton:hover {
-    background-color: #5f9cda;
+    background-color: #074668;
 }
 
 /* --- Rodapé de Ações --- */
