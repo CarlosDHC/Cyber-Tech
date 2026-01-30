@@ -66,11 +66,11 @@ function Home() {
 
   const imageMap = {
     "o-que-e-algoritmo": "/img_desafios/desafio-algoritmo.jpg",
-    "estudar-ou-descansar": "/img_desafios/desafio-direito.jpg",
-    "fome": "/img_desafios/desafio-engenharia.jpg",
-    "dia-ou-noite": "/img_desafios/desafio-tecnologia.jpg",
-    "Marketing": "/img_desafios/desafio-marketing.jpg",
-    "Recursos Humanos": "/img_desafios/desafio-rh.jpg",
+    "estudar-ou-descansar": "/tec-card.jpg",
+    "fome": "/eng-card.jpg",
+    "dia-ou-noite": "/dir-card.jpg",
+    "Marketing": "/mkt-card.jpg",
+    "Recursos Humanos": "/rh-card.jpg",
   };
 
   const slugToRoute = {
@@ -94,7 +94,8 @@ function Home() {
   const coursesData = [
     {
       id: 1,
-      image: "/di-carro.jpg",
+      title: "Direito",
+      image: "/dir-cursos.jpg",
       topics: [
         "LEGISLAÇÃO",
         "JUSTIÇA",
@@ -108,7 +109,8 @@ function Home() {
     },
     {
       id: 2,
-      image: "/eng-carro.jpg",
+      title: "Engenharia Civil",
+      image: "/eng-cursos.jpg",
       topics: [
         "PROJETO ESTRUTURAL",
         "PLANEJAMENTO URBANO",
@@ -122,7 +124,8 @@ function Home() {
     },
     {
       id: 3,
-      image: "/tec-carro.jpg",
+      title: "Tecnologia",
+      image: "/tec-cursos.jpg",
       topics: [
         "INTRODUÇÃO",
         "FRONT-END",
@@ -136,7 +139,8 @@ function Home() {
     },
     {
       id: 4,
-      image: "/rh-carro.jpg",
+      title: "Recursos Humanos",
+      image: "/rh-cursos.jpg",
       topics: [
         "RECRUTAMENTO & SELEÇÃO",
         "TREINAMENTO & DESENVOLVIMENTO",
@@ -150,7 +154,8 @@ function Home() {
     },
     {
       id: 5,
-      image: "/marketing-carro.jpg",
+      title: "Marketing Digital",
+      image: "/mkt-cursos.jpg",
       topics: [
         "SEO & CONTEÚDO",
         "MÍDIAS SOCIAIS & ANÚNCIOS",
@@ -168,7 +173,7 @@ function Home() {
     .filter((c) => c.slug !== "o-que-e-algoritmo")
     .slice(0, 6);
 
-  // Coloque o caminho das suas imagens aqui
+  
   const slides = [
     {
       id: 1,
@@ -194,7 +199,6 @@ function Home() {
     },
     {
       id: 5,
-      image: '/marketing-carro.jpg',
       title: 'Marketing Digital',
       subtitle: 'Construa marcas fortes e conecte-se com seu público-alvo.'
 
