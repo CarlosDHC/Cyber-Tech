@@ -49,26 +49,27 @@ function Blog() {
             <p>Engenharia Civil</p>
           </Link>
 
-          {/* Marketing */}
-          <Link to="/marketing" className={styles.challengeCard}>
-            <img 
-              src="/marketing-art.jpg" 
-              alt="Marketing" 
-              onError={(e) => e.target.src = "https://imgur.com/rjp7qWU.jpg"} 
-            />
-            <p>Marketing Digital</p>
-          </Link>
 
-          {/* RH */}
-          <Link to="/rh" className={styles.challengeCard}>
-            <img 
-              src="/rh-art.jpg" 
-              alt="RH" 
-              onError={(e) => e.target.src = "https://imgur.com/NRn7mwt.jpg"} 
-            />
-            <p>Recursos Humanos</p>
-          </Link>
+        {/* Marketing */}
+        <Link to="/marketing" className={styles.challengeCard}>
+          <img 
+            src="/Mk-blog.png" 
+            alt="Marketing" 
+          />
+          <p>Marketing Digital</p>
+        </Link>
+
+        {/* RH */}
+        <Link to="/rh" className={styles.challengeCard}>
+          <img 
+            src="/Rh-blog.png" 
+            alt="RH" 
+          />
+          <p>Recursos Humanos</p>
+        </Link>
+
         </div>
+
       </div>
       <ForumButton />
     </>

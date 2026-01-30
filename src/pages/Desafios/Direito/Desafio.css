@@ -1,0 +1,316 @@
+:root {
+  --bg: #f1f1f1;
+  --card: #ffffff;
+  --text: #233568;
+  --primary: #007bff;
+  --radius: 10px;
+}
+
+/* ===== ESTILOS GERAIS ===== */
+.pagina-desafios {
+  font-family: "Poppins", sans-serif;
+  color: var(--text);
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1, h2 {
+  color: var(--text);
+}
+
+.subtitle {
+  color: var(--text);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* ===== PLACAR FIXO ===== */
+.scoreboard {
+  position: fixed;
+  top: 4.5rem;
+  right: 1rem;
+  background: #1b1b1b;
+  color: #fff;
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== CONTAINER DOS DESAFIOS ===== */
+.challenge-container {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 3rem; 
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* ===== BLOCO DE CÓDIGO ===== */
+pre {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  color: var(--text);
+  font-size: 1rem;
+  border: 1px solid #e0e0e0;
+}
+
+/* ===== SELECTS ===== */
+select {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-family: monospace;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+select[disabled] {
+  background: #eee;
+  cursor: not-allowed;
+}
+
+/* ===== FEEDBACK ===== */
+.feedback {
+  margin-top: 1rem;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.feedback.correct {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.feedback.incorrect {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+/* ===== ALTERNATIVAS ===== */
+.alternativas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.alternativa-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 2px solid transparent;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.alternativa-btn:hover {
+  background: #e2e6ea;
+  border-color: #00bcd4;
+}
+
+.alternativa-btn.selecionada {
+  border-color: #00bcd4;
+  background-color: #e0f7fa;
+}
+
+.alternativa-btn.bloqueada {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===== SCORE FINAL ===== */
+.final-score {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  border: 2px solid var(--primary);
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  margin-top: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* ===== BOTÃO VERIFICAR ===== */
+.btn-verificar {
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+  width: 100%; /* Botão largo para facilitar o clique */
+}
+
+.btn-verificar:hover {
+  background: #0056b3;
+}
+
+/* ====================================================== */
+/* ===============  NAVEGAÇÃO VOLTAR/PRÓXIMO  =========== */
+/* ====================================================== */
+
+.navigation-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 40px;
+  padding: 0 10px;
+  gap: 15px; /* Espaço entre os botões no Desktop */
+}
+
+.navigation-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centraliza conteúdo */
+  gap: 8px;
+  background: var(--card);
+  color: var(--text);
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: 0.3s ease;
+  text-decoration: none;
+  border: 1px solid transparent;
+  min-width: 120px; /* Tamanho mínimo para botões ficarem uniformes */
+}
+
+.navigation-links a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: var(--primary);
+}
+
+/* Estilo específico para o botão de MENU (central) */
+.menu-link {
+  background-color: #eef2ff !important; /* Cor levemente diferente */
+  color: var(--primary) !important;
+  min-width: auto !important; /* Permite ser quadrado */
+  padding: 12px !important;
+}
+
+.navigation-links .logo-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Texto dentro dos botões */
+.nav-text {
+  display: inline-block;
+}
+
+/* ====================================================== */
+/* ===============  RESPONSIVIDADE  ===================== */
+/* ====================================================== */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .challenge-container {
+    padding: 2rem;
+    max-width: 95%;
+  }
+
+  .scoreboard {
+    top: 5rem;
+    right: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  h1 { font-size: 1.8rem; text-align: center; }
+}
+
+/* Mobile (Ajuste crítico para os botões alinhados) */
+@media (max-width: 600px) {
+
+  .pagina-desafios {
+    padding: 1rem;
+    padding-bottom: 4rem; /* Espaço extra embaixo */
+  }
+
+  .challenge-container {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Ajuste da navegação para ficar em linha e alinhada */
+  .navigation-links {
+    flex-direction: row; /* Força linha única */
+    gap: 10px; /* Espaço menor entre botões */
+    padding: 0;
+    margin-top: 20px;
+  }
+
+  .navigation-links a {
+    flex: 1; /* Faz os botões laterais crescerem iguais */
+    padding: 10px 5px; /* Padding reduzido */
+    font-size: 0.85rem; /* Fonte menor */
+    border-radius: 8px;
+    height: 48px; /* Altura fixa para alinhar todos */
+    min-width: 0; /* Permite encolher se necessário */
+  }
+
+  /* Botão do menu no meio não precisa crescer (flex: 0) */
+  .menu-link {
+    flex: 0 0 auto !important; 
+    width: 48px; /* Quadrado */
+    padding: 0 !important; /* Remove padding extra */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Ajuste dos ícones no mobile */
+  .navigation-links .logo-img {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Placar em posição inferior ou ajustada no mobile */
+  .scoreboard {
+    position: fixed;
+    top: auto;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
+    font-size: 0.8rem;
+    opacity: 0.9;
+  }
+
+  h1 { font-size: 1.5rem; margin-top: 1rem; }
+  h2 { font-size: 1.1rem; }
+
+  .alternativa-btn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  pre {
+    font-size: 0.85rem;
+  }
+}

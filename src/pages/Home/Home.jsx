@@ -11,6 +11,8 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 
+
+
 // Ícones
 import iconAlgoritmo from "../../assets/icons/icon-algoritmo.png";
 import iconPerson from "../../assets/icons/icon-person.png";
@@ -92,8 +94,7 @@ function Home() {
   const coursesData = [
     {
       id: 1,
-      title: "Direito",
-      image: "/di-art.jpg",
+      image: "/di-carro.jpg",
       topics: [
         "LEGISLAÇÃO",
         "JUSTIÇA",
@@ -107,8 +108,7 @@ function Home() {
     },
     {
       id: 2,
-      title: "Engenharia Civil",
-      image: "/eng-art.jpg",
+      image: "/eng-carro.jpg",
       topics: [
         "PROJETO ESTRUTURAL",
         "PLANEJAMENTO URBANO",
@@ -122,8 +122,7 @@ function Home() {
     },
     {
       id: 3,
-      title: "Tecnologia",
-      image: "/tec-art.jpg",
+      image: "/tec-carro.jpg",
       topics: [
         "INTRODUÇÃO",
         "FRONT-END",
@@ -137,8 +136,7 @@ function Home() {
     },
     {
       id: 4,
-      title: "Recursos Humanos",
-      image: "/rh-art.jpg",
+      image: "/rh-carro.jpg",
       topics: [
         "RECRUTAMENTO & SELEÇÃO",
         "TREINAMENTO & DESENVOLVIMENTO",
@@ -152,8 +150,7 @@ function Home() {
     },
     {
       id: 5,
-      title: "Marketing Digital",
-      image: "/marketing-art.jpg",
+      image: "/marketing-carro.jpg",
       topics: [
         "SEO & CONTEÚDO",
         "MÍDIAS SOCIAIS & ANÚNCIOS",
@@ -175,27 +172,23 @@ function Home() {
   const slides = [
     {
       id: 1,
-      image: '/tec-carro.jpg',
       title: 'Tecnologia',
       subtitle: 'Domine as habilidades digitais essenciais para o futuro.'
 
     },
     {
       id: 2,
-      image: '/eng-carro.jpg',
       title: 'Engenharia Civil',  
       subtitle: 'Construa o futuro com inovação e sustentabilidade.'
     },
     {
       id: 3,
-      image: '/di-carro.jpg',
       title: 'Direito',
       subtitle: 'Navegue com segurança pelas normas jurídicas e regulamentações.'
 
     },
     {
       id: 4,
-      image: '/rh-carro.jpg',
       title: 'Recursos Humanos',
       subtitle: 'Gestão estratégica do capital humano para o sucesso organizacional.'
     },
@@ -272,10 +265,10 @@ function Home() {
             transition={{ delay: 0.3 }}
           >
             <div className={styles.introductionContent}>
-              <h2 className={styles.introductionTitle}>Bem-vindos à Jornada Multiprofissional CyberTech</h2>
+              <h2 className={styles.introductionTitle}>Bem-vindos à Jornada Profissional CyberTech</h2>
               
               <p className={styles.introductionText}>
-                Nesta plataforma, você não apenas aprenderá conceitos isolados, mas como as engrenagens do mercado atual se conectam. Prepare-se para dominar as competências essenciais que definem o profissional do futuro:
+                Nesta plataforma, você aprenderá conceitos isolados, mas como as engrenagens do mercado atual se conectam. Prepare-se para dominar as competências essenciais que definem o profissional do futuro:
               </p>
 
               <div className={styles.introductionCards}>

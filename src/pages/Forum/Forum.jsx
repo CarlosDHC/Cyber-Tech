@@ -4,18 +4,27 @@ import styles from './Forum.module.css';
 // Imports do Firebase
 import { db, auth } from "../../../FirebaseConfig";
 import { 
-  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, 
-  updateDoc, doc, arrayUnion, arrayRemove 
+  collection, 
+  addDoc, 
+  query, 
+  orderBy, 
+  onSnapshot, 
+  serverTimestamp, 
+  updateDoc, 
+  doc, 
+  arrayUnion, 
+  arrayRemove 
 } from "firebase/firestore";
 
 const Forum = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   
+  // Sidebar
   const [trendingTags, setTrendingTags] = useState([]);
   
   // Filtros
-  const [activeFilter, setActiveFilter] = useState("Todas"); // Começa exibindo tudo
+  const [activeFilter, setActiveFilter] = useState("Todas"); 
   const [searchQuery, setSearchQuery] = useState(""); 
 
   // Nova pergunta
@@ -23,19 +32,31 @@ const Forum = () => {
   const [newContent, setNewContent] = useState("");
   const [imageLink, setImageLink] = useState(""); 
   
-  // Tags e Inputs
+  // Tags
   const [selectedTags, setSelectedTags] = useState(["Geral"]); 
   const [tagInput, setTagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Comentários
   const [commentInputs, setCommentInputs] = useState({}); 
 
-  // Categorias Principais (Filtro Rápido)
+  // --- CONFIGURAÇÃO INTELIGENTE DE CATEGORIAS ---
   const mainCategories = [
     "Todas", "Tecnologia", "Direito", "Engenharia", 
     "Marketing", "RH", "Geral"
   ];
 
-  // Sugestões de Tags
+  // Dicionário de sinônimos para o filtro inteligente (Opção 2)
+  const categoryMap = {
+    "Tecnologia": ["tecnologia", "python", "javascript", "react", "html/css", "lógica", "banco de dados", "mobile", "devops", "código", "programação","Framework", "web", "app"],
+    "Direito": ["direito", "direito digital", "leis", "jurídico", "legislação", "advocacia", "penal", "civil"],
+    "Engenharia": ["engenharia", "civil", "obras", "projetos", "cálculo", "estruturas", "construção"],
+    "Marketing": ["marketing", "seo", "branding", "social media", "vendas", "publicidade", "conteúdo"],
+    "RH": ["rh", "recursos humanos", "gestão", "carreira", "entrevista", "liderança", "vagas"],
+    "Geral": ["geral", "dúvida", "off-topic", "discussão", "ajuda"]
+  };
+
+  // Sugestões de Tags para o Input
   const tagSuggestions = [
     "Python", "JavaScript", "React", "HTML/CSS", "Lógica", 
     "Banco de Dados", "Mobile", "DevOps", "Carreira", "Gestão"
@@ -53,7 +74,7 @@ const Forum = () => {
       const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setPosts(postsData);
 
-      // Lógica de Trending Tags
+      // Lógica de Trending
       const tagStats = {}; 
       postsData.forEach(post => {
         if (post.tags && Array.isArray(post.tags)) {
@@ -74,7 +95,7 @@ const Forum = () => {
             const likesB = b.likedBy ? b.likedBy.length : 0;
             return likesB - likesA;
           })[0];
-          return { tag, count: stat.count, topPostTitle: topPost ? topPost.title : "Sem discussões" };
+          return { tag, count: stat.count, topPostTitle: topPost ? topPost.title : "Sem discussões ainda" };
         });
 
       setTrendingTags(sortedTags);
@@ -83,29 +104,44 @@ const Forum = () => {
     return () => unsubscribe();
   }, []);
 
-  // Lógica de Clique nas Categorias (Áreas)
   const handleCategoryClick = (category) => {
     setActiveFilter(category);
-    setSearchQuery(""); // Limpa a busca textual ao mudar de categoria
+    // Opcional: Se quiser limpar a busca ao mudar de categoria, descomente a linha abaixo
+    // setSearchQuery(""); 
   };
 
-  // Filtragem dos Posts
+  // --- LÓGICA DE FILTRAGEM AVANÇADA (OPÇÃO 2) ---
   const displayedPosts = posts.filter(post => {
-    // 1. Filtro por Categoria/Tag
-    const matchesCategory = activeFilter === "Todas" 
-      ? true 
-      : (post.tags && post.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()));
+    // 1. Filtro Inteligente por Categoria
+    let matchesCategory = false;
 
-    // 2. Filtro por Busca de Texto
+    if (activeFilter === "Todas") {
+      matchesCategory = true;
+    } else {
+      // Pega a lista de tags relacionadas à categoria selecionada (ou array vazio)
+      const relatedTags = categoryMap[activeFilter] || [];
+      
+      // Verifica se o post tem tags
+      if (post.tags && Array.isArray(post.tags)) {
+        // Verifica se ALGUMA tag do post está na lista de relacionadas OU é igual ao nome da categoria
+        matchesCategory = post.tags.some(tag => {
+          const lowerTag = tag.toLowerCase();
+          return lowerTag === activeFilter.toLowerCase() || relatedTags.includes(lowerTag);
+        });
+      }
+    }
+
+    // 2. Filtro por Busca de Texto (Mantendo lógica atual)
     const matchesSearch = searchQuery 
       ? (post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
          post.content.toLowerCase().includes(searchQuery.toLowerCase()))
       : true;
 
+    // Retorna verdadeiro apenas se AMBOS os filtros passarem
     return matchesCategory && matchesSearch;
   });
 
-  // --- LÓGICA DE TAGS (Mantida) ---
+  // --- Tags e Inputs ---
   const addTagLogic = () => {
     const val = tagInput.trim();
     if (val) {
@@ -113,8 +149,13 @@ const Forum = () => {
       setTagInput("");
     }
   };
-  const handleTagKeyDown = (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTagLogic(); } };
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTagLogic(); }
+  };
+
   const handleManualAddTag = (e) => { e.preventDefault(); addTagLogic(); };
+  
   const removeTag = (tagToRemove) => { setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove)); };
 
   const handlePublish = async (e) => {
@@ -125,6 +166,7 @@ const Forum = () => {
     if (tagInput.trim() && !finalTags.includes(tagInput.trim())) finalTags.push(tagInput.trim());
 
     if (finalTags.length === 0) { alert("Adicione pelo menos uma tag."); return; }
+
     const user = auth.currentUser;
     if (!user) { alert("Faça login para publicar."); return; }
 
@@ -137,7 +179,10 @@ const Forum = () => {
         createdAt: serverTimestamp(), tags: finalTags, likedBy: [], comments: [] 
       });
       setNewTitle(""); setNewContent(""); setImageLink(""); 
-      setSelectedTags(["Geral"]); setTagInput(""); setActiveFilter("Todas"); setSearchQuery("");
+      setSelectedTags(["Geral"]); setTagInput(""); 
+      // Não reseta o filtro para o usuário ver o post criado se estiver na categoria certa
+      // setActiveFilter("Todas"); 
+      setSearchQuery("");
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) { console.error(error); } finally { setIsSubmitting(false); }
   };
@@ -186,7 +231,7 @@ const Forum = () => {
             <h1 className={styles.pageTitle}>Fórum de Discussões</h1>
             <p className={styles.pageSubtitle}>Conecte-se com especialistas e tire suas dúvidas.</p>
             
-            {/* BARRA DE PESQUISA REFINADA */}
+            {/* BARRA DE PESQUISA */}
             <div className={styles.searchBar}>
               <div className={styles.searchIcon}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -202,7 +247,7 @@ const Forum = () => {
               />
             </div>
 
-            {/* --- NOVO: FILTRO POR ÁREAS (CATEGORY PILLS) --- */}
+            {/* FILTRO POR ÁREAS (Smart Filter) */}
             <div className={styles.categoryFilterContainer}>
               {mainCategories.map((cat) => (
                 <button 
@@ -224,7 +269,7 @@ const Forum = () => {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
               <h3>Nenhuma discussão encontrada</h3>
-              <p>Seja o primeiro a iniciar um tópico em <strong>{activeFilter}</strong>!</p>
+              <p>Não encontramos posts para <strong>{activeFilter}</strong> com esse termo.</p>
             </div>
           )}
           
@@ -299,7 +344,6 @@ const Forum = () => {
             );
           })}
 
-          {/* ÁREA DE CRIAÇÃO (DESIGN LIMPO) */}
           <div className={styles.newQuestionArea}>
             <h3>Iniciar nova discussão</h3>
             {!auth.currentUser ? (
@@ -345,6 +389,7 @@ const Forum = () => {
                   />
                   {imageLink && (
                     <div className={styles.miniPreview}>
+                      <span className={styles.previewLabel}>Pré-visualização:</span>
                       <img src={imageLink} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
                     </div>
                   )}
@@ -364,7 +409,6 @@ const Forum = () => {
           </div>
         </main>
         
-        {/* SIDEBAR COM SVG E DESIGN FLAT */}
         <aside className={styles.sidebarSection}>
           <div className={styles.sidebarCard}>
             <div className={styles.sidebarHeader}>
@@ -386,7 +430,13 @@ const Forum = () => {
             {trendingTags.length === 0 ? <p className={styles.emptyMsg}>Sem dados recentes</p> : (
               <ul className={styles.topicList}>
                 {trendingTags.map((item) => (
-                  <li key={item.tag} className={styles.topicItem} onClick={() => setActiveFilter(item.tag)}>
+                  <li key={item.tag} className={styles.topicItem} onClick={() => {
+                    // Se clicar na tag da sidebar, filtra por essa tag específica
+                    // ou podemos fazê-la ativar a Categoria Principal correspondente
+                    // A implementação atual filtra pela Tag específica
+                    setSearchQuery(item.tag); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}>
                     <div className={styles.topicHeader}>
                       <span className={styles.topicName}>#{item.tag}</span>
                       <span className={styles.topicCount}>{item.count}</span>

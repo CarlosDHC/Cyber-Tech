@@ -53,7 +53,7 @@ const Cadastro = () => {
       // 3. Salva os dados detalhados no Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        name: nome, 
+        name: nome,
         apelido,
         dataNascimento,
         telefone,
@@ -106,7 +106,7 @@ const Cadastro = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="apelido">Apelido</label>
+            <label htmlFor="apelido">Nome Social</label>
             <input
               type="text"
               id="apelido"
@@ -118,13 +118,17 @@ const Cadastro = () => {
 
           <div className={styles.formGroup}>
             <label htmlFor="dataNascimento">Data de Nascimento</label>
-            <input
-              type="date"
-              id="dataNascimento"
-              value={dataNascimento}
-              onChange={(e) => setDataNascimento(e.target.value)}
-              required
-            />
+            <div className={styles.formGroup}>
+              <input
+                type="date"
+                id="dataNascimento"
+                value={dataNascimento}
+                onChange={(e) => setDataNascimento(e.target.value)}
+                min="1900-01-01"
+                max="2099-12-31"
+                required
+              />
+            </div>
           </div>
 
           <div className={styles.formGroup}>
