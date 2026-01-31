@@ -5,7 +5,7 @@ import styles from "../Home/Home.module.css";
 function ChallengeList() {
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Desafios</h1>
+      <h1 className={styles.pageTitle}>Tecnologia</h1>
       <p className={styles.pageSubtitle}>
         Hora de praticar! Treine a lógica de programação com nossos desafios.
       </p>
