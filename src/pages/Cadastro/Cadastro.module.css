@@ -37,7 +37,28 @@
   margin-bottom: 2rem;
   font-size: 0.95rem;
 }
+.formRow {
+  display: flex;
+  gap: 1rem; /* Espaço entre o Nome e o Apelido */
+  margin-bottom: 1.5rem; /* Espaço para o próximo campo (Data de Nascimento) */
+}
 
+.formRow .formGroup {
+  flex: 1; /* Garante que ambos ocupem o mesmo espaço */
+  margin-bottom: 0; /* Remove a margem individual pois a .formRow já cuida do espaço inferior */
+}
+
+/* RESPONSIVIDADE: Em telas pequenas, volta a ficar um embaixo do outro */
+@media (max-width: 600px) {
+  .formRow {
+    display: block;
+    margin-bottom: 0;
+  }
+  
+  .formRow .formGroup {
+    margin-bottom: 1.5rem; /* Devolve a margem original para telas pequenas */
+  }
+}
 .formGroup {
   margin-bottom: 1.5rem;
 }
