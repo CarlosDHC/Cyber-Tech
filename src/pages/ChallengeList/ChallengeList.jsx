@@ -45,7 +45,7 @@ function ChallengeList() {
          <img
             src="/rh-card.jpg"
           ></img>
-          <p>Recursos Humanos124566</p>
+          <p>Recursos Humanos</p>
         </Link>
       </div>
     </div>
