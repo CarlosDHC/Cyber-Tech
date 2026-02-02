@@ -145,11 +145,12 @@ const Cadastro = () => {
               id="telefone"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
-              placeholder="(XX) XXXXX-XXXX"
+              placeholder="999999999"         // Exemplo de formato
+                maxLength="9"
             />
           </div>
-          </div>
-          <div className={styles.formGroup}>
+        </div>
+           <div className={styles.formGroup}>
             <label htmlFor="email">E-mail</label>
             <input
               type="email"
@@ -160,7 +161,7 @@ const Cadastro = () => {
               required
             />
           </div>
-           <div className={styles.formRow}>
+<div className={styles.formRow}>
           <div className={styles.formGroup}>
             <label htmlFor="password">Senha</label>
             <input
@@ -184,7 +185,7 @@ const Cadastro = () => {
               required
             />
           </div>
-          </div>
+</div>
           {error && <p className={styles.errorMessage}>{error}</p>}
 
           <button
