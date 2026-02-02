@@ -17,7 +17,7 @@ function ChallengeList() {
           <img 
             src="/tec-card.jpg"> 
           </img>
-          <p>Tecnologia </p>
+          <p>Tecnologia</p>
         </Link>
 
         {/* Desafio 2 */}
@@ -45,7 +45,7 @@ function ChallengeList() {
          <img
             src="/rh-card.jpg"
           ></img>
-          <p>Recursos Humanos</p>
+          <p>Recursos Humanos124566</p>
         </Link>
       </div>
     </div>
