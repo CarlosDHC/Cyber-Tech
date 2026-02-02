@@ -6,9 +6,9 @@ import styles from "../Home/Home.module.css";
 function ChallengeList() {
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Cursos</h1>
+      <h1 className={styles.pageTitle}>Desafios</h1>
       <p className={styles.pageSubtitle}>
-        Selecione a sua área.
+        Selecione a sua área de atuação.
       </p>
 
       <div className={styles.challengeCardsList}>

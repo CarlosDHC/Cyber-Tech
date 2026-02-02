@@ -5,9 +5,9 @@ import styles from "../Home/Home.module.css";
 function ChallengeList() {
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Desafios</h1>
+      <h1 className={styles.pageTitle}>Recursos Humanos</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! Teste sua lógica com os nossos exercícios práticos. 
+        Hora de praticar! Desenvolva competências essenciais da área de Recursos Humanos.
       </p>
       <div className={styles.challengeCardsList}>
         {/* Desafio 1 */}
