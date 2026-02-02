@@ -92,30 +92,37 @@ const Cadastro = () => {
         <h2>Crie sua conta</h2>
         <p className={styles.loginSubtitle}>É rápido e fácil!</p>
 
+
         <form onSubmit={handleSubmit} noValidate>
-          <div className={styles.formGroup}>
-            <label htmlFor="nome">Nome Completo</label>
-            <input
-              type="text"
-              id="nome"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Seu nome completo"
-              required
-            />
-          </div>
+          
+          
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label htmlFor="nome">Nome Completo</label>
+              <input
+                type="text"
+                id="nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Seu nome completo"
+                required
+              />
+            </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="apelido">Nome Social</label>
-            <input
-              type="text"
-              id="apelido"
-              value={apelido}
-              onChange={(e) => setApelido(e.target.value)}
-              placeholder="Como prefere ser chamado"
-            />
+            <div className={styles.formGroup}>
+              <label htmlFor="apelido">Nome Social</label>
+              <input
+                type="text"
+                id="apelido"
+                value={apelido}
+                onChange={(e) => setApelido(e.target.value)}
+                placeholder="Como prefere ser chamado"
+              />
+            </div>
           </div>
+          {/* FIM DA ALTERAÇÃO */}
 
+          <div className={styles.formRow}>
           <div className={styles.formGroup}>
             <label htmlFor="dataNascimento">Data de Nascimento</label>
             <div className={styles.formGroup}>
@@ -141,7 +148,7 @@ const Cadastro = () => {
               placeholder="(XX) XXXXX-XXXX"
             />
           </div>
-
+          </div>
           <div className={styles.formGroup}>
             <label htmlFor="email">E-mail</label>
             <input
@@ -153,7 +160,7 @@ const Cadastro = () => {
               required
             />
           </div>
-
+           <div className={styles.formRow}>
           <div className={styles.formGroup}>
             <label htmlFor="password">Senha</label>
             <input
@@ -177,7 +184,7 @@ const Cadastro = () => {
               required
             />
           </div>
-
+          </div>
           {error && <p className={styles.errorMessage}>{error}</p>}
 
           <button

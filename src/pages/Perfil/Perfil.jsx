@@ -183,7 +183,15 @@ export default function Perfil() {
             </div>
             <div className={styles.inputGroup}>
               <label>Data de Nascimento</label>
-              <input name="dataNascimento" type="date" value={form.dataNascimento} onChange={handleChange} />
+              <input name="dataNascimento" type="date" value={form.dataNascimento} onChange={handleChange}
+                
+                id="dataNascimento"
+                
+               
+                min="1900-01-01"
+                max="2099-12-31"
+                />
+             
             </div>
 
             {/* Linha 3 */}
