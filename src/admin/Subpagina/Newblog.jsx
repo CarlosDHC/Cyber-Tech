@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../Admin.module.css";
 
-// Firebase
+// FirebaseA
 import { db } from "../../../FirebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 

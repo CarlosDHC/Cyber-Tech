@@ -202,8 +202,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(9, 124, 219, 0.9);
-  color: white;
+  background-color: rgba(247, 249, 250, 0.9);
+  color: rgb(0, 0, 0);
   border: none;
   width: 25px;
   height: 25px;
@@ -262,9 +262,9 @@
 }
 
 .courseTitle {
-  font-size: 1rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--black);
   margin-bottom: 0.8rem;
   text-align: center;
   font-family: "Playfair Display", "Poppins", sans-serif;
