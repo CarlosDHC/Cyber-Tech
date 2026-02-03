@@ -192,7 +192,7 @@ export default function DesafioRh1() {
 
         <Link to="/desafios/Engenharia/DesafioEng2" className="next-link">
           Próximo
-          <img src="/flecha2.png" alt="Próximo" className="logo-img" />
+          <img src="/flecha2.pnRH" alt="Próximo" className="logo-img" />
         </Link>
       </div>
     </div>
