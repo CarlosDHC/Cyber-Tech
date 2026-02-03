@@ -1,45 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Admin.module.css"; // Usa o mesmo CSS do Admin principal
+import styles from "../Admin.module.css";
 
 // Firebase
 import { db } from "../../../FirebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 
-// --- CONFIGURAÇÃO DAS SUBCATEGORIAS (ATUALIZADO COM 8 OPÇÕES) ---
-const OPCOES_POR_AREA = {
-  "Tecnologia": [
-      "Lógica de Programação", 
-      "Estrutura de Dados", 
-      "Front-end (HTML/CSS)", 
-      "JavaScript Avançado", 
-      "React.js", 
-      "Banco de Dados",
-      "Git e GitHub",       // Novo
-      "Projetos Práticos"   // Novo
-  ],
-  "Engenharia": ["Física Mecânica", "Cálculo Estrutural", "Hidráulica", "Resistência dos Materiais", "Gestão de Obras"],
-  "Direito": ["Direito Civil", "Direito Penal", "Direito Constitucional", "Direito Trabalhista", "Direito Digital"],
-  "Marketing": ["Fundamentos de Marketing", "Marketing Digital", "SEO e Tráfego", "Branding", "Copywriting"],
-  "Rh": ["Gestão de Pessoas", "Recrutamento e Seleção", "Treinamento", "Cultura Organizacional", "Liderança"]
-};
-
 export default function NewDesafios() {
     const [loading, setLoading] = useState(false);
     const [collapsed, setCollapsed] = useState(true);
 
-    // Metadados do Desafio
     const [tituloGeral, setTituloGeral] = useState("");
+    const [subtitulo, setSubtitulo] = useState("");
     const [capa, setCapa] = useState("");
     const [tentativas, setTentativas] = useState(1);
-    
-    // Seleção de Área e Subcategoria
     const [area, setArea] = useState("Tecnologia");
-    const [subcategoriaSelecionada, setSubcategoriaSelecionada] = useState("");
 
-    // Estrutura das 6 Questões (Inicialmente vazias)
-    const [exercicios, setExercicios] = useState(
-        Array(6).fill(null).map(() => ({
+    const [exercicios, setExercicios] = useState([
+        {
             perguntaTexto: "",
             perguntaImagem: "",
             alternativaCorreta: "",
@@ -49,65 +27,93 @@ export default function NewDesafios() {
                 c: { texto: "", imagem: "" },
                 d: { texto: "", imagem: "" }
             }
-        }))
-    );
+        }
+    ]);
 
-    // Reseta a subcategoria se mudar a área para evitar erros
-    useEffect(() => {
-        setSubcategoriaSelecionada("");
-    }, [area]);
+    // Adicionar Nova Questão (COM LIMITE DE 10)
+    const adicionarQuestao = () => {
+        if (exercicios.length >= 10) {
+            alert("Limite máximo de 10 questões atingido!");
+            return;
+        }
 
-    // Atualiza o enunciado ou a resposta correta da questão
+        setExercicios([
+            ...exercicios,
+            {
+                perguntaTexto: "",
+                perguntaImagem: "",
+                alternativaCorreta: "",
+                alternativas: {
+                    a: { texto: "", imagem: "" },
+                    b: { texto: "", imagem: "" },
+                    c: { texto: "", imagem: "" },
+                    d: { texto: "", imagem: "" }
+                }
+            }
+        ]);
+    };
+
+    // Remover Questão
+    const excluirQuestao = (indexToDelete) => {
+        if (exercicios.length === 1) {
+            alert("O desafio precisa ter pelo menos uma questão.");
+            return;
+        }
+
+        if (window.confirm("Excluir esta questão?")) {
+            const novaLista = exercicios.filter((_, index) => index !== indexToDelete);
+            setExercicios(novaLista);
+        }
+    };
+
+    // Atualiza campos da questão
     const handleQuestaoChange = (index, campo, valor) => {
         const novosExercicios = [...exercicios];
         novosExercicios[index] = { ...novosExercicios[index], [campo]: valor };
         setExercicios(novosExercicios);
     };
 
-    // Atualiza o texto das alternativas (a, b, c, d)
+    // Atualiza alternativas
     const handleAltChange = (exIndex, letra, campo, valor) => {
         const novosExercicios = [...exercicios];
-        novosExercicios[exIndex].alternativas[letra] = { 
-            ...novosExercicios[exIndex].alternativas[letra], 
-            [campo]: valor 
+        novosExercicios[exIndex].alternativas[letra] = {
+            ...novosExercicios[exIndex].alternativas[letra],
+            [campo]: valor
         };
         setExercicios(novosExercicios);
     };
 
     const salvarDesafios = async () => {
-        // Validação 1: Campos principais
-        if (!tituloGeral || !area || !subcategoriaSelecionada) {
-            alert("Preencha o Título, Área e Subcategoria.");
+        if (!tituloGeral || !area) {
+            alert("Preencha o Título Principal e a Área de Conhecimento.");
             return;
         }
 
-        // Validação 2: Filtrar questões vazias
-        // Só aceita questões que tenham Texto E uma Alternativa Correta marcada
-        const questoesValidas = exercicios.filter(q => 
+        const questoesValidas = exercicios.filter(q =>
             q.perguntaTexto.trim() !== "" && q.alternativaCorreta !== ""
         );
 
         if (questoesValidas.length === 0) {
-            alert("Preencha pelo menos uma questão completa (Enunciado e Resposta Correta).");
+            alert("Preencha pelo menos uma questão completa.");
             return;
         }
 
         setLoading(true);
         try {
-            // Gravar no Firebase
             await addDoc(collection(db, "desafios"), {
                 titulo: tituloGeral,
+                subtitulo: subtitulo,
                 area,
-                subcategoria: subcategoriaSelecionada, // "React.js", "Git e GitHub", etc.
                 imagemCapa: capa || "https://placehold.co/600x400?text=Quiz",
                 tentativasPermitidas: Number(tentativas),
-                tipo: "quiz", 
-                questoes: questoesValidas, // Envia apenas as questões preenchidas
+                tipo: "quiz",
+                questoes: questoesValidas,
+                qtdQuestoes: questoesValidas.length,
                 dataCriacao: new Date().toISOString()
             });
-            
+
             alert("Desafio publicado com sucesso!");
-            window.location.reload(); // Recarrega para limpar o formulário
+            window.location.reload();
         } catch (error) {
             console.error("Erro ao salvar:", error);
             alert("Erro ao publicar o desafio.");
@@ -118,7 +124,6 @@ export default function NewDesafios() {
 
     return (
         <div className={styles.container}>
-            {/* Sidebar consistente com o Admin Principal */}
             <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
                 <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
                     <img src="/menu.png" alt="menu" />
@@ -143,21 +148,23 @@ export default function NewDesafios() {
 
                 <div className={styles.editorContainer}>
                     <div className={styles.formColumn}>
-                        
-                        {/* --- BLOCO 1: CONFIGURAÇÕES GERAIS --- */}
+
+                        {/* --- BLOCO 1: CONFIGURAÇÕES (METADADOS) --- */}
                         <div className={styles.metaBox}>
-                            <h3>1. Dados do Desafio</h3>
+                            <h3 style={{ marginTop: 0, color: '#1E293B' }}>1. Configurações</h3>
+
                             <div className={styles.inputGroup}>
-                                <label className={styles.fieldLabel}>Título do Quiz</label>
-                                <input 
-                                    className={styles.inputField} 
-                                    placeholder="Ex: Git Básico - Nível 1" 
-                                    value={tituloGeral} 
-                                    onChange={e => setTituloGeral(e.target.value)} 
+                                <label className={styles.fieldLabel}>Título Principal</label>
+                                <input
+                                    className={styles.inputField}
+                                    placeholder="Ex: Lógica de Programação - Módulo 1"
+                                    value={tituloGeral}
+                                    onChange={e => setTituloGeral(e.target.value)}
+                                    style={{ fontWeight: 'bold' }}
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                                 <div className={styles.inputGroup} style={{ flex: 1, minWidth: '200px' }}>
                                     <label className={styles.fieldLabel}>Área</label>
                                     <select className={styles.inputField} value={area} onChange={e => setArea(e.target.value)}>
@@ -169,84 +176,132 @@ export default function NewDesafios() {
                                     </select>
                                 </div>
 
-                                <div className={styles.inputGroup} style={{ flex: 1, minWidth: '200px' }}>
-                                    <label className={styles.fieldLabel}>Matéria (Capítulo)</label>
-                                    <select className={styles.inputField} value={subcategoriaSelecionada} onChange={e => setSubcategoriaSelecionada(e.target.value)}>
-                                        <option value="">-- Selecione --</option>
-                                        {OPCOES_POR_AREA[area]?.map((op) => (
-                                            <option key={op} value={op}>{op}</option>
-                                        ))}
-                                    </select>
+                                <div className={styles.inputGroup} style={{ flex: 1, minWidth: '150px' }}>
+                                    <label className={styles.fieldLabel}>Tentativas</label>
+                                    <input
+                                        className={styles.inputField}
+                                        type="number"
+                                        min="1"
+                                        value={tentativas}
+                                        onChange={e => setTentativas(e.target.value)}
+                                    />
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
-                                <div className={styles.inputGroup} style={{ flex: 2 }}>
-                                    <label className={styles.fieldLabel}>Capa (URL da Imagem)</label>
-                                    <input className={styles.inputField} placeholder="https://..." value={capa} onChange={e => setCapa(e.target.value)} />
-                                </div>
-                                <div className={styles.inputGroup} style={{ flex: 1 }}>
-                                    <label className={styles.fieldLabel}>Tentativas</label>
-                                    <input className={styles.inputField} type="number" min="1" value={tentativas} onChange={e => setTentativas(e.target.value)} />
-                                </div>
+                            <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
+                                <label className={styles.fieldLabel}>Imagem de Capa (URL)</label>
+                                <input className={styles.inputField} placeholder="https://..." value={capa} onChange={e => setCapa(e.target.value)} />
                             </div>
-                            
-                            {capa && <img src={capa} alt="Preview" style={{ height: '100px', marginTop: '10px', borderRadius: '6px', objectFit: 'cover' }} onError={(e)=>e.target.style.display='none'} />}
+                            {capa && <img src={capa} alt="Preview" style={{ height: '120px', marginTop: '10px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #ddd' }} onError={(e) => e.target.style.display = 'none'} />}
                         </div>
 
                         <hr className={styles.divider} />
 
-                        {/* --- BLOCO 2: LISTA DE QUESTÕES --- */}
                         <div className={styles.blocksList}>
+
+                            <div style={{ marginBottom: '25px', paddingBottom: '15px' }}>
+                                <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#095e8b' }}>2. Dados do Desafio</h3>
+
+                                <div className={styles.inputGroup}>
+                                    <label className={styles.fieldLabel}>Título Principal</label>
+                                    <input
+                                        className={styles.inputField}
+                                        placeholder="..."
+                                        value={tituloGeral}
+                                        onChange={e => setTituloGeral(e.target.value)}
+                                        style={{ fontWeight: 'bold' }}
+                                    />
+                                </div>
+
+                                <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
+                                    <label className={styles.fieldLabel}>Subtítulo</label>
+                                    <input
+                                        className={styles.inputField}
+                                        placeholder="..."
+                                        value={subtitulo}
+                                        onChange={e => setSubtitulo(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* LISTA DE QUESTÕES */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                                <h3>3. Perguntas ({exercicios.length}/10)</h3>
+                                {exercicios.length >= 10 && <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.9rem' }}>Máximo atingido!</span>}
+                            </div>
+
                             {exercicios.map((ex, index) => (
                                 <div key={index} className={styles.blockItem}>
                                     <div className={styles.blockHeader}>
-                                        <span className={styles.blockLabel} style={{background: '#2563EB', color: 'white'}}>QUESTÃO {index + 1}</span>
+                                        <span className={styles.blockLabel} style={{ background: '#095e8b', color: 'white' }}>
+                                            QUESTÃO {index + 1}
+                                        </span>
+
+                                        <div className={styles.blockActions}>
+                                            <button
+                                                onClick={() => excluirQuestao(index)}
+                                                className={styles.btnIcon}
+                                                title="Excluir Questão"
+                                            >
+                                                <img src="/lixeira.png" alt="Excluir" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    
+
                                     <div className={styles.inputGroup}>
                                         <label className={styles.fieldLabel}>Enunciado</label>
-                                        <textarea 
-                                            className={styles.textAreaBlock} 
-                                            placeholder="Digite a pergunta aqui..." 
-                                            value={ex.perguntaTexto} 
+                                        <textarea
+                                            className={styles.textAreaBlock}
+                                            placeholder="Digite a pergunta..."
+                                            value={ex.perguntaTexto}
                                             onChange={e => handleQuestaoChange(index, 'perguntaTexto', e.target.value)}
                                             rows={2}
                                         />
                                     </div>
 
                                     <div className={styles.inputGroup}>
-                                        <input className={styles.inputField} placeholder="URL de imagem de apoio (opcional)" value={ex.perguntaImagem} onChange={e => handleQuestaoChange(index, 'perguntaImagem', e.target.value)} />
-                                        {ex.perguntaImagem && <img src={ex.perguntaImagem} alt="" style={{height:'60px', marginTop:'5px'}} onError={(e)=>e.target.style.display='none'}/>}
+                                        <input className={styles.inputField} placeholder="URL da imagem (opcional)" value={ex.perguntaImagem} onChange={e => handleQuestaoChange(index, 'perguntaImagem', e.target.value)} />
+                                        {ex.perguntaImagem && <img src={ex.perguntaImagem} alt="" style={{ height: '60px', marginTop: '5px', borderRadius: '4px' }} onError={(e) => e.target.style.display = 'none'} />}
                                     </div>
 
                                     {/* Alternativas */}
-                                    <div style={{ marginTop: '15px', background: '#f8f9fa', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
-                                        <p style={{fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '10px', color: '#555'}}>ALTERNATIVAS (Marque a correta):</p>
-                                        
+                                    <div style={{ marginTop: '15px', background: '#f1f5f9', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '10px', color: '#475569' }}>ALTERNATIVAS (Marque a correta):</p>
+
                                         {['a', 'b', 'c', 'd'].map((letra) => (
                                             <div key={letra} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', gap: '10px' }}>
-                                                <input 
-                                                    type="radio" 
-                                                    name={`correta-${index}`} 
-                                                    checked={ex.alternativaCorreta === letra} 
+                                                <input
+                                                    type="radio"
+                                                    name={`correta-${index}`}
+                                                    checked={ex.alternativaCorreta === letra}
                                                     onChange={() => handleQuestaoChange(index, 'alternativaCorreta', letra)}
                                                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563EB' }}
                                                 />
-                                                <span style={{ fontWeight: 'bold', width: '20px', textTransform: 'uppercase' }}>{letra})</span>
-                                                
-                                                <input 
-                                                    className={styles.inputField} 
-                                                    placeholder={`Resposta da opção ${letra.toUpperCase()}`} 
-                                                    value={ex.alternativas[letra].texto} 
-                                                    onChange={e => handleAltChange(index, letra, 'texto', e.target.value)} 
-                                                    style={{ flex: 1 }}
+                                                <span style={{ fontWeight: 'bold', width: '25px', textTransform: 'uppercase', color: '#334155' }}>{letra})</span>
+
+                                                <input
+                                                    className={styles.inputField}
+                                                    placeholder={`Resposta ${letra.toUpperCase()}`}
+                                                    value={ex.alternativas[letra].texto}
+                                                    onChange={e => handleAltChange(index, letra, 'texto', e.target.value)}
+                                                    style={{ flex: 1, background: 'white' }}
                                                 />
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             ))}
+
+                            <div className={styles.addButtons} style={{ marginTop: '15px' }}>
+                                <button
+                                    onClick={adicionarQuestao}
+                                    className={styles.btnAdd}
+                                    disabled={exercicios.length >= 10}
+                                    style={exercicios.length >= 10 ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+                                >
+                                    {exercicios.length >= 10 ? "Máximo de Questões Atingido" : "+ Adicionar Questão"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
