@@ -13,7 +13,7 @@ function ChallengeList() {
         {/* Desafio 1 */}
         <Link to="/desafios/Rh/DesafioRh1" className={styles.challengeCard}>
           <img
-            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-tima-miroshnichenko-5439436.jpg?raw=true" 
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-resumegenius-18848929.jpg?raw=true" 
           ></img>
           <p>Recrutamento & Seleção</p> 
         </Link>
@@ -21,7 +21,7 @@ function ChallengeList() {
         {/* Desafio 2 */}
         <Link to="/desafios/Rh/DesafioRh2" className={styles.challengeCard}>
           <img
-            src="https://imgur.com/7VyVCw2.jpg"
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-tima-miroshnichenko-5439436.jpg?raw=true"
           ></img>
           <p>Treinamento & Desenvolvimento</p> 
         </Link>
@@ -29,14 +29,14 @@ function ChallengeList() {
         {/* Desafio 3 */}
         <Link to="/desafios/Rh/DesafioRh3" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/uAH3O0f.jpg" 
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-rdne-7821913.jpg?raw=true" 
           ></img>
           <p>Relações Trabalhistas</p>
         </Link>
         {/* Desafio 4 */}
         <Link to="/desafios/Rh/DesafioRh4" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/n4dfJ4f.jpg"
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-yankrukov-7698746.jpg?raw=true"
           ></img>
           <p>Cultura & Engajamento</p>
         </Link>
@@ -48,17 +48,17 @@ function ChallengeList() {
         </Link>
         <Link to="/desafios/Rh/DesafioRh6" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/n4dfJ4f.jpg"
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/pexels-rdne-10376258.jpg?raw=true"
           ></img>
           <p>Benefícios</p>
         </Link><Link to="/desafios/Rh/DesafioRh7" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/n4dfJ4f.jpg"
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-pavel-danilyuk-7869111.jpg?raw=true"
           ></img>
           <p>Avaliação e Desempenho</p>
         </Link><Link to="/desafios/Rh/DesafioRh8" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/n4dfJ4f.jpg"
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-burst-544965.jpg?raw=true"
           ></img>
           <p>Segurança do Trabalho</p>
         </Link>
