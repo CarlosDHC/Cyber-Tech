@@ -207,6 +207,12 @@
   letter-spacing: 0.5px;
 }
 
+.menu-azulejos-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
 /* ===============================
    RESPONSIVIDADE
 =============================== */
