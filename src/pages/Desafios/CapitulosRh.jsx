@@ -13,7 +13,7 @@ function ChallengeList() {
         {/* Desafio 1 */}
         <Link to="/desafios/Rh/DesafioRh1" className={styles.challengeCard}>
           <img
-            src="https://imgur.com/IBcmitz.jpg" 
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-tima-miroshnichenko-5439436.jpg?raw=true" 
           ></img>
           <p>Recrutamento & Seleção</p> 
         </Link>
