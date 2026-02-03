@@ -45,6 +45,7 @@
 }
 
 .cardCompact {
+  height: 10px;
     background: #fff;
     padding: 20px;
     border-radius: 12px;

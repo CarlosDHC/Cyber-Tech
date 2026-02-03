@@ -132,19 +132,19 @@ export default function Admin() {
               <>
                 <div className={styles.metricsGrid}>
                   <div className={styles.cardCompact}>
-                    <span className={styles.cardHeaderMini}>Total Alunos</span>
-                    <img src="/ialuno.png" alt="icon" className={styles.iconMini} />
+                    <span className={styles.cardHeaderMini}>Total de Alunos</span>
+                    {/*<img src="/ialuno.png" alt="icon" className={styles.iconMini} />*/}
                     <strong className={styles.bigNumber}>{stats.users}</strong>
                   </div>
 
                   <div className={styles.cardCompact}>
-                    <span className={styles.cardHeaderMini}>Total Posts</span>
-                    <img src="/iblog.png" alt="icon" className={styles.iconMini} />
+                    <span className={styles.cardHeaderMini}>Total de Posts</span>
+                    {/*<img src="/iblog.png" alt="icon" className={styles.iconMini} />*/}
                     <strong className={styles.bigNumber}>{stats.posts}</strong>
                   </div>
 
                   <div className={styles.cardCompact}>
-                    <span className={styles.cardHeaderMini}>Destaques</span>
+                    <span className={styles.cardHeaderMini}>Alunos em Destaques</span>
                     <div className={styles.miniList}>
                       {topStudents.map((aluno, i) => (
                         <div key={i} className={styles.miniItem}>
@@ -163,14 +163,14 @@ export default function Admin() {
                           <span className={styles.truncate}>{aluno.nome}</span>
                           <span className={styles.lowScore}>{aluno.media.toFixed(1)}</span>
                         </div>
-                      )) : <div className={styles.okMsg}>Tudo em ordem! 😊</div>}
+                      )) : <div className={styles.okMsg}>Tudo em ordem!</div>}
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.chartFullWidth}>
                    <div className={styles.chartHeader}>
-                      <img src="/igrafico.png" alt="g" />
+                      {/*<img src="/igrafico.png" alt="g" />*/}
                       <h3>Média de Notas por Desafio</h3>
                    </div>
                    <div className={styles.chartWrapper}>
