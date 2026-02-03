@@ -42,7 +42,7 @@ function ChallengeList() {
         </Link>
         <Link to="/desafios/Rh/DesafioRh5" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/n4dfJ4f.jpg"
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-gabby-k-5273559.jpg?raw=true"
           ></img>
           <p>Folha de Pagamento</p>
         </Link>
