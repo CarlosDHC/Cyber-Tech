@@ -14,7 +14,7 @@ function ChallengeList() {
            {/* Desafio 1 */}
                <Link to="/Desafios/Engenharia/DesafioEng1" className={styles.challengeCard}>
                  <img
-                   src="/img_desafios/algoritmo.jpg"
+                   src="/img_desafios/proj-estrutural.jpg"
                  ></img>
                  <p>Projeto Estrutural</p> 
                </Link>
@@ -22,7 +22,7 @@ function ChallengeList() {
                {/* Desafio 2 */}
                <Link to="/desafios/Engenharia/DesafioEng2" className={styles.challengeCard}>
                  <img
-                   src="/img_desafios/operacoes.jpg"
+                   src="/img_desafios/planejamento-urbano.jpg"
                  ></img>
                  <p>Planejamento Urbano</p> 
                </Link>
@@ -30,38 +30,38 @@ function ChallengeList() {
                {/* Desafio 3 */}
                <Link to="/desafios/Engenharia/DesafioEng3" className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/condicionais.jpg"
+                   src="/img_desafios/infra-eng.jpg"
                  ></img>
                  <p>Infraestrutura</p>
                </Link>
                {/* Desafio 4 */}
                <Link to="/desafios/Engenharia/DesafioEng4" className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/funcoes.jpg"
+                   src="/img_desafios/geo-solos.jpg"
                  ></img>
                  <p>Geotecnia e Solos</p>
                </Link>
                <Link to="/desafios/Engenharia/DesafioEng5" className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/funcoes.jpg"
+                   src="/img_desafios/pontes-viadutos.jpg"
                  ></img>
                  <p>Pontes e Viadutos</p>
                </Link>
                <Link to="/desafios/Engenharia/DesafioEng6" className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/funcoes.jpg"
+                   src="/img_desafios/const.jpg"
                  ></img>
                  <p>Constituição</p>
                </Link>
                <Link to="/desafios/Engenharia/DesafioEng7" className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/funcoes.jpg"
+                   src="/img_desafios/processo-eng.jpg"
                  ></img>
                  <p>Processo</p>
                </Link>
                <Link to="/desafios/Engenharia/DesafioEng8" className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/funcoes.jpg"
+                   src="/img_desafios/fundacoes.jpg"
                  ></img>
                  <p>Fundações</p>
                </Link>

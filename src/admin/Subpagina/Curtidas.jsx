@@ -8,6 +8,7 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
 export default function Curtidas() {
   const [curtidas, setCurtidas] = useState([]);
+  const [topPosts, setTopPosts] = useState([]); // Estado para os dados do Top 5
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -29,6 +30,32 @@ export default function Curtidas() {
         }));
 
         setCurtidas(listaCurtidas);
+
+        // PROCESSAMENTO PARA O TOP 5 (TABELA)
+        const stats = {};
+        
+        listaCurtidas.forEach((item) => {
+            // Usa o título do post ou o ID como fallback
+            const titulo = item.postTitle || item.postId || "Post sem título";
+            
+            if (!stats[titulo]) {
+                stats[titulo] = 0;
+            }
+            stats[titulo] += 1;
+        });
+
+        // Transforma em array: [{ name: "Titulo", likes: 10 }, ...]
+        const formattedData = Object.keys(stats).map(key => ({
+            name: key,
+            likes: stats[key]
+        }));
+
+        // Ordena Decrescente (Maior -> Menor) e pega os top 5
+        const top5 = formattedData.sort((a, b) => b.likes - a.likes).slice(0, 5);
+
+        setTopPosts(top5);
+        //-
+
       } catch (error) {
         console.error("Erro ao buscar curtidas:", error);
       } finally {
@@ -107,6 +134,52 @@ export default function Curtidas() {
           <p>Nenhuma curtida registrada ainda.</p>
         ) : (
           <>
+            {/* TABELA DE TOP 5 CURTIDAS */}
+            <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+                <h3 style={{ marginBottom: '15px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '10px' }}>
+                    Top 5 Posts Mais Populares
+                </h3>
+                
+                {topPosts.length > 0 ? (
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                            <thead>
+                                <tr style={{ background: '#f8f9fa' }}>
+                                    <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057', width: '50px' }}>#</th>
+                                    <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057' }}>Título do Post</th>
+                                    <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057', textAlign: 'center', width: '120px' }}>Total Curtidas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {topPosts.map((post, index) => (
+                                    <tr key={index} style={{ borderBottom: "1px solid #f1f3f5" }}>
+                                        <td style={{ padding: "12px", fontWeight: 'bold', color: '#2563EB' }}>{index + 1}º</td>
+                                        <td style={{ padding: "12px", fontWeight: '500' }}>{post.name}</td>
+                                        <td style={{ padding: "12px", textAlign: 'center' }}>
+                                            <span style={{ 
+                                                background: '#dbeafe', 
+                                                color: '#1e40af', 
+                                                padding: '4px 12px', 
+                                                borderRadius: '20px',
+                                                fontWeight: 'bold',
+                                                fontSize: '0.9rem'
+                                            }}>
+                                                {post.likes}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p style={{ color: '#888', fontStyle: 'italic' }}>Dados insuficientes para o ranking.</p>
+                )}
+            </div>
+
+            {/* LISTA GERAL / TABELA DE HISTÓRICO */}
+            <h3 style={{ marginTop: '40px', marginBottom: '15px', color: '#666' }}>Últimas Curtidas Recebidas</h3>
+            
             {isMobile ? (
               <div className={styles.mobileCardsContainer}>
                 {curtidas.map((c) => (

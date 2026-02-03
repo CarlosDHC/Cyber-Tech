@@ -218,7 +218,7 @@
 }
 
 .carouselBtn:hover {
-  background-color: var(--dark-blue);
+  background-color: var(--black);
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -262,12 +262,12 @@
 }
 
 .courseTitle {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--black);
   margin-bottom: 0.8rem;
   text-align: center;
-  font-family: "Playfair Display", "Poppins", sans-serif;
+  font-family: "poppins", sans-serif;
   letter-spacing: 0.8px;
 }
 
@@ -320,7 +320,7 @@
 .challengesSection h2 {
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--black);
 }
 
 .challengesSection p {
@@ -370,7 +370,7 @@
 .challengeCard p {
   margin: 0.8rem 0 1rem;
   font-weight: 600;
-  color: var(--primary-blue);
+  color: var(--dark-blue);
   font-size: 1.1rem;
 }
 
@@ -488,7 +488,7 @@
 .introductionTitle {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary-blue);
+  color: var(--black);
   margin-bottom: 0.8rem;
   text-align: center;
 }
@@ -496,7 +496,7 @@
 .introductionText {
   font-size: 0.95rem;
   line-height: 1.5;
-  color: var(--text-color);
+  color: var(--black);
   margin-bottom: 1.2rem;
   text-align: justify;
 }
@@ -512,7 +512,7 @@
   background: white;
   padding: 1rem;
   border-radius: 10px;
-  border-top: 4px solid var(--primary-blue);
+  border-top: 4px solid var(--black);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -525,7 +525,7 @@
 .introductionCard h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--black);
   margin-bottom: 0.4rem;
 }
 

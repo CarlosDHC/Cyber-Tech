@@ -120,7 +120,7 @@ const PostDinamico = () => {
             <div key={index} className="content-block">
               {bloco.type === 'paragraph' && <p>{bloco.content}</p>}
               {bloco.type === 'subtitle' && <h2>{bloco.content}</h2>}
-              {bloco.type === 'image' && <img src={bloco.content} alt="Detalhe" />}
+              {/* {bloco.type === 'image' && <img src={bloco.content} alt="Detalhe" />} */}
               {bloco.type === 'code' && <pre><code>{bloco.content}</code></pre>}
             </div>
           ))
@@ -145,7 +145,7 @@ const PostDinamico = () => {
         {/* O BOTÃO CENTRAL IMPORTANTE */}
         <div className="nav-center">
           <Link to={backLink} className="menu-azulejos" title={`Voltar para ${post.categoria}`}>
-            <img src="/azulejos.png" alt="Menu Categorias" />
+            <img src="/azulejos.png" alt="Menu Categorias" className="menu-azulejos-img" />
           </Link>
         </div>
 

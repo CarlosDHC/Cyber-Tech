@@ -179,11 +179,24 @@ export default function Perfil() {
             {/* Linha 2 */}
             <div className={styles.inputGroup}>
               <label>Telefone</label>
-              <input name="telefone" value={form.telefone} onChange={handleChange} placeholder="(xx) xxxx-xxxx" />
+              <input name="telefone" value={form.telefone} onChange={handleChange} placeholder="(xx) xxxx-xxxx" 
+              id="telefone" 
+              
+               maxLength="9"
+              />
             </div>
             <div className={styles.inputGroup}>
               <label>Data de Nascimento</label>
-              <input name="dataNascimento" type="date" value={form.dataNascimento} onChange={handleChange} />
+              <input name="dataNascimento" type="date" value={form.dataNascimento} onChange={handleChange}
+              
+                
+                id="dataNascimento"
+                
+               
+                min="1900-01-01"
+                max="2099-12-31"
+                />
+             
             </div>
 
             {/* Linha 3 */}

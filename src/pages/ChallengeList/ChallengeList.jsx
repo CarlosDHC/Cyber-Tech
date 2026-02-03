@@ -15,15 +15,15 @@ function ChallengeList() {
         {/* Desafio 1 */}
         <Link to="/desafios/CapitulosTecnologia" className={styles.challengeCard}>
           <img 
-            src="https://imgur.com/A6MA8Ua.jpg"> 
+            src="/tec-card.jpg"> 
           </img>
-          <p>Tecnologia </p>
+          <p>Tecnologia</p>
         </Link>
 
         {/* Desafio 2 */}
         <Link to="/desafios/CapitulosDireito" className={styles.challengeCard}>
           <img
-            src="https://imgur.com/6RTD2WO.jpg"
+            src="/dir-card.jpg"
           ></img>
           <p>Direito</p> 
         </Link>
@@ -31,19 +31,19 @@ function ChallengeList() {
         {/* Desafio 3 */}
         <Link to="/desafios/CapitulosEngenharia" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/5KHksLP.jpg"
+            src="/eng-card.jpg"
           ></img>
           <p>Engenharia Civil</p>
         </Link>
         <Link to="/desafios/CapitulosMarketing" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/rjp7qWU.jpg"
+            src="/mkt-card.jpg"
           ></img>
           <p>Marketing Digital</p>
         </Link>
         <Link to="/desafios/CapitulosRh" className={styles.challengeCard}>
          <img
-            src="https://imgur.com/NRn7mwt.jpg"
+            src="/rh-card.jpg"
           ></img>
           <p>Recursos Humanos</p>
         </Link>
