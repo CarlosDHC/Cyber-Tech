@@ -75,68 +75,6 @@ const corretas = ["a", "c", "b", "a", "c", "b"];
       salvarNoBanco();
     }
   }, [verificarFim, salvo, pontuacao]);
-const desafios = [
-  {
-    titulo: "Direitos Fundamentais",
-    codigo: "Qual artigo da Constituição Federal trata dos direitos e deveres individuais e coletivos?",
-    alternativas: {
-      a: "Artigo 5º",
-      b: "Artigo 1º",
-      c: "Artigo 14",
-      d: "Artigo 60",
-    },
-  },
-  {
-    titulo: "Direito à Vida",
-    codigo: "O direito à vida, segundo a Constituição Federal, é:",
-    alternativas: {
-      a: "Relativo e pode ser livremente retirado",
-      b: "Garantido apenas aos brasileiros natos",
-      c: "Inviolável",
-      d: "Garantido apenas em tempos de paz",
-    },
-  },
-  {
-    titulo: "Liberdade de Expressão",
-    codigo: "Sobre a liberdade de expressão, é correto afirmar que:",
-    alternativas: {
-      a: "É absoluta e sem limites",
-      b: "É garantida, vedado o anonimato",
-      c: "Só pode ser exercida com autorização do Estado",
-      d: "Não se aplica à internet",
-    },
-  },
-  {
-    titulo: "Igualdade",
-    codigo: "O princípio da igualdade previsto na Constituição significa que:",
-    alternativas: {
-      a: "Todos são iguais perante a lei",
-      b: "Todos devem ser tratados de forma idêntica",
-      c: "A lei pode favorecer determinados grupos sem justificativa",
-      d: "Apenas brasileiros são iguais perante a lei",
-    },
-  },
-  {
-    titulo: "Deveres do Cidadão",
-    codigo: "Qual das alternativas representa um dever do cidadão?",
-    alternativas: {
-      a: "Direito à vida",
-      b: "Liberdade de crença",
-      c: "Votar, quando obrigatório",
-      d: "Direito de propriedade",
-    },
-  },
-  {
-    titulo: "Direito de Propriedade",
-    codigo: "O direito de propriedade, segundo a Constituição Federal:",
-    alternativas: {
-      a: "É absoluto e ilimitado",
-      b: "Deve atender à sua função social",
-      c: "Não pode sofrer restrições",
-      d: "Só existe para bens imóveis",
-    },
-  },
-];
 
 
   return (

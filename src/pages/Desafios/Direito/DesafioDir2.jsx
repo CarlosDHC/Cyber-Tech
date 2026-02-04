@@ -76,69 +76,6 @@ const corretas = ["b", "c", "a", "b", "c", "a"];
     }
   }, [verificarFim, salvo, pontuacao]);
 
- const desafios = [
-  {
-    titulo: "Ética Jurídica",
-    codigo: "A ética no sistema jurídico tem como principal objetivo:",
-    alternativas: {
-      a: "Punir apenas condutas ilegais",
-      b: "Orientar condutas justas e responsáveis",
-      c: "Substituir as leis",
-      d: "Beneficiar apenas operadores do direito",
-    },
-  },
-  {
-    titulo: "Moral e Ética",
-    codigo: "Qual a diferença entre moral e ética?",
-    alternativas: {
-      a: "Não há diferença entre elas",
-      b: "A ética impõe sanções legais",
-      c: "A moral refere-se a costumes e a ética à reflexão crítica",
-      d: "A ética é individual e a moral é jurídica",
-    },
-  },
-  {
-    titulo: "Conduta Ética",
-    codigo: "Uma conduta ética no sistema jurídico exige:",
-    alternativas: {
-      a: "Imparcialidade, honestidade e responsabilidade",
-      b: "Vantagem pessoal",
-      c: "Interesse político",
-      d: "Obediência cega à autoridade",
-    },
-  },
-  {
-    titulo: "Operadores do Direito",
-    codigo: "É dever ético dos operadores do direito:",
-    alternativas: {
-      a: "Defender interesses pessoais",
-      b: "Atuar com honestidade e boa-fé",
-      c: "Ignorar princípios morais",
-      d: "Priorizar resultados a qualquer custo",
-    },
-  },
-  {
-    titulo: "Justiça",
-    codigo: "A ética contribui para a justiça quando:",
-    alternativas: {
-      a: "Favorece interesses particulares",
-      b: "É aplicada apenas em julgamentos",
-      c: "Promove decisões equilibradas e justas",
-      d: "Substitui a lei escrita",
-    },
-  },
-  {
-    titulo: "Responsabilidade Social",
-    codigo: "No contexto jurídico, a responsabilidade social significa:",
-    alternativas: {
-      a: "Atuar pensando no bem da sociedade",
-      b: "Cumprir ordens sem questionar",
-      c: "Atender apenas clientes ricos",
-      d: "Evitar envolvimento social",
-    },
-  },
-];
-
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>
