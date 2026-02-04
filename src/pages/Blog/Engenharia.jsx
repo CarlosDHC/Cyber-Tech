@@ -42,7 +42,7 @@ function PostCard({ post }) {
     <div className="post-card-alg">
       <Link to={linkDestino} className="read-more-link">
         <div className="post-image">
-          <img src={post.imagem || "/placeholder-blog.png"} alt={post.titulo} className="post-img-blog" onError={(e) => e.target.src = "https://placehold.co/600x400?text=Engenharia"} />
+          <img src={post.imagemUrl || "/placeholder-blog.png"} alt={post.titulo} className="post-img-blog" onError={(e) => e.target.src = "https://placehold.co/600x400?text=Engenharia"} />
         </div>
         <div className="post-info">
           <h3 className="post-title">{post.titulo}</h3>
