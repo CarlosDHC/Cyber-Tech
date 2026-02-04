@@ -212,7 +212,7 @@ export default function NewBlog() {
                   {/* --- CAMPO DE TEMPO MELHORADO --- */}
                   <div className={styles.inputGroup} style={{ flex: 1 }}>
                     <label className={styles.fieldLabel}>
-                      Tempo Estimado de Leitura (min)
+                      Tempo Estimado de Leitura
                     </label>
                     <input 
                       className={styles.inputField} 
@@ -221,9 +221,9 @@ export default function NewBlog() {
                       onChange={e => setTempoLeitura(e.target.value)} 
                       placeholder="Calculado automaticamente..."
                     />
-                    <small style={{ color: '#666', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
+                    {/*<small style={{ color: '#666', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
                       Estimativa de quanto tempo o usuário levará para ler o artigo.
-                    </small>
+                    </small>*/}
                   </div>
                 </div>
 
