@@ -29,7 +29,7 @@ function ChallengeList() {
         {/* Desafio 3 */}
         <Link to="/desafios/Rh/DesafioRh3" className={styles.challengeCard}>
          <img
-            src="https://raw.githubusercontent.com/CarlosDHC/cyber-tech-v.2.0/refs/heads/main/rt.jfif" 
+            src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/pexels-khwanchai-4175028.jpg?raw=true" 
           ></img>
           <p>Relações Trabalhistas</p>
         </Link>
