@@ -75,70 +75,7 @@ export default function DesafioDireito5() {
       salvarNoBanco();
     }
   }, [verificarFim, salvo, pontuacao]);
-
-  const desafios = [
-    {
-      titulo: "Poderes da União",
-      codigo: "Quando começa a personalidade civil da Constituição e Jurisprudência natural?",
-      alternativas: {
-        a: "Executivo, Legislativo, Judiciário e Ministério Público",
-        b: "Executivo, Legislativo e Judiciário",
-        c: "Legislativo, Judiciário e Tribunal de Contas",
-        d: "Executivo, Judiciário e Defensoria Pública",
-      },
-    },
-    {
-      titulo: "Separação dos Poderes e Controle Recíproco",
-      codigo: "Quem é De acordo com a jurisprudência do STF, o princípio da separação dos poderes: incapaz segundo o Código Civil?",
-      alternativas: {
-        a: "É absoluto e não admite exceções anos",
-        b: "Impede qualquer forma de controle entre os Poderes",
-        c: "Admite controles recíprocos, desde que respeitados os limites constitucionais",
-        d: "Autoriza a supremacia do Poder Executivo sobre os demais",
-      },
-    },
-    {
-      titulo: "Direito Fundamental à Saúde",
-      codigo: "Conforme entendimento do STF, o direito à saúde:",
-      alternativas: {
-        a: "É norma programática sem eficácia jurídica",
-        b: "Depende exclusivamente de previsão orçamentária",
-        c: "Pode ser exigido judicialmente em qualquer situação",
-        d: "É direito fundamental de aplicação imediata, respeitados critérios técnicos",
-      },
-    },
-    {
-      titulo: "Controle Concentrado de Constitucionalidade",
-      codigo: "Segundo a Constituição Federal, o controle concentrado de constitucionalidade é exercido, em regra, pelo:",
-      alternativas: {
-        a: "Superior Tribunal de Justiça",
-        b: "Tribunal de Contas da União",
-        c: "Supremo Tribunal Federal",
-        d: "Congresso Nacional",
-      },
-    },
-    {
-      titulo: "Liberdade de Expressão e Limites Constitucionais",
-      codigo: "A jurisprudência do STF entende que a liberdade de expressão:",
-      alternativas: {
-        a: "É absoluta e ilimitada",
-        b: "Pode ser restringida apenas por decisão judicial",
-        c: "Pode ser restringida apenas por decisão judicial",
-        d: "Autoriza qualquer manifestação, inclusive anônima",
-      },
-    },
-    {
-      titulo: "Negócio Jurídico",
-      codigo: "Conforme a Constituição e a jurisprudência dominante, o mandado de segurança é cabível quando:",
-      alternativas: {
-        a: "Houver ameaça ou violação a direito líquido e certo",
-        b: "For necessário discutir prova complexa",
-        c: "Houver direito coletivo sem representante legal",
-        d: "For questionada lei em tese",
-      },
-    },
-  ];
-
+  
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>

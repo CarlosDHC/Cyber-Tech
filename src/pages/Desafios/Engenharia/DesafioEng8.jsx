@@ -76,69 +76,6 @@ export default function DesafioDireito4() {
     }
   }, [verificarFim, salvo, pontuacao]);
 
-  const desafios = [
-    {
-      titulo: "Função Essencial à Justiça",
-      codigo: "Segundo a Constituição Federal, a advocacia é:",
-      alternativas: {
-        a: "Atividade privada sem relevância pública",
-        b: "Função essencial à Justiça",
-        c: "Órgão auxiliar do Poder Judiciário",
-        d: "Serviço público delegado",
-      },
-    },
-    {
-      titulo: "Inviolabilidade do Advogado",
-      codigo: "De acordo com o Estatuto da OAB (Lei nº 8.906/94), o advogado é inviolável:",
-      alternativas: {
-        a: "Em qualquer situação, sem exceções",
-        b: "Apenas no exercício da defesa criminal",
-        c: "Por seus atos e manifestações no exercício da profissão, nos limites da lei",
-        d: "Somente quando atuando em juízo",
-      },
-    },
-    {
-      titulo: "Sigilo Profissional",
-      codigo: "Sobre o sigilo profissional do advogado, é correto afirmar que:",
-      alternativas: {
-        a: "Pode ser livremente quebrado por ordem judicial",
-        b: "É dever absoluto, mesmo para defesa própria",
-        c: "Pode ser relativizado em situações excepcionais previstas em leio",
-        d: "Não se aplica a informações recebidas do cliente",
-      },
-    },
-    {
-      titulo: "Direitos do Advogado",
-      codigo: "Constitui direito do advogado, conforme o Estatuto da OAB:",
-      alternativas: {
-        a: "Recusar-se a prestar contas ao cliente",
-        b: "Ter vista dos processos apenas com autorização judicial",
-        c: "Comunicar-se com o cliente preso, ainda que incomunicável",
-        d: "Praticar atos privativos de magistrados",
-      },
-    },
-    {
-      titulo: "Ética Profissional e Captação de Clientela",
-      codigo: "Segundo o Código de Ética e Disciplina da OAB, é vedado ao advogado:",
-      alternativas: {
-        a: "Divulgar conteúdos jurídicos com finalidade educativa",
-        b: "Participar de eventos jurídicos",
-        c: "Utilizar publicidade moderada e informativa",
-        d: "Captar clientela por meio de mercantilização da profissão",
-      },
-    },
-    {
-      titulo: "Exercício da Advocacia e Impedimentos",
-      codigo: "Conforme o Estatuto da OAB, estão impedidos de exercer a advocacia:",
-      alternativas: {
-        a: "Todos os servidores públicos",
-        b: "Apenas os membros do Poder Judiciário",
-        c: "Os ocupantes de cargos que gerem incompatibilidade ou impedimento legal",
-        d: "Apenas os advogados públicos",
-      },
-    },
-  ];
-
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>

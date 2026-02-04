@@ -77,70 +77,7 @@ const corretas = ["b", "a", "c", "b", "a", "c"];
     }
   }, [verificarFim, salvo, pontuacao]);
 
-  const desafios = [
-  {
-    titulo: "Conceito de Legislação",
-    codigo: "Legislação pode ser definida como:",
-    alternativas: {
-      a: "Conjunto de costumes sociais",
-      b: "Conjunto de leis que regem uma sociedade",
-      c: "Decisões exclusivas dos juízes",
-      d: "Normas morais sem obrigatoriedade",
-    },
-  },
-  {
-    titulo: "Lei",
-    codigo: "O que é uma lei?",
-    alternativas: {
-      a: "Norma jurídica escrita, criada pelo Poder competente",
-      b: "Opinião pessoal do legislador",
-      c: "Regra moral",
-      d: "Costume popular",
-    },
-  },
-  {
-    titulo: "Hierarquia das Leis",
-    codigo: "Qual norma está no topo da hierarquia normativa brasileira?",
-    alternativas: {
-      a: "Lei ordinária",
-      b: "Decreto",
-      c: "Constituição Federal",
-      d: "Portaria",
-    },
-  },
-  {
-    titulo: "Vigência da Lei",
-    codigo: "Quando uma lei começa a produzir efeitos, em regra?",
-    alternativas: {
-      a: "No momento em que é proposta",
-      b: "Após sua publicação",
-      c: "Quando o juiz aplica",
-      d: "Quando o cidadão concorda",
-    },
-  },
-  {
-    titulo: "Obrigatoriedade da Lei",
-    codigo: "Sobre a obrigatoriedade da lei, é correto afirmar que:",
-    alternativas: {
-      a: "Ninguém pode alegar desconhecimento da lei para descumpri-la",
-      b: "A lei só vale para quem a conhece",
-      c: "A lei é opcional",
-      d: "A lei só se aplica a servidores públicos",
-    },
-  },
-  {
-    titulo: "Revogação da Lei",
-    codigo: "Uma lei pode ser revogada quando:",
-    alternativas: {
-      a: "O juiz decide",
-      b: "O povo deixa de cumpri-la",
-      c: "Outra lei posterior a modifica ou elimina",
-      d: "O Executivo ignora sua aplicação",
-    },
-  },
-];
-
-
+ 
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>

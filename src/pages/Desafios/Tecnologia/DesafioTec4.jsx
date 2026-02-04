@@ -69,59 +69,6 @@ export default function DesafioTec4() {
     }
   }, [verificarFim, salvo, pontuacao]);
 
-  const desafios = [
-    {
-      titulo: "Saudação do Dia",
-      codigo: `Qual função retorna "Bom dia!" se a hora for menor que 12, e "Boa noite!" caso contrário?`,
-      alternativas: {
-        a: `def saudacao():\n    if hora < 12:\n        return "Boa noite!"\n    else:\n        return "Bom dia!"`,
-        b: `def saudacao(hora):\n    if hora < 12:\n        return "Bom dia!"\n    else:\n        return "Boa noite!"`,
-        c: `def saudacao():\n    print("Bom dia!")`,
-        d: `saudacao(hora):\n    return "Bom dia!"`,
-      },
-    },
-    {
-      titulo: "Verificar se é Dia",
-      codigo: `Qual função retorna True se for dia (entre 6h e 18h) e False se for noite?`,
-      alternativas: {
-        a: `def eh_dia(hora):\n    return hora < 6`,
-        b: `def eh_dia(hora):\n    return hora >= 6 and hora < 18`,
-        c: `def eh_dia(hora):\n    print("Dia" if hora < 18)`,
-        d: `def eh_dia():\n    return hora >= 6`,
-      },
-    },
-    {
-      titulo: "Nascer do Sol",
-      codigo: `O que será impresso ao executar o código abaixo?\n\ndef nascer_do_sol():\n    return "O sol está nascendo!"\n\nmensagem = nascer_do_sol()\nprint(mensagem)`,
-      alternativas: {
-        a: `O sol está nascendo!`,
-        b: `mensagem`,
-        c: `None`,
-        d: `Erro: falta argumento`,
-      },
-    },
-    {
-      titulo: "Função com parâmetro",
-      codigo: `Qual função imprime "É dia claro!" se for antes das 18h, e "Boa noite!" caso contrário?`,
-      alternativas: {
-        a: `def tempo(hora):\n    if hora < 18:\n        print("É dia claro!")\n    else:\n        print("Boa noite!")`,
-        b: `def tempo():\n    if hora < 18:\n        return "É dia claro!"`,
-        c: `tempo(hora):\n    print("É dia claro!")`,
-        d: `def tempo(hora):\n    print("Boa tarde!")`,
-      },
-    },
-    {
-      titulo: "Função sem retorno",
-      codigo: `O que acontece com o código abaixo?\n\ndef boa_noite():\n    print("Boa noite!")\n\nresultado = boa_noite()\nprint(resultado)`,
-      alternativas: {
-        a: `Boa noite!\nNone`,
-        b: `None`,
-        c: `Boa noite!\nBoa noite!`,
-        d: `Erro: função sem retorno`,
-      },
-    },
-  ];
-
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>
