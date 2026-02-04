@@ -21,7 +21,7 @@ function ChallengeList() {
         {/* Desafio 2 */}
         <Link to="/desafios/Marketing/DesafioMar2" className={styles.challengeCard}>
           <img
-            src="https://imgur.com/7VyVCw2.jpg"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkM5hLE7qMu1DbnsrbwBeWtUbg5PprxAXdXg&s"
           ></img>
           <p>Mídias Socias</p> 
         </Link>
