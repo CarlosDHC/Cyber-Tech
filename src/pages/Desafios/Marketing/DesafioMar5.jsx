@@ -67,69 +67,6 @@ export default function DesafioMar5() {
     }
   }, [verificarFim, salvo, pontuacao]);
 
-  const desafios = [
-    {
-      titulo: "Compatibilização de Projetos",
-      codigo: "O projeto estrutural deve ser compatibilizado com:",
-      alternativas: {
-        a: "Apenas o projeto hidráulico",
-        b: "Projetos arquitetônico e complementares",
-        c: "Somente o cronograma",
-        d: "Apenas o orçamento",
-      },
-    },
-    {
-      titulo: "Finalidade da Análise Estrutural",
-      codigo: "A análise estrutural visa determinar:",
-      alternativas: {
-        a: "Custos da obra",
-        b: "Esforços e deslocamentos",
-        c: "Tipo de acabamento",
-        d: "Layout arquitetônico",
-      },
-    },
-    {
-      titulo: "Base do Dimensionamento Estrutural",
-      codigo: "O dimensionamento estrutural baseia-se:",
-      alternativas: {
-        a: "Na experiência do engenheiro",
-        b: "Em normas técnicas",
-        c: "Em preferências do cliente",
-        d: "No menor custo possível",
-      },
-    },
-    {
-      titulo: "Ações Permanentes",
-      codigo: "As ações permanentes incluem:",
-      alternativas: {
-        a: "Vento e sismo",
-        b: "Cargas de uso",
-        c: "Peso próprio da estrutura",
-        d: "Impactos acidentais",
-      },
-    },
-    {
-      titulo: "Ações Variáveis",
-      codigo: "As ações variáveis incluem:",
-      alternativas: {
-        a: "Peso das fundações",
-        b: "Peso das vigas",
-        c: "Sobrecargas de uso",
-        d: "Peso próprio",
-      },
-    },
-    {
-      titulo: "Direitos Fundamentais",
-      codigo: "Os direitos fundamentais têm como objetivo principal:",
-      alternativas: {
-        a: "Garantir dignidade, liberdade e igualdade às pessoas",
-        b: "Beneficiar apenas o Estado",
-        c: "Regular apenas a economia",
-        d: "Punir infrações administrativas",
-      },
-    },
-  ];
-
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>

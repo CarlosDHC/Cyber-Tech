@@ -67,69 +67,6 @@ export default function DesafioEng2() {
     }
   }, [verificarFim, salvo, pontuacao]);
 
-  const desafios = [
-    {
-      titulo: "O que é o Direito?",
-      codigo: "O Direito pode ser definido como:",
-      alternativas: {
-        a: "Um conjunto de regras morais sem força obrigatória.",
-        b: "Um conjunto de normas que regulam a convivência em sociedade.",
-        c: "Apenas leis escritas pelo Poder Executivo.",
-        d: "Um ramo exclusivo da filosofia.",
-      },
-    },
-    {
-      titulo: "Fontes do Direito",
-      codigo: "Qual das alternativas é considerada uma fonte formal do Direito?",
-      alternativas: {
-        a: "Opinião pessoal do juiz",
-        b: "Costumes sociais informais",
-        c: "A lei",
-        d: "Vontade individual",
-      },
-    },
-    {
-      titulo: "Direito Público e Privado",
-      codigo: "O Direito Constitucional pertence a qual ramo?",
-      alternativas: {
-        a: "Direito Público",
-        b: "Direito Privado",
-        c: "Direito Empresarial",
-        d: "Direito Internacional Privado",
-      },
-    },
-    {
-      titulo: "Princípio da Legalidade",
-      codigo: "O princípio da legalidade determina que:",
-      alternativas: {
-        a: "Tudo é permitido ao cidadão",
-        b: "Ninguém é obrigado a fazer ou deixar de fazer algo senão em virtude de lei",
-        c: "A lei vale apenas para o Estado",
-        d: "As leis são opcionais",
-      },
-    },
-    {
-      titulo: "Constituição Federal",
-      codigo: "Qual é a principal função da Constituição Federal?",
-      alternativas: {
-        a: "Criar leis municipais",
-        b: "Regular contratos privados",
-        c: "Organizar o Estado e garantir direitos fundamentais",
-        d: "Punir crimes",
-      },
-    },
-    {
-      titulo: "Direitos Fundamentais",
-      codigo: "Os direitos fundamentais têm como objetivo principal:",
-      alternativas: {
-        a: "Garantir dignidade, liberdade e igualdade às pessoas",
-        b: "Beneficiar apenas o Estado",
-        c: "Regular apenas a economia",
-        d: "Punir infrações administrativas",
-      },
-    },
-  ];
-
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>

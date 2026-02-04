@@ -78,18 +78,6 @@ export default function DesafioTec2() {
     }
   }, [verificarFim, salvo, pontuacao]);
 
-  const desafios = [
-    { titulo: "Soma de valores", codigo: `a = 10\nb = 5\nresultado = a ___ b\nprint(resultado)  # Esperado: 15` },
-    { titulo: "Subtração simples", codigo: `x = 20\ny = 8\nresultado = x ___ y\nprint(resultado)  # Esperado: 12` },
-    { titulo: "Multiplicação de números", codigo: `num1 = 4\nnum2 = 3\nresultado = num1 ___ num2\nprint(resultado)  # Esperado: 12` },
-    { titulo: "Divisão", codigo: `valor = 10\ndivisor = 2\nresultado = valor ___ divisor\nprint(resultado)  # Esperado: 5.0` },
-    { titulo: "Resto da divisão", codigo: `a = 9\nb = 4\nresultado = a ___ b\nprint(resultado)  # Esperado: 1` },
-    { titulo: "Potência (exponenciação)", codigo: `base = 2\nexpoente = 4\nresultado = base ___ expoente\nprint(resultado)  # Esperado: 16` },
-    { titulo: "Operador lógico AND", codigo: `idade = 20\ncarteira = True\nif idade >= 18 ___ carteira:\n    print("Pode dirigir")` }
-  ];
-
-  const opcoes = ["+", "-", "*", "/", "%", "**", "and", "or", "not"];
-
   return (
     <div className="pagina-desafios">
       <div className="scoreboard">{atualizarPlacar()}</div>
