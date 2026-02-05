@@ -1,73 +1,81 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css";
+import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
 
-function ChallengeList() {
+// Firebase Imports
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { db } from "../../../FirebaseConfig";
+
+function CapitulosEngenharia() {
+  const [desafios, setDesafios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Define a área desta página
+  const AREA_ATUAL = "Engenharia"; 
+
+  useEffect(() => {
+    const fetchDesafios = async () => {
+      try {
+        setLoading(true);
+        // Busca desafios da coleção 'desafios' filtrados pela área
+        const q = query(
+          collection(db, "desafios"),
+          where("area", "==", AREA_ATUAL),
+          orderBy("dataCriacao", "desc") // Ordena pelos mais novos
+        );
+
+        const querySnapshot = await getDocs(q);
+        const listaDesafios = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        setDesafios(listaDesafios);
+      } catch (error) {
+        console.error("Erro ao buscar desafios:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesafios();
+  }, []);
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Engenharia Civil</h1>
+      <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! 
+        Hora de praticar! Treine a lógica de programação com nossos desafios.
       </p>
 
-      <div className={styles.challengeCardsList}>
-           {/* Desafio 1 */}
-               <Link to="/Desafios/Engenharia/DesafioEng1" className={styles.challengeCard}>
-                 <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/proj-estrutural.jpg?raw=true"
-                 ></img>
-                 <p>Projeto Estrutural</p> 
-               </Link>
-       
-               {/* Desafio 2 */}
-               <Link to="/desafios/Engenharia/DesafioEng2" className={styles.challengeCard}>
-                 <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/planejamento-urbano.jpg?raw=true"
-                 ></img>
-                 <p>Planejamento Urbano</p> 
-               </Link>
-       
-               {/* Desafio 3 */}
-               <Link to="/desafios/Engenharia/DesafioEng3" className={styles.challengeCard}>
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+      ) : (
+        <div className={styles.challengeCardsList}>
+          {desafios.length > 0 ? (
+            desafios.map((desafio) => (
+              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
                 <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/infra-eng.jpg?raw=true"
-                 ></img>
-                 <p>Infraestrutura</p>
-               </Link>
-               {/* Desafio 4 */}
-               <Link to="/desafios/Engenharia/DesafioEng4" className={styles.challengeCard}>
-                <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/geo-solos.jpg?raw=true"
-                 ></img>
-                 <p>Geotecnia e Solos</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng5" className={styles.challengeCard}>
-                <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pontes-viadutos.jpg?raw=true"
-                 ></img>
-                 <p>Pontes e Viadutos</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng6" className={styles.challengeCard}>
-                <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/const.jpg?raw=true"
-                 ></img>
-                 <p>Constituição</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng7" className={styles.challengeCard}>
-                <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/processo-eng.jpg?raw=true"
-                 ></img>
-                 <p>Processo</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng8" className={styles.challengeCard}>
-                <img
-                   src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/fundacoes.jpg?raw=true"
-                 ></img>
-                 <p>Fundações</p>
-               </Link>
-             </div>
-           </div>
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Quiz"}
+                  alt={desafio.titulo}
+                  // Adiciona um fallback caso a imagem esteja quebrada
+                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  style={{ objectFit: 'cover' }}
+                />
+                <p>{desafio.titulo}</p>
+                {/* Opcional: Mostrar a subcategoria pequena */}
+                <span style={{ fontSize: '0.8rem', color: '#666' }}>{desafio.subcategoria}</span>
+              </Link>
+            ))
+          ) : (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
+              Nenhum desafio encontrado para esta área no momento.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
-export default ChallengeList;
+export default CapitulosEngenharia;
