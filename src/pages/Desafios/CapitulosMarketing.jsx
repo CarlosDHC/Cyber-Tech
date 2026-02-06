@@ -48,6 +48,7 @@ function CapitulosMarketing() {
         Hora de praticar! Treine a lógica de programação com nossos desafios.
       </p>
 
+
       {loading ? (
         <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
       ) : (
