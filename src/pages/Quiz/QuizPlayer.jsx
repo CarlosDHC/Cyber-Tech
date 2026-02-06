@@ -67,7 +67,7 @@ export default function QuizPlayer() {
   if (loading) return <div className="quiz-loading">Carregando Desafio...</div>;
   if (!desafio) return <div className="quiz-error">Desafio não encontrado. <Link to="/desafios">Voltar</Link></div>;
 
-  // --- TELA DE RESULTADO ---
+  // TELA DE RESULTADO
   if (mostrarResultado) {
     const total = desafio.questoes.length;
     const porcentagem = (nota / total) * 100;
@@ -95,7 +95,7 @@ export default function QuizPlayer() {
     );
   }
 
-  // --- TELA DO JOGO (PERGUNTA ATUAL) ---
+  //  TELA DO JOGO (PERGUNTA ATUAL
   const questaoAtual = desafio.questoes[indiceAtual];
 
   return (
