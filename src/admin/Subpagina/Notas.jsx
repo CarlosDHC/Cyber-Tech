@@ -16,7 +16,6 @@ export default function Notas() {
   useEffect(() => {
     const buscarNotas = async () => {
       try {
-        // Busca todas as pontuações ordenadas por data
         const q = query(collection(db, "pontuacoes"), orderBy("data", "desc"));
         const snapshot = await getDocs(q);
 
@@ -24,29 +23,31 @@ export default function Notas() {
 
         snapshot.docs.forEach((doc) => {
           const dados = doc.data();
-          const emailAluno = dados.email;
+          
+          // CORREÇÃO AQUI: Tenta ler 'email' (novo) ou 'userEmail' (antigo)
+          const emailAluno = dados.email || dados.userEmail;
 
           if (!emailAluno) return;
 
           // Se o aluno ainda não existe no objeto, cria a entrada
           if (!agrupamento[emailAluno]) {
             agrupamento[emailAluno] = {
-              uid: dados.uid,
-              nome: dados.nome || dados.usuario || "Aluno sem nome",
-              email: dados.email,
-              respostasBrutas: [] // Array temporário para todas as tentativas
+              uid: dados.uid || dados.userId, // Lê uid novo ou userId antigo
+              nome: dados.nome || dados.userName || dados.usuario || "Aluno sem nome",
+              email: emailAluno,
+              respostasBrutas: []
             };
           }
 
-          // Adiciona os dados brutos
+          // Adiciona os dados brutos (compatibilidade com nomes antigos)
           agrupamento[emailAluno].respostasBrutas.push({
             id: doc.id,
-            desafioId: dados.desafioId, // Importante para identificar unicamente o desafio
-            desafio: dados.desafio,
-            categoria: dados.categoria || "Geral", // Novo campo
+            desafioId: dados.desafioId,
+            desafio: dados.desafio || dados.desafioTitulo || "Desafio sem título", // Lê desafio ou desafioTitulo
+            categoria: dados.categoria || "Geral",
             nota: Number(dados.nota || 0),
             total: Number(dados.total || 1),
-            tentativas: Number(dados.tentativas || 1), // Novo campo
+            tentativas: Number(dados.tentativas || 1),
             data: dados.data
           });
         });
@@ -60,22 +61,18 @@ export default function Notas() {
             const chaveDesafio = resp.desafioId || resp.desafio;
 
             if (!desafiosUnicos[chaveDesafio]) {
-              // Se é a primeira vez que vemos este desafio para este aluno, salva
               desafiosUnicos[chaveDesafio] = resp;
             } else {
-              // Se já existe, verificamos se a nota atual é maior que a salva
+              // Mantém apenas a maior nota
               if (resp.nota > desafiosUnicos[chaveDesafio].nota) {
                 desafiosUnicos[chaveDesafio] = resp;
               }
-              // Nota: Mantemos o objeto com a maior nota. 
-              // O campo 'tentativas' já virá correto do Firebase na nova versão.
             }
           });
 
-          // Converte o objeto de desafios únicos de volta para array
           const respostasFinais = Object.values(desafiosUnicos);
 
-          // Calcula a média baseada apenas nas melhores notas
+          // Calcula a média
           let somaNotasPonderadas = 0;
           respostasFinais.forEach(resp => {
             const notaBase10 = (resp.nota / resp.total) * 10;
@@ -88,25 +85,18 @@ export default function Notas() {
 
           return {
             ...aluno,
-            respostas: respostasFinais, // Substitui a lista bruta pela filtrada
+            respostas: respostasFinais,
             media: mediaFinal
           };
         });
 
         setAlunos(listaProcessada);
 
-        // Lógica para Destaques (Top 5)
-        const destaques = [...listaProcessada]
-          .sort((a, b) => b.media - a.media)
-          .slice(0, 5);
-        setTopStudents(destaques);
+        // Top 5 Destaques
+        setTopStudents([...listaProcessada].sort((a, b) => b.media - a.media).slice(0, 5));
 
-        // Lógica para Risco (Top 5 com média < 6.0)
-        const risco = [...listaProcessada]
-          .filter(a => a.media < 6.0)
-          .sort((a, b) => a.media - b.media)
-          .slice(0, 5);
-        setRiskStudents(risco);
+        // Top 5 Risco
+        setRiskStudents([...listaProcessada].filter(a => a.media < 6.0).sort((a, b) => a.media - b.media).slice(0, 5));
 
       } catch (error) {
         console.error("Erro ao buscar notas:", error);
@@ -120,9 +110,8 @@ export default function Notas() {
 
   const formatarData = (isoString) => {
     if (!isoString) return "-";
-    // Tenta converter se for Timestamp do Firebase ou string ISO
     const d = isoString.toDate ? isoString.toDate() : new Date(isoString);
-    if (isNaN(d)) return "-"; // Data inválida
+    if (isNaN(d)) return "-"; 
     return d.toLocaleDateString("pt-BR") + " às " + d.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
   };
 
@@ -151,7 +140,6 @@ export default function Notas() {
           <p>Nenhuma nota registrada ainda.</p>
         ) : (
           <>
-            {/* --- SEÇÃO DE DESTAQUES E RISCO --- */}
             <div className={styles.metricsGrid} style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div className={styles.card}>
                 <h3 style={{ borderBottom: '2px solid #00C49F', paddingBottom: '10px', marginBottom: '15px' }}>🏆 Top 5 Destaques</h3>
@@ -196,7 +184,6 @@ export default function Notas() {
               </div>
             </div>
 
-            {/* --- LISTA DETALHADA --- */}
             <div className={styles.cards}>
               {alunos.map((aluno) => (
                 <div key={aluno.email} className={styles.card} style={{ display: 'block' }}>
