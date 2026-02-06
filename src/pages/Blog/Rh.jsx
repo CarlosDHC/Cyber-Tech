@@ -48,7 +48,7 @@ function PostCard({ post }) {
           <div className="post-meta">
             <p><img src='/user.png' className='user' alt="Autor" /> {post.autor || "Equipe"}</p>
             <p><img src='/calendar.png' alt="Data" className='user' /> {post.data}</p>
-            <p><img src='/time-left.png' className='user' alt="Tempo" /> {post.tempoLeitura}</p>
+            <p><img src='/time-left.png' className='user' alt="Tempo" /> {post.tempoLeitura} (Tempo de Leitura)</p>
           </div>
         </div>
       </Link>
