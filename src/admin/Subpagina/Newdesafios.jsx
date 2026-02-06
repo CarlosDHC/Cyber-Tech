@@ -130,11 +130,35 @@ export default function NewDesafios() {
                 </button>
                 <h2 className={styles.title}>Admin</h2>
                 <ul className={styles.navList}>
-                    <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-                    <li><Link to="/admin/notas" className={styles.navLink}><img src="/estrela.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
-                    <li><Link to="/admin/newblog" className={styles.navLink}><img src="/blog.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
-                    <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
-                    <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Curtidas</span></Link></li>
+                    <li>
+                        <Link to="/admin" className={styles.navLink}>
+                            <img src="/casa.png" alt="H" />
+                            <span className={styles.linkText}>Home</span>
+                        </Link>
+                    </li>
+                    <li><Link to="/admin/notas" className={styles.navLink}>
+                        <img src="/blog.png" alt="N" />
+                        <span className={styles.linkText}>Notas</span>
+                    </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin/newblog" className={styles.navLink}>
+                            <img src="/inotas.png" alt="B" />
+                            <span className={styles.linkText}>Blog</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin/newdesafios" className={styles.navLink}>
+                            <img src="/idesafio.png" alt="D" />
+                            <span className={styles.linkText}>Desafios</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin/curtidas" className={styles.navLink}>
+                            <img src="/curti.png" alt="L" />
+                            <span className={styles.linkText}>Like</span>
+                        </Link>
+                    </li>
                 </ul>
             </aside>
 
@@ -175,7 +199,7 @@ export default function NewDesafios() {
                                         <option value="Rh">RH</option>
                                     </select>
                                 </div>
-{/*ATENÇÃO --------------------------------------------------------------------------------------------------------------------------------------------------- */}
+                                {/*ATENÇÃO --------------------------------------------------------------------------------------------------------------------------------------------------- */}
                                 <div className={styles.inputGroup} style={{ flex: 1, minWidth: '150px' }}>
                                     <label className={styles.fieldLabel}>Tentativas</label>
                                     <input
@@ -187,7 +211,7 @@ export default function NewDesafios() {
                                     />
                                 </div>
                             </div>
-{/*ATENÇÃO --------------------------------------------------------------------------------------------------------------------------------------------------- */}
+                            {/*ATENÇÃO --------------------------------------------------------------------------------------------------------------------------------------------------- */}
                             <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
                                 <label className={styles.fieldLabel}>Imagem de Capa (URL)</label>
                                 <input className={styles.inputField} placeholder="https://..." value={capa} onChange={e => setCapa(e.target.value)} />
