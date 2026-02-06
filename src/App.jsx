@@ -51,7 +51,7 @@ import ProtectedAdminRoute from './context/ProtectedAdminRoute.jsx';
 import CapitulosTecnologia from './pages/Desafios/CapitulosTecnologia.jsx';
 import CapitulosDireito from './pages/Desafios/CapitulosDireito.jsx';
 import CapitulosEngenharia from './pages/Desafios/CapitulosEngenharia.jsx';
-// import CapitulosMarketing from './pages/Desafios/CapitulosMarketing.jsx';
+import CapitulosMarketing from './pages/Desafios/CapitulosMarketing.jsx';
 import CapitulosRh from './pages/Desafios/CapitulosRh.jsx';
 
 // Novas páginas
