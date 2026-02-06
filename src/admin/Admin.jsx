@@ -116,11 +116,35 @@ export default function Admin() {
         </button>
         <h2 className={styles.title}>ADMIN</h2>
         <ul className={styles.navList}>
-          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
-          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
-          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
-          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
+          <li>
+            <Link to="/admin" className={styles.navLink}>
+              <img src="/casa.png" alt="H" />
+              <span className={styles.linkText}>Home</span>
+            </Link>
+          </li>
+          <li><Link to="/admin/notas" className={styles.navLink}>
+            <img src="/blog.png" alt="N" />
+            <span className={styles.linkText}>Notas</span>
+          </Link>
+          </li>
+          <li>
+            <Link to="/admin/newblog" className={styles.navLink}>
+              <img src="/inotas.png" alt="B" />
+              <span className={styles.linkText}>Blog</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/newdesafios" className={styles.navLink}>
+              <img src="/idesafio.png" alt="D" />
+              <span className={styles.linkText}>Desafios</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/curtidas" className={styles.navLink}>
+              <img src="/curti.png" alt="L" />
+              <span className={styles.linkText}>Like</span>
+            </Link>
+          </li>
         </ul>
       </aside>
 
@@ -169,17 +193,17 @@ export default function Admin() {
                 </div>
 
                 <div className={styles.chartFullWidth}>
-                   <div className={styles.chartHeader}>
-                      {/*<img src="/igrafico.png" alt="g" />*/}
-                      <h3>Média de Notas por Desafio</h3>
-                   </div>
-                   <div className={styles.chartWrapper}>
+                  <div className={styles.chartHeader}>
+                    {/*<img src="/igrafico.png" alt="g" />*/}
+                    <h3>Média de Notas por Desafio</h3>
+                  </div>
+                  <div className={styles.chartWrapper}>
                     <ResponsiveContainer width="100%" height={350}>
                       <BarChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" fontSize={11} />
                         <YAxis domain={[0, 10]} fontSize={11} />
-                        <Tooltip cursor={{fill: '#f5f5f5'}} />
+                        <Tooltip cursor={{ fill: '#f5f5f5' }} />
                         <Bar dataKey="media" radius={[4, 4, 0, 0]} barSize={40}>
                           {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[entry.name] || '#8884d8'} />
@@ -187,7 +211,7 @@ export default function Admin() {
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
-                   </div>
+                  </div>
                 </div>
               </>
             )}
