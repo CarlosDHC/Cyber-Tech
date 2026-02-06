@@ -175,7 +175,7 @@ export default function NewDesafios() {
                                         <option value="Rh">RH</option>
                                     </select>
                                 </div>
-
+{/*ATENÇÃO --------------------------------------------------------------------------------------------------------------------------------------------------- */}
                                 <div className={styles.inputGroup} style={{ flex: 1, minWidth: '150px' }}>
                                     <label className={styles.fieldLabel}>Tentativas</label>
                                     <input
@@ -187,7 +187,7 @@ export default function NewDesafios() {
                                     />
                                 </div>
                             </div>
-
+{/*ATENÇÃO --------------------------------------------------------------------------------------------------------------------------------------------------- */}
                             <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
                                 <label className={styles.fieldLabel}>Imagem de Capa (URL)</label>
                                 <input className={styles.inputField} placeholder="https://..." value={capa} onChange={e => setCapa(e.target.value)} />
