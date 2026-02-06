@@ -72,6 +72,8 @@ function CapitulosRH() {
             <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
               Nenhum desafio encontrado para esta área no momento.
             </p>
+
+            
           )}
         </div>
       )}
