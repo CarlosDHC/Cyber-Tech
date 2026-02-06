@@ -9,6 +9,8 @@
 }
 
 .quiz-container {
+    margin: 0 auto;
+    margin-top: 40px;
     background: white;
     width: 100%;
     max-width: 700px;
