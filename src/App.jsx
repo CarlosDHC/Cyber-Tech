@@ -33,9 +33,7 @@ import EsqueciSenha from './pages/EsqueciSenha/EsqueciSenha.jsx';
 import EsqueciSenhaPerfil from './pages/EsqueciSenha/EsqueciSenhaPerfil.jsx';
 import Perfil from './pages/Perfil/Perfil.jsx';
 
-// --- JOGO DO QUIZ (IMPORT NOVO) ---
-// Certifica-te de criar este arquivo em src/pages/Quiz/QuizPlayer.jsx
-// Se ainda não existir, comente esta linha abaixo:
+// --- JOGO DO QUIZ ---
 import QuizPlayer from './pages/Quiz/QuizPlayer.jsx'; 
 
 // Admin
@@ -55,8 +53,6 @@ import CapitulosDireito from './pages/Desafios/CapitulosDireito.jsx';
 import CapitulosEngenharia from './pages/Desafios/CapitulosEngenharia.jsx';
 import CapitulosMarketing from './pages/Desafios/CapitulosMarketing.jsx';
 import CapitulosRh from './pages/Desafios/CapitulosRh.jsx';
-
-
 
 // Novas páginas
 import Sobre from './pages/Sobre/Sobre.jsx';
@@ -110,9 +106,13 @@ function App() {
             } />
             
             {/* --- ROTA DE JOGO (QUIZ) --- */}
-            {/* Esta rota é necessária para o botão "INICIAR DESAFIO" funcionar */}
             <Route path="/quiz/:id" element={
               <ProtectedRoute><AnimatedPage><QuizPlayer /></AnimatedPage></ProtectedRoute>
+            } />
+
+            {/* --- MENU PRINCIPAL DE DESAFIOS (A CORREÇÃO ESTÁ AQUI) --- */}
+            <Route path="/desafios" element={
+              <ProtectedRoute><AnimatedPage><ChallengeList /></AnimatedPage></ProtectedRoute>
             } />
 
             {/* --- Rotas Capítulos --- */}
@@ -122,9 +122,8 @@ function App() {
             <Route path="/desafios/capitulosdireito" element={<ProtectedRoute><AnimatedPage><CapitulosDireito /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosmarketing" element={<ProtectedRoute><AnimatedPage><CapitulosMarketing /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosrh" element={<ProtectedRoute><AnimatedPage><CapitulosRh /></AnimatedPage></ProtectedRoute>} />
-
-           
-
+            
+            
             {/* --- Perfil e Fórum --- */}
             <Route path="/perfil" element={<ProtectedRoute><AnimatedPage><Perfil /></AnimatedPage></ProtectedRoute>} />
             <Route path="/forum" element={<ProtectedRoute><AnimatedPage><Forum /></AnimatedPage></ProtectedRoute>} />
@@ -137,7 +136,7 @@ function App() {
             <Route path="/admin/newdesafios" element={<ProtectedAdminRoute><AnimatedPage><Newdesafios/></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/notas" element={<ProtectedAdminRoute><AnimatedPage><Notas /></AnimatedPage></ProtectedAdminRoute>} />
 
-            {/* Rota 404 (Opcional, mas recomendada) */}
+            {/* Rota 404 */}
             <Route path="*" element={<div style={{textAlign: 'center', padding: '50px'}}>Página não encontrada</div>} />
 
           </Routes>

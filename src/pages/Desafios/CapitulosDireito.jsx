@@ -1,71 +1,81 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css";
+import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
 
-function ChallengeList() {
+// Firebase Imports
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { db } from "../../../FirebaseConfig";
+
+function CapitulosDireito() {
+  const [desafios, setDesafios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Define a área desta página
+  const AREA_ATUAL = "Direito"; 
+
+  useEffect(() => {
+    const fetchDesafios = async () => {
+      try {
+        setLoading(true);
+        // Busca desafios da coleção 'desafios' filtrados pela área
+        const q = query(
+          collection(db, "desafios"),
+          where("area", "==", AREA_ATUAL),
+          orderBy("dataCriacao", "desc") // Ordena pelos mais novos
+        );
+
+        const querySnapshot = await getDocs(q);
+        const listaDesafios = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        setDesafios(listaDesafios);
+      } catch (error) {
+        console.error("Erro ao buscar desafios:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesafios();
+  }, []);
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Direito</h1>
+      <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! Teste seus conhecimentos jurídicos com nossos desafios.
+        Hora de praticar! Treine a lógica de programação com nossos desafios.
       </p>
 
-      <div className={styles.challengeCardsList}>
-        {/* Desafio 1 */}
-        <Link to="/desafios/Direito/DesafioDir1" className={styles.challengeCard}>
-          <img
-            src="https://amaerj.org.br/wp-content/uploads/2018/10/CNJ_Balanca-Justica_Arquivo-CNJ.jpg"
-          ></img>
-          <p>Legislação</p> 
-        </Link> 
-        <Link to="/desafios/Direito/DesafioDir2" className={styles.challengeCard}>
-          <img
-            src="https://cdn.prod.website-files.com/63e66ec5712a8ab81dfeaec6/664e7a664782ffc19527ba8d_Entendendo%20a%20Justi%C3%A7a%20Arbitral%20uma%20Alternativa%20Eficiente%20%C3%A0%20Justi%C3%A7a%20Comum.jpg"
-          ></img>
-          <p>Justiça</p> 
-        </Link> 
-        {/* Desafio 2 */}
-        <Link to="/desafios/Direito/DesafioDir3" className={styles.challengeCard}>
-          <img
-            src="https://www.bcompany.com.br/wp-content/uploads/2025/11/malhete-com-balanca-de-temis-e-livros-ao-fundo-1024x683.jpg"
-          ></img>
-          <p>Direitos e Deveres</p> 
-        </Link>
-
-        {/* Desafio 3 */}
-        <Link to="/desafios/Direito/DesafioDir4" className={styles.challengeCard}>
-         <img
-            src="https://imgs.jusbr.com/publications/images/fa6f8c9b6731077a0f96742016133888"
-          ></img>
-          <p>Advocacia</p>
-        </Link>
-        <Link to="/desafios/Direito/DesafioDir5" className={styles.challengeCard}>
-         <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGeXxl0Jh_pDdkD2Y_2xFEYWO7lq15f_cRXg&s"
-          ></img>
-          <p>Constituição</p>
-        </Link>
-        <Link to="/desafios/Direito/DesafioDir6" className={styles.challengeCard}>
-         <img
-            src="https://seuprocesso.com/blog/wp-content/uploads/elementor/thumbs/2151023395-qluhsttt2zolo4swjzk2wzwrbjm4gn15xydfn8lcls.jpg"
-          ></img>
-          <p>Processo</p>
-        </Link>
-        <Link to="/desafios/Direito/DesafioDir7" className={styles.challengeCard}>
-         <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHmfX5VIW5tH6_WV_BAaeC-8paoEOGv9D1bw&s"
-          ></img>
-          <p>Jurisprudência</p>
-        </Link>
-        <Link to="/desafios/Direito/DesafioDir8" className={styles.challengeCard}>
-         <img
-            src="https://farj-rj.com/wp-content/uploads/2019/08/direito.jpg"
-          ></img>
-          <p>Ética</p>
-        </Link>
-      </div>
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+      ) : (
+        <div className={styles.challengeCardsList}>
+          {desafios.length > 0 ? (
+            desafios.map((desafio) => (
+              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
+                <img
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Quiz"}
+                  alt={desafio.titulo}
+                  // Adiciona um fallback caso a imagem esteja quebrada
+                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  style={{ objectFit: 'cover' }}
+                />
+                <p>{desafio.titulo}</p>
+                {/* Opcional: Mostrar a subcategoria pequena */}
+                <span style={{ fontSize: '0.8rem', color: '#666' }}>{desafio.subcategoria}</span>
+              </Link>
+            ))
+          ) : (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
+              Nenhum desafio encontrado para esta área no momento.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-export default ChallengeList;
+export default CapitulosDireito;
