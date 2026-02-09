@@ -130,7 +130,6 @@ function CapitulosRH() {
               Nenhum desafio encontrado para esta área no momento.
             </p>
 
-            
           )}
         </div>
       )}
