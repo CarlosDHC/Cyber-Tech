@@ -38,7 +38,7 @@ function CapitulosMarketing() {
       }
     };
 
-    fetchDesafios();
+      fetchDesafios();
   }, []);
 
   return (
@@ -47,7 +47,6 @@ function CapitulosMarketing() {
       <p className={styles.pageSubtitle}>
         Hora de praticar! Treine a lógica de programação com nossos desafios.
       </p>
-
 
       {loading ? (
         <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
