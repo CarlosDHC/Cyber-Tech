@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css"; 
+import styles from "../Home/Home.module.css"; // Reutilizando seus estilos do projeto
 
 // Firebase Imports
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../../FirebaseConfig";
 
-function CapitulosRH() {
+function CapitulosRh() {
   const [desafios, setDesafios] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. PADRONIZAÇÃO: Use "RH" (maiúsculas) para coincidir com o novo Select do Admin
+  // Define a área desta página como RH (Recursos Humanos)
   const AREA_ATUAL = "RH"; 
 
   useEffect(() => {
     const fetchDesafios = async () => {
       try {
         setLoading(true);
-        // Busca os desafios filtrando pela área correta
+        // Busca os desafios da coleção 'desafios' filtrados pela área RH
         const q = query(
           collection(db, "desafios"),
           where("area", "==", AREA_ATUAL),
@@ -32,7 +32,7 @@ function CapitulosRH() {
 
         setDesafios(listaDesafios);
       } catch (error) {
-        console.error("Erro ao buscar desafios:", error);
+        console.error("Erro ao buscar desafios de RH:", error);
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ function CapitulosRH() {
     <div className={`container ${styles.challengeListContainer}`}>
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Treine seus conhecimentos em Recursos Humanos com nossos desafios interativos.
+        Desenvolva competências em gestão de pessoas e legislação com nossos simulados.
       </p>
 
       {loading ? (
@@ -54,23 +54,31 @@ function CapitulosRH() {
         <div className={styles.challengeCardsList}>
           {desafios.length > 0 ? (
             desafios.map((desafio) => (
-              /* 2. ROTA CORRETA: Redireciona para /quiz/ID para usar o novo QuizPlayer */
               <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
                 <img
-                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=RH+Quiz"}
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=RH"}
                   alt={desafio.titulo}
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
                 />
-                <p>{desafio.titulo}</p>
-                <span style={{ fontSize: '0.8rem', color: '#666' }}>
-                    {desafio.qtdQuestoes} Questões • 2 Tentativas
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                {/* --- EXIBIÇÃO PADRONIZADA: QUESTÕES E TENTATIVAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------------------- */}
+
+                <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
+                  {desafio.subcategoria}
                 </span>
               </Link>
             ))
           ) : (
             <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
-              Nenhum desafio encontrado para RH. Crie um no Painel Admin!
+              Nenhum desafio encontrado para a área de RH no momento.
             </p>
           )}
         </div>
@@ -79,4 +87,4 @@ function CapitulosRH() {
   );
 }
 
-export default CapitulosRH;
+export default CapitulosRh;

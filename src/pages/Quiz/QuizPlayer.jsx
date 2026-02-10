@@ -62,14 +62,12 @@ export default function QuizPlayer() {
           setTentativasUsadas(jaFeitas);
           setMelhorNotaAnterior(dadosS.nota || 0);
 
-          // SÓ ativa modo revisão se JÁ tiver completado o limite (ex: 2)
           if (jaFeitas >= limite) {
             setModoRevisao(true);
           } else {
-            setModoRevisao(false); // Garante que começa como jogo
+            setModoRevisao(false);
           }
         } else {
-          // Se não existe documento, é a primeira tentativa absoluta
           setTentativasUsadas(0);
           setModoRevisao(false);
         }
@@ -84,7 +82,7 @@ export default function QuizPlayer() {
   }, [id, navigate]);
 
   const selecionarOpcao = (letra) => {
-    if (modoRevisao) return; // Trava interação no modo revisão
+    if (modoRevisao) return; 
     setRespostasUsuario(prev => ({ ...prev, [indiceAtual]: letra }));
   };
 
@@ -93,9 +91,9 @@ export default function QuizPlayer() {
       setIndiceAtual(indiceAtual + 1);
     } else {
       if (modoRevisao) {
-        navigate('/desafios'); // Se era revisão, apenas sai
+        navigate('/desafios'); 
       } else {
-        calcularESalvarResultado(); // Se era jogo, finaliza
+        calcularESalvarResultado(); 
       }
     }
   };
@@ -119,7 +117,6 @@ export default function QuizPlayer() {
         const scoreId = `${auth.currentUser.uid}_${id}`;
         const scoreRef = doc(db, "pontuacoes", scoreId);
         
-        // Aumenta o contador atual
         const novaContagem = tentativasUsadas + 1;
         const notaFinal = Math.max(acertos, melhorNotaAnterior);
 
@@ -138,7 +135,7 @@ export default function QuizPlayer() {
         }, { merge: true });
         
         setTentativasUsadas(novaContagem);
-        setMostrarResultado(true); // Só mostra a tela de resultado após salvar com sucesso
+        setMostrarResultado(true); 
       } catch (error) {
         console.error("Erro ao salvar:", error);
         alert("Erro ao salvar progresso.");
@@ -153,23 +150,41 @@ export default function QuizPlayer() {
 
   const questaoAtual = desafio.questoes[indiceAtual];
 
-  // Tela de Resultado após concluir uma tentativa
   if (mostrarResultado) {
     const limite = desafio.tentativasPermitidas || 2;
+    const esgotouTentativas = tentativasUsadas >= limite;
+
     return (
       <div className="quiz-container resultado-container">
-        <h1>{tentativasUsadas >= limite ? "Chances Esgotadas" : "Desafio Finalizado!"}</h1>
+        <h1>Desafio Finalizado!</h1>
         <div className="score-circle">{notaAtual} / {desafio.questoes.length}</div>
         <p>Você completou {tentativasUsadas} de {limite} tentativas.</p>
-        <div className="resultado-actions">
-           <button 
-             className="btn-restart" 
-             style={{backgroundColor: '#F59E0B'}} 
-             onClick={() => { setMostrarResultado(false); setModoRevisao(true); setIndiceAtual(0); }}
-           >
-              Ver Gabarito e Justificativas
-           </button>
-           <Link to="/desafios" className="btn-sair">Voltar ao Menu</Link>
+        
+        <div className="resultado-actions" style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
+            
+            {esgotouTentativas ? (
+              // APARECE APENAS APÓS A SEGUNDA TENTATIVA
+              <button 
+                className="btn-restart" 
+                style={{ backgroundColor: '#F59E0B', color: 'white', padding: '12px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }} 
+                onClick={() => { setMostrarResultado(false); setModoRevisao(true); setIndiceAtual(0); }}
+              >
+                Ver Gabarito e Justificativas
+              </button>
+            ) : (
+              // APARECE ENQUANTO NÃO ESGOTAR AS TENTATIVAS
+              <button 
+                className="btn-restart" 
+                style={{ backgroundColor: '#2d72d9', color: 'white', padding: '12px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }} 
+                onClick={() => window.location.reload()}
+              >
+                Repetir tentativa do exercício
+              </button>
+            )}
+
+            <Link to="/desafios" className="btn-sair" style={{ textDecoration: 'none', color: '#666', padding: '12px 20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+              Voltar ao Menu
+            </Link>
         </div>
       </div>
     );
@@ -185,7 +200,6 @@ export default function QuizPlayer() {
 
         <h2 className="pergunta-texto">{questaoAtual.perguntaTexto}</h2>
 
-        {/* Lógica de exibição: Se for revisão, mostra texto. Se for jogo, mostra botões. */}
         {modoRevisao ? (
           <div className="caixa-justificativa" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '8px' }}>
             <h3 style={{ color: '#92400E' }}>💡 Justificativa:</h3>

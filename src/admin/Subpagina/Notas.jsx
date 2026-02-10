@@ -132,7 +132,7 @@ export default function Notas() {
       </aside>
 
       <main className={styles.main}>
-        <h1>Desempenho dos Alunos (Melhores Notas)</h1>
+        <h1>Desempenho dos Alunos</h1>
 
         {loading ? (
           <p>Carregando notas...</p>
@@ -142,7 +142,7 @@ export default function Notas() {
           <>
             <div className={styles.metricsGrid} style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div className={styles.card}>
-                <h3 style={{ borderBottom: '2px solid #00C49F', paddingBottom: '10px', marginBottom: '15px' }}>🏆 Top 5 Destaques</h3>
+                <h3 style={{ borderBottom: '2px solid #00C49F', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em Destaque</h3>
                 <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ textAlign: 'left', color: '#999' }}>
@@ -162,7 +162,7 @@ export default function Notas() {
               </div>
 
               <div className={styles.card} style={{ borderLeft: '4px solid #FF8042' }}>
-                <h3 style={{ borderBottom: '2px solid #FF8042', paddingBottom: '10px', marginBottom: '15px' }}>⚠️ Top 5 em Risco</h3>
+                <h3 style={{ borderBottom: '2px solid #FF8042', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em risco</h3>
                 {riskStudents.length > 0 ? (
                   <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse' }}>
                     <thead>

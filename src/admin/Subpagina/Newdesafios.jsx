@@ -138,8 +138,8 @@ export default function PainelDesafios() {
 
             <main className={styles.main}>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    <button className={styles.publishBtn} onClick={() => {setTab("criar"); setEditandoId(null)}} style={{ backgroundColor: tab === 'criar' ? '#0f172a' : '#3b82f6' }}>+ Novo</button>
-                    <button className={styles.publishBtn} onClick={() => {setTab("gerenciar"); setEditandoId(null)}} style={{ backgroundColor: tab === 'gerenciar' ? '#0f172a' : '#3b82f6' }}>Gerenciar</button>
+                    <button className={styles.publishBtn} onClick={() => {setTab("criar"); setEditandoId(null)}} style={{ backgroundColor: tab === 'criar' ? '#0f172a' : '#095d8bd5' }}>+ Novo</button>
+                    <button className={styles.publishBtn} onClick={() => {setTab("gerenciar"); setEditandoId(null)}} style={{ backgroundColor: tab === 'gerenciar' ? '#0f172a' : '#095d8bd5' }}>Gerenciar</button>
                 </div>
 
                 <div className={styles.headerFlex}>

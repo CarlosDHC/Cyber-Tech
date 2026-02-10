@@ -136,7 +136,7 @@ export default function Curtidas() {
             {/* TABELA DE TOP 5 CURTIDAS */}
             <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
                 <h3 style={{ marginBottom: '15px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '10px' }}>
-                    Top 5 Posts Mais Populares
+                    Post mais populares
                 </h3>
                 
                 {topPosts.length > 0 ? (

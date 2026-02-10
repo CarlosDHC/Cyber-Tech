@@ -62,9 +62,19 @@ function CapitulosTecnologia() {
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
                 />
-                <p>{desafio.titulo}</p>
-                {/* Opcional: Mostrar a subcategoria pequena */}
-                <span style={{ fontSize: '0.8rem', color: '#666' }}>{desafio.subcategoria}</span>
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------ */}
+
+                <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
+                  {desafio.subcategoria}
+                </span>
               </Link>
             ))
           ) : (

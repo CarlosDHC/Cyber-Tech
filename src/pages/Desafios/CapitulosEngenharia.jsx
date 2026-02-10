@@ -10,18 +10,18 @@ function CapitulosEngenharia() {
   const [desafios, setDesafios] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Define a área desta página
+  // Define a área desta página como Engenharia
   const AREA_ATUAL = "Engenharia"; 
 
   useEffect(() => {
     const fetchDesafios = async () => {
       try {
         setLoading(true);
-        // Busca desafios da coleção 'desafios' filtrados pela área
+        // Busca desafios da coleção 'desafios' filtrados pela área Engenharia
         const q = query(
           collection(db, "desafios"),
           where("area", "==", AREA_ATUAL),
-          orderBy("dataCriacao", "desc") // Ordena pelos mais novos
+          orderBy("dataCriacao", "desc")
         );
 
         const querySnapshot = await getDocs(q);
@@ -32,7 +32,7 @@ function CapitulosEngenharia() {
 
         setDesafios(listaDesafios);
       } catch (error) {
-        console.error("Erro ao buscar desafios:", error);
+        console.error("Erro ao buscar desafios de Engenharia:", error);
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ function CapitulosEngenharia() {
     <div className={`container ${styles.challengeListContainer}`}>
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! Treine a lógica de programação com nossos desafios.
+        Soluções técnicas e inovação: aplique seus conhecimentos em desafios de Engenharia.
       </p>
 
       {loading ? (
@@ -56,20 +56,29 @@ function CapitulosEngenharia() {
             desafios.map((desafio) => (
               <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
                 <img
-                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Quiz"}
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Engenharia"}
                   alt={desafio.titulo}
-                  // Adiciona um fallback caso a imagem esteja quebrada
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
                 />
-                <p>{desafio.titulo}</p>
-                {/* Opcional: Mostrar a subcategoria pequena */}
-                <span style={{ fontSize: '0.8rem', color: '#666' }}>{desafio.subcategoria}</span>
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS PADRONIZADAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------------------- */}
+
+                <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
+                  {desafio.subcategoria}
+                </span>
               </Link>
             ))
           ) : (
             <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
-              Nenhum desafio encontrado para esta área no momento.
+              Nenhum desafio encontrado para a área de Engenharia no momento.
             </p>
           )}
         </div>
