@@ -38,7 +38,7 @@ function CapitulosMarketing() {
       }
     };
 
-    fetchDesafios();
+      fetchDesafios();
   }, []);
 
   return (
