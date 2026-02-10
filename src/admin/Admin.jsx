@@ -21,6 +21,10 @@ export default function Admin() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
 
+  // Estados para o filtro de áreas
+  const [selectedArea, setSelectedArea] = useState('Todas');
+  const [availableAreas, setAvailableAreas] = useState(['Todas']);
+
   const isDashboard = location.pathname === '/admin';
 
   const COLORS = {
@@ -42,12 +46,31 @@ export default function Admin() {
         const usersColl = collection(db, "users");
         const blogColl = collection(db, "blog");
         const adminsColl = collection(db, "admins");
+        
+        // 1. Buscar desafios para mapear os Títulos -> Áreas
+        const desafiosColl = collection(db, "desafios");
 
-        const [usersSnap, blogSnap, adminsSnap] = await Promise.all([
+        const [usersSnap, blogSnap, adminsSnap, desafiosSnap] = await Promise.all([
           getCountFromServer(usersColl).catch(() => ({ data: () => ({ count: 0 }) })),
           getCountFromServer(blogColl).catch(() => ({ data: () => ({ count: 0 }) })),
-          getCountFromServer(adminsColl).catch(() => ({ data: () => ({ count: 0 }) }))
+          getCountFromServer(adminsColl).catch(() => ({ data: () => ({ count: 0 }) })),
+          getDocs(desafiosColl).catch(() => ({ docs: [] })) // Busca os desafios para pegar a área
         ]);
+
+        // Criar mapa de desafio -> área e lista de áreas disponíveis
+        const desafioAreaMap = {};
+        const areasEncontradas = new Set(['Todas']);
+        
+        desafiosSnap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.titulo && data.area) {
+            desafioAreaMap[data.titulo] = data.area;
+            areasEncontradas.add(data.area);
+          }
+        });
+
+        // Atualiza as opções do filtro com as áreas encontradas no banco
+        setAvailableAreas(Array.from(areasEncontradas));
 
         setStats({
           users: usersSnap.data().count - adminsSnap.data().count,
@@ -56,13 +79,25 @@ export default function Admin() {
 
         const pontuacoesRef = collection(db, "pontuacoes");
         const querySnapshot = await getDocs(query(pontuacoesRef));
-        const agrupamento = { "Geral": { somaNotas: 0, quantidade: 0 } };
+        
+        // Estrutura do agrupamento agora inclui a propriedade 'area'
+        const agrupamento = { "Geral": { somaNotas: 0, quantidade: 0, area: "Geral" } };
         const alunosMap = {};
 
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           const nomeDesafio = data.desafio ? data.desafio.split(" - ")[0].trim() : "Outros";
-          if (!agrupamento[nomeDesafio]) agrupamento[nomeDesafio] = { somaNotas: 0, quantidade: 0 };
+          
+          // Define a área do desafio atual baseada no mapa criado
+          const areaDoDesafio = desafioAreaMap[nomeDesafio] || "Outros";
+
+          if (!agrupamento[nomeDesafio]) {
+            agrupamento[nomeDesafio] = { 
+              somaNotas: 0, 
+              quantidade: 0, 
+              area: areaDoDesafio // Salva a área aqui
+            };
+          }
 
           const notaBruta = Number(data.nota || 0);
           let totalQuestoes = Number(data.total) || GABARITO_TOTAIS[nomeDesafio] || 1;
@@ -91,7 +126,8 @@ export default function Admin() {
             const item = agrupamento[chave];
             return {
               name: chave,
-              media: Number((item.somaNotas / item.quantidade || 0).toFixed(1))
+              media: Number((item.somaNotas / item.quantidade || 0).toFixed(1)),
+              area: item.area // Passa a área para o dado final
             };
           });
 
@@ -103,10 +139,18 @@ export default function Admin() {
 
         setTopStudents([...listaAlunos].sort((a, b) => b.media - a.media).slice(0, 3));
         setRiskStudents([...listaAlunos].filter(a => a.media < 6.0).sort((a, b) => a.media - b.media).slice(0, 3));
-      } catch (e) { setErrorMsg("Erro ao carregar dados."); } finally { setLoading(false); }
+      } catch (e) { 
+        console.error(e);
+        setErrorMsg("Erro ao carregar dados."); 
+      } finally { setLoading(false); }
     }
     fetchDashboardData();
   }, [isDashboard]);
+
+  // Lógica de filtragem dos dados do gráfico
+  const filteredChartData = selectedArea === 'Todas'
+    ? chartData
+    : chartData.filter(item => item.area === selectedArea);
 
   return (
     <div className={styles.container}>
@@ -116,11 +160,35 @@ export default function Admin() {
         </button>
         <h2 className={styles.title}>ADMIN</h2>
         <ul className={styles.navList}>
-          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
-          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
-          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
-          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
+          <li>
+            <Link to="/admin" className={styles.navLink}>
+              <img src="/casa.png" alt="H" />
+              <span className={styles.linkText}>Home</span>
+            </Link>
+          </li>
+          <li><Link to="/admin/notas" className={styles.navLink}>
+            <img src="/blog.png" alt="N" />
+            <span className={styles.linkText}>Notas</span>
+          </Link>
+          </li>
+          <li>
+            <Link to="/admin/newblog" className={styles.navLink}>
+              <img src="/inotas.png" alt="B" />
+              <span className={styles.linkText}>Blog</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/newdesafios" className={styles.navLink}>
+              <img src="/idesafio.png" alt="D" />
+              <span className={styles.linkText}>Desafios</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/curtidas" className={styles.navLink}>
+              <img src="/curti.png" alt="L" />
+              <span className={styles.linkText}>Like</span>
+            </Link>
+          </li>
         </ul>
       </aside>
 
@@ -133,13 +201,11 @@ export default function Admin() {
                 <div className={styles.metricsGrid}>
                   <div className={styles.cardCompact}>
                     <span className={styles.cardHeaderMini}>Total de Alunos</span>
-                    {/*<img src="/ialuno.png" alt="icon" className={styles.iconMini} />*/}
                     <strong className={styles.bigNumber}>{stats.users}</strong>
                   </div>
 
                   <div className={styles.cardCompact}>
                     <span className={styles.cardHeaderMini}>Total de Posts</span>
-                    {/*<img src="/iblog.png" alt="icon" className={styles.iconMini} />*/}
                     <strong className={styles.bigNumber}>{stats.posts}</strong>
                   </div>
 
@@ -169,25 +235,39 @@ export default function Admin() {
                 </div>
 
                 <div className={styles.chartFullWidth}>
-                   <div className={styles.chartHeader}>
-                      {/*<img src="/igrafico.png" alt="g" />*/}
-                      <h3>Média de Notas por Desafio</h3>
-                   </div>
-                   <div className={styles.chartWrapper}>
+                  <div className={styles.chartHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3>Média de Notas por Desafio</h3>
+                    
+                    {/* Seletor de Filtro de Área */}
+                    <div className={styles.filterArea}>
+                      <select 
+                        value={selectedArea} 
+                        onChange={(e) => setSelectedArea(e.target.value)}
+                        style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      >
+                        {availableAreas.map(area => (
+                          <option key={area} value={area}>{area}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.chartWrapper}>
                     <ResponsiveContainer width="100%" height={350}>
-                      <BarChart data={chartData}>
+                      {/* Usamos filteredChartData aqui */}
+                      <BarChart data={filteredChartData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" fontSize={11} />
                         <YAxis domain={[0, 10]} fontSize={11} />
-                        <Tooltip cursor={{fill: '#f5f5f5'}} />
+                        <Tooltip cursor={{ fill: '#f5f5f5' }} />
                         <Bar dataKey="media" radius={[4, 4, 0, 0]} barSize={40}>
-                          {chartData.map((entry, index) => (
+                          {filteredChartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[entry.name] || '#8884d8'} />
                           ))}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
-                   </div>
+                  </div>
                 </div>
               </>
             )}

@@ -116,23 +116,14 @@ function App() {
             } />
 
             {/* --- Rotas Capítulos --- */}
+            <Route path="/desafios" element={<ProtectedRoute><AnimatedPage><ChallengeList /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulostecnologia" element={<ProtectedRoute><AnimatedPage><CapitulosTecnologia /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosengenharia" element={<ProtectedRoute><AnimatedPage><CapitulosEngenharia /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosdireito" element={<ProtectedRoute><AnimatedPage><CapitulosDireito /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosmarketing" element={<ProtectedRoute><AnimatedPage><CapitulosMarketing /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosrh" element={<ProtectedRoute><AnimatedPage><CapitulosRh /></AnimatedPage></ProtectedRoute>} />
             
-            {/* --- EXCLUÍ TODAS AS ROTAS DE DESAFIOS
-
-                  REPITO!!!!!
-                  
-                  
-                  EXCLUÍ TODAS AS ROTAS DE DESAFIOS 
-                  
-                  
-                  KAKAKAKAKAKAKAKAKAKKAKAKAKAKAKAHHAHAHAHAHAHAHHAHAHAHAHHA--- 
-            */}
-
+            
             {/* --- Perfil e Fórum --- */}
             <Route path="/perfil" element={<ProtectedRoute><AnimatedPage><Perfil /></AnimatedPage></ProtectedRoute>} />
             <Route path="/forum" element={<ProtectedRoute><AnimatedPage><Forum /></AnimatedPage></ProtectedRoute>} />
