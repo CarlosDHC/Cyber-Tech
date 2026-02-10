@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import './QuizPlayer.css';
 
 import { db, auth } from '../../../FirebaseConfig';
@@ -12,14 +12,15 @@ import {
 
 export default function QuizPlayer() {
   const { id } = useParams();
+  const navigate = useNavigate();
   
   const [desafio, setDesafio] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Estados de Tentativas e Melhor Nota
+  // Estados de Histórico
   const [tentativasUsadas, setTentativasUsadas] = useState(0);
   const [melhorNotaAnterior, setMelhorNotaAnterior] = useState(0);
-  const [verificandoTentativas, setVerificandoTentativas] = useState(true);
+  const [modoRevisao, setModoRevisao] = useState(false);
 
   // Estados do Jogo
   const [indiceAtual, setIndiceAtual] = useState(0);
@@ -28,17 +29,49 @@ export default function QuizPlayer() {
   const [notaAtual, setNotaAtual] = useState(0);
   const [salvando, setSalvando] = useState(false);
 
-  // 1. Carregar o Desafio
+  // 1. Efeito único para carregar TUDO ao iniciar
   useEffect(() => {
-    const carregarDesafio = async () => {
+    const inicializarDados = async () => {
+      if (!id || !auth.currentUser) return;
+      
       try {
+        setLoading(true);
+
+        // Busca o Desafio
         const docRef = doc(db, "desafios", id);
         const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          setDesafio(docSnap.data());
-        } else {
+        if (!docSnap.exists()) {
           alert("Desafio não encontrado!");
+          navigate('/desafios');
+          return;
+        }
+        const dadosD = docSnap.data();
+        setDesafio(dadosD);
+
+        // Busca a Pontuação
+        const scoreId = `${auth.currentUser.uid}_${id}`;
+        const scoreRef = doc(db, "pontuacoes", scoreId);
+        const scoreSnap = await getDoc(scoreRef);
+
+        if (scoreSnap.exists()) {
+          const dadosS = scoreSnap.data();
+          const jaFeitas = dadosS.tentativas || 0;
+          const limite = dadosD.tentativasPermitidas || 2;
+
+          setTentativasUsadas(jaFeitas);
+          setMelhorNotaAnterior(dadosS.nota || 0);
+
+          // SÓ ativa modo revisão se JÁ tiver completado o limite (ex: 2)
+          if (jaFeitas >= limite) {
+            setModoRevisao(true);
+          } else {
+            setModoRevisao(false); // Garante que começa como jogo
+          }
+        } else {
+          // Se não existe documento, é a primeira tentativa absoluta
+          setTentativasUsadas(0);
+          setModoRevisao(false);
         }
       } catch (error) {
         console.error("Erro ao carregar:", error);
@@ -46,47 +79,29 @@ export default function QuizPlayer() {
         setLoading(false);
       }
     };
-    carregarDesafio();
-  }, [id]);
 
-  // 2. Checar Histórico (Tentativas e Nota)
-  useEffect(() => {
-    const checarHistorico = async () => {
-      if (!auth.currentUser || !id) return;
-
-      try {
-        const scoreId = `${auth.currentUser.uid}_${id}`;
-        const scoreRef = doc(db, "pontuacoes", scoreId);
-        const scoreSnap = await getDoc(scoreRef);
-
-        if (scoreSnap.exists()) {
-          const dados = scoreSnap.data();
-          setTentativasUsadas(dados.tentativas || 0);
-          setMelhorNotaAnterior(dados.nota || 0);
-        } else {
-          setTentativasUsadas(0);
-          setMelhorNotaAnterior(0);
-        }
-      } catch (error) {
-        console.error("Erro ao verificar histórico:", error);
-      } finally {
-        setVerificandoTentativas(false);
-      }
-    };
-
-    checarHistorico();
-  }, [id]);
+    inicializarDados();
+  }, [id, navigate]);
 
   const selecionarOpcao = (letra) => {
-    setRespostasUsuario({ ...respostasUsuario, [indiceAtual]: letra });
+    if (modoRevisao) return; // Trava interação no modo revisão
+    setRespostasUsuario(prev => ({ ...prev, [indiceAtual]: letra }));
   };
 
   const proximaQuestao = () => {
     if (indiceAtual < desafio.questoes.length - 1) {
       setIndiceAtual(indiceAtual + 1);
     } else {
-      calcularESalvarResultado();
+      if (modoRevisao) {
+        navigate('/desafios'); // Se era revisão, apenas sai
+      } else {
+        calcularESalvarResultado(); // Se era jogo, finaliza
+      }
     }
+  };
+
+  const voltarQuestao = () => {
+    if (indiceAtual > 0) setIndiceAtual(indiceAtual - 1);
   };
 
   const calcularESalvarResultado = async () => {
@@ -98,126 +113,118 @@ export default function QuizPlayer() {
     });
 
     setNotaAtual(acertos);
-    setMostrarResultado(true);
-
+    
     if (auth.currentUser) {
       try {
         const scoreId = `${auth.currentUser.uid}_${id}`;
         const scoreRef = doc(db, "pontuacoes", scoreId);
         
-        // Garante que salvamos a maior nota entre a atual e a anterior
+        // Aumenta o contador atual
+        const novaContagem = tentativasUsadas + 1;
         const notaFinal = Math.max(acertos, melhorNotaAnterior);
-        
-        // CORREÇÃO: Salvando com os nomes de campos que o Admin espera
-        const dadosParaSalvar = {
+
+        await setDoc(scoreRef, {
           uid: auth.currentUser.uid,
           email: auth.currentUser.email,
           nome: auth.currentUser.displayName || "Usuário",
-          
           desafioId: id,
-          desafio: desafio.titulo || "Desafio Sem Título", // Nome correto para o Admin
-          categoria: desafio.categoria || "Geral",
-          subcategoria: desafio.subcategoria || "",
-          
+          desafio: desafio.titulo || "Desafio",
+          categoria: desafio.area || "Geral",
           nota: notaFinal,
           ultimaNota: acertos,
           total: desafio.questoes.length,
-          tentativas: tentativasUsadas + 1,
+          tentativas: novaContagem,
           data: serverTimestamp()
-        };
-
-        // Usa setDoc com merge para atualizar ou criar
-        await setDoc(scoreRef, dadosParaSalvar, { merge: true });
+        }, { merge: true });
         
-        setTentativasUsadas(prev => prev + 1);
-        setMelhorNotaAnterior(notaFinal);
-
+        setTentativasUsadas(novaContagem);
+        setMostrarResultado(true); // Só mostra a tela de resultado após salvar com sucesso
       } catch (error) {
-        console.error("Erro ao salvar pontuação:", error);
+        console.error("Erro ao salvar:", error);
+        alert("Erro ao salvar progresso.");
       } finally {
         setSalvando(false);
       }
     }
   };
 
-  if (loading) return <div className="quiz-loading">Carregando Desafio...</div>;
-  if (!desafio) return <div className="quiz-error">Desafio não encontrado. <Link to="/desafios">Voltar</Link></div>;
+  if (loading) return <div className="quiz-loading">Carregando dados...</div>;
+  if (!desafio) return <div className="quiz-error">Desafio não carregado.</div>;
 
+  const questaoAtual = desafio.questoes[indiceAtual];
+
+  // Tela de Resultado após concluir uma tentativa
   if (mostrarResultado) {
-    const total = desafio.questoes.length;
-    const porcentagem = (notaAtual / total) * 100;
-    let mensagem = "", cor = "";
-
-    if (porcentagem === 100) { mensagem = "Perfeito!"; cor = "#10B981"; }
-    else if (porcentagem >= 70) { mensagem = "Aprovado!"; cor = "#2563EB"; }
-    else { mensagem = "Tente novamente!"; cor = "#EF4444"; }
-
+    const limite = desafio.tentativasPermitidas || 2;
     return (
       <div className="quiz-container resultado-container">
-        <h1>Resultado da Tentativa</h1>
-        <div className="score-circle" style={{ borderColor: cor, color: cor }}>
-          {notaAtual} / {total}
-        </div>
-        <h2>{mensagem}</h2>
-        
-        <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#f9fafb', borderRadius: '8px', fontSize: '0.9rem' }}>
-          <strong>Melhor pontuação registrada:</strong> {Math.max(notaAtual, melhorNotaAnterior)} / {total}
-        </div>
-        
-        {salvando && <p style={{fontSize: '0.8rem', color: '#666'}}>Salvando...</p>}
-
+        <h1>{tentativasUsadas >= limite ? "Chances Esgotadas" : "Desafio Finalizado!"}</h1>
+        <div className="score-circle">{notaAtual} / {desafio.questoes.length}</div>
+        <p>Você completou {tentativasUsadas} de {limite} tentativas.</p>
         <div className="resultado-actions">
-          {!verificandoTentativas && (
-            <>
-              {tentativasUsadas < (desafio.tentativasPermitidas || 3) ? (
-                <button className="btn-restart" onClick={() => window.location.reload()}>
-                  Tentar Novamente ({tentativasUsadas}/{desafio.tentativasPermitidas || 3})
-                </button>
-              ) : (
-                <button className="btn-restart" disabled style={{ opacity: 0.5 }}>
-                  Limite Atingido
-                </button>
-              )}
-            </>
-          )}
-          <Link to="/desafios" className="btn-sair">Sair</Link>
+           <button 
+             className="btn-restart" 
+             style={{backgroundColor: '#F59E0B'}} 
+             onClick={() => { setMostrarResultado(false); setModoRevisao(true); setIndiceAtual(0); }}
+           >
+              Ver Gabarito e Justificativas
+           </button>
+           <Link to="/desafios" className="btn-sair">Voltar ao Menu</Link>
         </div>
       </div>
     );
   }
 
-  const questaoAtual = desafio.questoes[indiceAtual];
-
   return (
     <div className="quiz-bg">
       <div className="quiz-container">
         <div className="quiz-header">
-          <span className="quiz-badge">{desafio.categoria} - {desafio.subcategoria}</span>
-          <span className="quiz-counter">Q. {indiceAtual + 1} / {desafio.questoes.length}</span>
+          <span className="quiz-badge">{modoRevisao ? "MODO REVISÃO" : desafio.area}</span>
+          <span className="quiz-counter">Questão {indiceAtual + 1} / {desafio.questoes.length}</span>
         </div>
-        <div className="barra-progresso">
-          <div className="progresso-preenchido" style={{ width: `${((indiceAtual + 1) / desafio.questoes.length) * 100}%` }}></div>
-        </div>
+
         <h2 className="pergunta-texto">{questaoAtual.perguntaTexto}</h2>
-        {questaoAtual.perguntaImagem && <img src={questaoAtual.perguntaImagem} alt="" className="pergunta-img" />}
-        
-        <div className="alternativas-grid">
-          {['a', 'b', 'c', 'd'].map((letra) => {
-            const opcao = questaoAtual.alternativas[letra];
-            if (!opcao) return null;
-            const isSelected = respostasUsuario[indiceAtual] === letra;
-            return (
-              <div key={letra} className={`alternativa-card ${isSelected ? 'selecionada' : ''}`} onClick={() => selecionarOpcao(letra)}>
-                <div className="letra-bolinha">{letra.toUpperCase()}</div>
-                <div className="texto-opcao">{opcao.texto}</div>
-                {opcao.imagem && <img src={opcao.imagem} alt="" className="opcao-img" />}
-              </div>
-            );
-          })}
-        </div>
-        <div className="quiz-footer">
-          <button className="btn-proximo" disabled={!respostasUsuario[indiceAtual]} onClick={proximaQuestao}>
-            {indiceAtual === desafio.questoes.length - 1 ? "Finalizar" : "Próxima"} &rarr;
+
+        {/* Lógica de exibição: Se for revisão, mostra texto. Se for jogo, mostra botões. */}
+        {modoRevisao ? (
+          <div className="caixa-justificativa" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '8px' }}>
+            <h3 style={{ color: '#92400E' }}>💡 Justificativa:</h3>
+            <p style={{ color: '#4B5563', whiteSpace: 'pre-wrap' }}>
+              {questaoAtual.respostaEsperada || "Nenhum comentário disponível."}
+            </p>
+            <p style={{ marginTop: '10px', fontWeight: 'bold', color: '#166534' }}>
+              Resposta correta: {questaoAtual.alternativaCorreta?.toUpperCase()}
+            </p>
+          </div>
+        ) : (
+          <div className="alternativas-grid">
+            {['a', 'b', 'c', 'd'].map((letra) => {
+              const opcao = questaoAtual.alternativas?.[letra];
+              if (!opcao?.texto) return null;
+              return (
+                <div 
+                  key={letra} 
+                  className={`alternativa-card ${respostasUsuario[indiceAtual] === letra ? 'selecionada' : ''}`} 
+                  onClick={() => selecionarOpcao(letra)}
+                >
+                  <div className="letra-bolinha">{letra.toUpperCase()}</div>
+                  <div className="texto-opcao">{opcao.texto}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="quiz-footer" style={{ marginTop: '30px', display: 'flex', justifyContent: 'space-between' }}>
+          <button className="btn-voltar" onClick={voltarQuestao} disabled={indiceAtual === 0}>Anterior</button>
+          <button 
+            className="btn-proximo" 
+            onClick={proximaQuestao}
+            disabled={!modoRevisao && !respostasUsuario[indiceAtual] && !salvando}
+          >
+            {indiceAtual === desafio.questoes.length - 1 
+              ? (modoRevisao ? "Sair da Revisão" : (salvando ? "Salvando..." : "Finalizar")) 
+              : "Próxima"}
           </button>
         </div>
       </div>

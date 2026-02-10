@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
+import styles from "../Home/Home.module.css"; 
 
 // Firebase Imports
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
@@ -10,18 +10,18 @@ function CapitulosRH() {
   const [desafios, setDesafios] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Define a área desta página
+  // 1. PADRONIZAÇÃO: Use "RH" (maiúsculas) para coincidir com o novo Select do Admin
   const AREA_ATUAL = "RH"; 
 
   useEffect(() => {
     const fetchDesafios = async () => {
       try {
         setLoading(true);
-        // Busca desafios da coleção 'desafios' filtrados pela área
+        // Busca os desafios filtrando pela área correta
         const q = query(
           collection(db, "desafios"),
           where("area", "==", AREA_ATUAL),
-          orderBy("dataCriacao", "desc") // Ordena pelos mais novos
+          orderBy("dataCriacao", "desc")
         );
 
         const querySnapshot = await getDocs(q);
@@ -45,7 +45,7 @@ function CapitulosRH() {
     <div className={`container ${styles.challengeListContainer}`}>
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! Treine a lógica de programação com nossos desafios.
+        Treine seus conhecimentos em Recursos Humanos com nossos desafios interativos.
       </p>
 
       {loading ? (
@@ -54,24 +54,24 @@ function CapitulosRH() {
         <div className={styles.challengeCardsList}>
           {desafios.length > 0 ? (
             desafios.map((desafio) => (
+              /* 2. ROTA CORRETA: Redireciona para /quiz/ID para usar o novo QuizPlayer */
               <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
                 <img
-                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Quiz"}
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=RH+Quiz"}
                   alt={desafio.titulo}
-                  // Adiciona um fallback caso a imagem esteja quebrada
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
                 />
                 <p>{desafio.titulo}</p>
-                {/* Opcional: Mostrar a subcategoria pequena */}
-                <span style={{ fontSize: '0.8rem', color: '#666' }}>{desafio.subcategoria}</span>
+                <span style={{ fontSize: '0.8rem', color: '#666' }}>
+                    {desafio.qtdQuestoes} Questões • 2 Tentativas
+                </span>
               </Link>
             ))
           ) : (
             <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
-              Nenhum desafio encontrado para esta área no momento.
+              Nenhum desafio encontrado para RH. Crie um no Painel Admin!
             </p>
-
           )}
         </div>
       )}
