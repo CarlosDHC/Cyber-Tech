@@ -1,6 +1,6 @@
 :root {
   --sidebar-width-open: 250px;
-  --sidebar-width-collapsed: 70px;
+  --sidebar-width-collapsed: 60px;
 
   --header-height: 70px;
 
@@ -45,6 +45,7 @@
 }
 
 .cardCompact {
+  height: 150px;
     background: #fff;
     padding: 20px;
     border-radius: 12px;
@@ -625,6 +626,7 @@ font-size: 15px;
 }
 
 .btnAdd {
+  width: 300px;
   background-color: #fff;
   border: 1px dashed #94a3b8;
   color: #64748b;
@@ -732,7 +734,7 @@ font-size: 15px;
 /* --- TABLET (até 900px) -*/
 @media (max-width: 900px) {
   .sidebar {
-    width: 60px !important;
+    width: 40px !important;
     padding: 10px 5px !important;
     align-items: center;
   }

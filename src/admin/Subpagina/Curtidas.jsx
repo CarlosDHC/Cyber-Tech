@@ -93,35 +93,34 @@ export default function Curtidas() {
 
         <ul className={styles.navList}>
           <li>
-            <Link to="/admin" data-tooltip="Home" className={styles.navLink}>
-              <img src="/casa.png" alt="Home" />
-              <span className={styles.linkText}>Home</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/notas" data-tooltip="Notas" className={styles.navLink}>
-              <img src="/estrela.png" alt="Notas" />
-              <span className={styles.linkText}>Notas</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newblog" data-tooltip="Blog" className={styles.navLink}>
-              <img src="/blog.png" alt="Blog" />
-              <span className={styles.linkText}>Blog</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newdesafios" data-tooltip="Desafios" className={styles.navLink}>
-              <img src="/desafio.png" alt="Desafios" />
-              <span className={styles.linkText}>Desafios</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/curtidas" data-tooltip="like" className={styles.navLink}>
-              <img src="/curti.png" alt="curti" />
-              <span className={styles.linkText}>like</span>
-            </Link>
-          </li>
+                      <Link to="/admin" className={styles.navLink}>
+                        <img src="/casa.png" alt="H" />
+                        <span className={styles.linkText}>Home</span>
+                      </Link>
+                    </li>
+                    <li><Link to="/admin/notas" className={styles.navLink}>
+                      <img src="/blog.png" alt="N" />
+                      <span className={styles.linkText}>Notas</span>
+                    </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/newblog" className={styles.navLink}>
+                        <img src="/inotas.png" alt="B" />
+                        <span className={styles.linkText}>Blog</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/newdesafios" className={styles.navLink}>
+                        <img src="/idesafio.png" alt="D" />
+                        <span className={styles.linkText}>Desafios</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/curtidas" className={styles.navLink}>
+                        <img src="/curti.png" alt="L" />
+                        <span className={styles.linkText}>Like</span>
+                      </Link>
+                    </li>
         </ul>
       </aside>
 
@@ -137,7 +136,7 @@ export default function Curtidas() {
             {/* TABELA DE TOP 5 CURTIDAS */}
             <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
                 <h3 style={{ marginBottom: '15px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '10px' }}>
-                    🏆 Top 5 Posts Mais Populares
+                    Post mais populares
                 </h3>
                 
                 {topPosts.length > 0 ? (
