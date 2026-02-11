@@ -21,7 +21,7 @@ function ChallengeList() {
         {/* Desafio 2 */}
         <Link to="/desafios/Rh/DesafioRh2" className={styles.challengeCard}>
           <img
-            src="https://imgur.com/7VyVCw2.jpg"
+            src="C:\Users\usrlabeco2N\Documents\GitHub\cyber-tech-v.2.0\public\rh-cursos.jpg"
           ></img>
           <p>Treinamento & Desenvolvimento</p> 
         </Link>
