@@ -661,9 +661,9 @@
   }
 
   .challengeCard {
-    width: 90%; /* Quase largura total */
-    max-width: 300px;
-    margin: 0;
+    width: 400px; /* Quase largura total */
+    max-width: 350px;
+    margin: 1px;
   }
 
   /* 6. Seção de Introdução (Cards Informativos) */

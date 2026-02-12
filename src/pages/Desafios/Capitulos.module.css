@@ -68,3 +68,30 @@
 .btnStart:hover {
     background-color: #0056b3;
 }
+
+/* Adicione ao final do seu Capitulos.module.css */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 15px;
+    }
+
+    .card img {
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: 1fr; /* Força uma coluna em telemóveis pequenos */
+    }
+
+    .card h3 {
+        font-size: 1.2rem;
+    }
+}
