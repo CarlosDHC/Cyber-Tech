@@ -201,33 +201,3 @@
     padding: 12px;
   }
 }
-
-/* Aplique este padrão em ambos os ficheiros de Login/Cadastro */
-
-@media (max-width: 600px) {
-  .loginContainer {
-    padding: 15px;
-    padding-top: 80px; /* Evita que o header cubra o formulário */
-  }
-
-  .loginCard {
-    padding: 1.5rem 1.2rem;
-    border-radius: 8px;
-  }
-
-  .loginCard h2 {
-    font-size: 1.5rem;
-  }
-
-  .formGroup input {
-    font-size: 16px; /* Tamanho ideal para evitar zoom automático no iOS */
-    padding: 12px;
-  }
-
-  /* No Cadastro.module.css, a formRow já tem um ajuste, 
-     garanta que o gap seja removido */
-  .formRow {
-    flex-direction: column;
-    gap: 0;
-  }
-}

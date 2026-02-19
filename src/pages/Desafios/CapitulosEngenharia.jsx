@@ -63,6 +63,13 @@ function CapitulosEngenharia() {
                 />
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
                 
+                {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS PADRONIZADAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------------------- */}
 
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}

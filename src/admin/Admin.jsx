@@ -21,7 +21,6 @@ export default function Admin() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
 
-  // --- ALTERAÇÃO: Iniciando em Tecnologia e removendo 'Todas' ---
   const [selectedArea, setSelectedArea] = useState('Tecnologia');
   const [availableAreas, setAvailableAreas] = useState([]);
 
@@ -53,7 +52,7 @@ export default function Admin() {
         ]);
 
         const desafioAreaMap = {};
-        const areasEncontradas = new Set(); // Removido 'Todas' daqui
+        const areasEncontradas = new Set(); 
         
         desafiosSnap.docs.forEach(doc => {
           const data = doc.data();
@@ -135,7 +134,7 @@ export default function Admin() {
     fetchDashboardData();
   }, [isDashboard]);
 
-  // --- ALTERAÇÃO: Filtragem obrigatória por área ---
+  // Filtragem obrigatória por área 
   const filteredChartData = chartData.filter(item => item.area === selectedArea);
 
   return (

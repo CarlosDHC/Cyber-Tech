@@ -23,7 +23,7 @@ export default function Notas() {
 
         snapshot.docs.forEach((doc) => {
           const dados = doc.data();
-          
+
           // CORREÇÃO AQUI: Tenta ler 'email' (novo) ou 'userEmail' (antigo)
           const emailAluno = dados.email || dados.userEmail;
 
@@ -79,8 +79,8 @@ export default function Notas() {
             somaNotasPonderadas += notaBase10;
           });
 
-          const mediaFinal = respostasFinais.length > 0 
-            ? (somaNotasPonderadas / respostasFinais.length) 
+          const mediaFinal = respostasFinais.length > 0
+            ? (somaNotasPonderadas / respostasFinais.length)
             : 0;
 
           return {
@@ -111,7 +111,7 @@ export default function Notas() {
   const formatarData = (isoString) => {
     if (!isoString) return "-";
     const d = isoString.toDate ? isoString.toDate() : new Date(isoString);
-    if (isNaN(d)) return "-"; 
+    if (isNaN(d)) return "-";
     return d.toLocaleDateString("pt-BR") + " às " + d.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
   };
 
@@ -123,11 +123,11 @@ export default function Notas() {
         </button>
         <h2 className={styles.title}>Administrador</h2>
         <ul className={styles.navList}>
-          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="Home" /><span className={styles.linkText}>Home</span></Link></li>
-          <li><Link to="/admin/notas" className={styles.navLink}><img src="/estrela.png" alt="Notas" /><span className={styles.linkText}>Notas</span></Link></li>
-          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/blog.png" alt="Blog" /><span className={styles.linkText}>Blog</span></Link></li>
-          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="Desafios" /><span className={styles.linkText}>Desafios</span></Link></li>
-          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="like" /><span className={styles.linkText}>like</span></Link></li>
+          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
+          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
         </ul>
       </aside>
 
@@ -193,8 +193,8 @@ export default function Notas() {
                       <p style={{ fontSize: '0.9rem', color: '#666' }}>{aluno.email}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                       <span style={{ display: 'block', fontSize: '0.8rem', color: '#999' }}>Média Geral</span>
-                       <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#333' }}>{aluno.media.toFixed(1)}</span>
+                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#999' }}>Média Geral</span>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#333' }}>{aluno.media.toFixed(1)}</span>
                     </div>
                   </div>
 

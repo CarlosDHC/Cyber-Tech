@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. CONFIGURAÇÕES ORIGINAIS (CORES E VARIÁVEIS DO SEU PROJETO)
-   ========================================================================== */
 :root {
   --sidebar-width-open: 250px;
   --sidebar-width-collapsed: 60px;
@@ -35,116 +32,126 @@
   scroll-behavior: smooth;
 }
 
-/* ==========================================================================
-   2. ESTILOS GERAIS E DASHBOARD
-   ========================================================================== */
 .mainTitle {
-  font-size: 1.5rem !important;
-  margin-bottom: 25px !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 25px !important;
 }
 
 .metricsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .cardCompact {
   height: 150px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .cardHeaderMini {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  font-weight: 700;
-  margin-bottom: 8px;
-  text-align: center;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
 }
 
 .iconMini {
-  width: 20px !important;
-  height: 20px !important;
-  opacity: 0.6;
-  margin-bottom: 5px;
+    width: 20px !important;
+    height: 20px !important;
+    opacity: 0.6;
+    margin-bottom: 5px;
 }
 
 .bigNumber {
-  font-size: 2rem;
-  color: var(--color-primary-light);
-  font-weight: 800;
+    font-size: 2rem;
+    color: var(--color-primary-light);
+    font-weight: 800;
 }
 
 .miniList {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .miniItem {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 2px;
 }
 
 .truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 70%;
-  font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+    font-size: 15px;
 }
 
-.highScore { color: var(--color-success); font-weight: 700; font-size: 15px; }
-.lowScore { color: var(--color-text-warning); font-weight: 700; font-size: 15px; }
+.highScore { color: var(--color-success); 
+  font-weight: 700; 
+font-size: 15px;}
+.lowScore { color: var(--color-text-warning); 
+  font-weight: 700; 
+font-size: 15px;
+}
 .riskBorder { border-left: 4px solid var(--color-text-warning); }
 .okMsg { color: var(--color-success); font-size: 0.7rem; font-weight: 700; text-align: center; }
 
 /* GRÁFICO LARGURA TOTAL */
 .chartFullWidth {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid var(--color-border);
-  width: 100%;
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border);
+    width: 100%;
 }
 
 .chartHeader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
 }
 
 .chartHeader img { width: 20px; }
 .chartHeader h3 { font-size: 0.95rem; color: var(--color-text-dark); }
 
-.chartWrapper { width: 100%; }
+.chartWrapper {
+    width: 100%;
+}
 
-/* ==========================================================================
-   3. LAYOUT PRINCIPAL (SIDEBAR E MAIN)
-   ========================================================================== */
+/* Responsividade do Grid */
+@media (max-width: 1100px) {
+    .metricsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .metricsGrid { grid-template-columns: 1fr; }
+}
+
+/* LAYOUT PRINCIPAL*/
 .container {
   display: flex;
   min-height: 100vh;
   background-color: var(--color-light-bg);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
-  position: relative;
 }
 
 /* SIDEBAR */
@@ -160,17 +167,19 @@
   transition: 
     width var(--transition-speed) var(--transition-ease),
     padding var(--transition-speed) var(--transition-ease);
+
   will-change: width, padding;
+
   overflow: hidden;
   white-space: nowrap;
   flex-shrink: 0;
+
   position: fixed;
   top: var(--header-height);
   left: 0;
   bottom: 0;
   height: auto;
   margin: 0 !important;
-  z-index: 1000; /* Garante que fique acima do conteúdo */
 }
 
 /* ÁREA PRINCIPAL */
@@ -181,8 +190,11 @@
   box-sizing: border-box;
   margin-left: var(--sidebar-width-open);
   margin-top: 1rem;
+
+  /* ANIMAÇÃO SUAVE DO CONTEÚDO */
   transition: margin-left var(--transition-speed) var(--transition-ease);
   will-change: margin-left;
+
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   min-height: calc(100vh - var(--header-height) - 40px);
 }
@@ -217,7 +229,7 @@
   justify-content: center;
   padding-left: 0;
   padding-right: 0;
-  padding: 5px; 
+  padding: 5px; /*ADICIONADO*/
 }
 
 /* BOTÃO HAMBURGUER */
@@ -254,12 +266,19 @@
   justify-content: flex-start;
   padding-left: 12px;
   border-radius: 8px;
+
   transition: background 160ms;
   margin-bottom: 10px;
 }
 
-.toggleBtn img { width: 24px; height: 24px; }
-.toggleBtn:hover { background: rgba(255, 255, 255, 0.1); }
+.toggleBtn img {
+  width: 24px;
+  height: 24px;
+}
+
+.toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
 
 .title {
   color: #ffffff;
@@ -289,7 +308,8 @@
   width: 100%;
 }
 
-.navLink:hover, .active {
+.navLink:hover,
+.active {
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -299,9 +319,7 @@
   filter: invert(1);
 }
 
-/* ==========================================================================
-   4. COMPONENTES: CARDS, EDITOR E FORMULÁRIOS
-   ========================================================================== */
+/* CARDS */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -377,9 +395,13 @@
   border-color: #b91c1c !important;
 }
 
-.warning { color: #dc2626; font-weight: 500; }
+.warning {
+  color: #dc2626;
+  font-weight: 500;
+}
 
-/* EDITOR (NewBlog/NewDesafios) */
+/* EDITOR DE BLOG*/
+
 .inputGroup {
   display: flex;
   flex-direction: column;
@@ -403,7 +425,9 @@
   gap: 20px;
 }
 
-.headerFlex h1 { margin: 0; }
+.headerFlex h1 {
+  margin: 0;
+}
 
 .publishBtn {
   background-color: var(--color-primary-light);
@@ -532,12 +556,16 @@
   border-radius: 4px;
 }
 
-.blockActions { display: flex; gap: 8px; }
+.blockActions {
+  display: flex;
+  gap: 8px;
+}
 
 .btnIcon {
   background: #fff;
   border: 1px solid #095e8b;
   cursor: pointer;
+  /*width: 40p*/
   height: 30px;
   border-radius: 6px;
   transition: all 0.2s;
@@ -552,10 +580,18 @@
   transform: translateY(-1px);
 }
 
-.btnIcon img { width: 16px; height: 16px; opacity: 0.7; }
-.btnIcon:hover img { opacity: 1; }
+.btnIcon img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
 
-.inputBlock, .textAreaBlock {
+.btnIcon:hover img {
+  opacity: 1;
+}
+
+.inputBlock,
+.textAreaBlock {
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -567,9 +603,13 @@
   color: #333;
 }
 
-.textAreaBlock { min-height: 120px; line-height: 1.6; }
+.textAreaBlock {
+  min-height: 120px;
+  line-height: 1.6;
+}
 
-.inputBlock:focus, .textAreaBlock:focus {
+.inputBlock:focus,
+.textAreaBlock:focus {
   outline: none;
   border-color: var(--color-primary-blue);
   box-shadow: 0 0 0 2px rgba(74, 130, 243, 0.1);
@@ -608,7 +648,7 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Customização para Grade de Alternativas */
+/* Customização para a Grade de Alternativas no Desafio */
 .alternativasGrid {
   display: flex;
   flex-direction: column;
@@ -649,7 +689,7 @@
   text-transform: uppercase;
 }
 
-/* ESTILOS PARA MOBILE CARDS (Notas/Curtidas) */
+/* ESTILOS PARA MOBILE CARDS (Curtidas)*/
 .mobileCardsContainer {
   display: flex;
   flex-direction: column;
@@ -678,85 +718,78 @@
   font-size: 1.1rem;
 }
 
-.alunoEmail { font-size: 0.85rem; color: #666; }
-.cardDetail { font-size: 0.95rem; margin-bottom: 5px; color: #333; }
+.alunoEmail {
+  font-size: 0.85rem;
+  color: #666;
+}
 
-/* ==========================================================================
-   5. RESPONSIVIDADE AVANÇADA (MOBILE FIX)
-   ========================================================================== */
+.cardDetail {
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+  color: #333;
+}
 
-/* 1. TABLET (até 1024px) */
-@media (max-width: 1024px) {
+/* ESPONSIVIDADE */
+
+/* --- TABLET (até 900px) -*/
+@media (max-width: 900px) {
+  .sidebar {
+    width: 40px !important;
+    padding: 10px 5px !important;
+    align-items: center;
+  }
+
+  .toggleBtn,
+  .title,
+  .linkText {
+    display: none !important;
+  }
+
+  .navLink {
+    justify-content: center;
+    padding: 12px;
+  }
+
   .main {
-    margin-left: var(--sidebar-width-collapsed);
+    margin-left: 60px;
+    margin-right: 10px;
     padding: 20px;
   }
-  
-  /* Sidebar colapsada forçada em tablet */
-  .sidebar:not(.sidebarCollapsed) {
-    width: var(--sidebar-width-collapsed);
-  }
-  
-  .sidebar .title, .sidebar .linkText {
-    display: none;
-  }
-  
-  .sidebar .navLink {
-    justify-content: center;
+
+  .publishBtn {
+    padding: 10px 20px;
+    font-size: 0.95rem;
   }
 }
 
-/* 2. MOBILE (até 768px) - AQUI OCORRE A MÁGICA */
-@media (max-width: 768px) {
-  /* Some com o botão de toggle */
-  .toggleBtn {
-    display: none !important;
-  }
-
-  /* Sidebar fica apenas com ícones */
-  .sidebar {
-    width: var(--sidebar-width-collapsed) !important;
-    padding-top: 15px;
-  }
-  
-  .sidebar .title, 
-  .sidebar .linkText {
-    display: none !important;
-  }
-  
-  .sidebar .navLink {
-    justify-content: center;
-    padding: 15px 0;
-  }
-
-  /* Ajuste do Main */
+/* --- MOBILE (até 600px) -*/
+@media (max-width: 600px) {
   .main {
-    margin-left: var(--sidebar-width-collapsed);
-    width: calc(100% - var(--sidebar-width-collapsed));
     padding: 15px;
+    margin-right: 10px;
+    margin-left: 60px;
+    transform: none;
   }
 
-  /* FORÇA CARDS UM EMBAIXO DO OUTRO */
-  .metricsGrid, 
-  .cards {
-    grid-template-columns: 1fr !important; /* Coluna única */
-    gap: 20px;
-  }
-
-  /* Headers empilhados */
   .headerFlex {
     flex-direction: column;
     align-items: stretch;
-    text-align: center;
     gap: 15px;
   }
 
-  /* Botões full width */
-  .publishBtn, .btnAdd {
+  .headerFlex h1 {
+    text-align: center;
+    font-size: 1.5rem;
+  }
+
+  .publishBtn {
     width: 100%;
   }
 
-  /* Formulários no mobile */
+  .formColumn {
+    padding: 20px 15px;
+  }
+
   .blockHeader {
     flex-direction: column;
     align-items: flex-start;
@@ -765,29 +798,15 @@
 
   .blockActions {
     width: 100%;
-    justify-content: space-between;
-    margin-top: 5px;
+    justify-content: flex-end;
   }
 
-  /* Alternativas em coluna */
-  .alternativaItem {
+  .addButtons {
     flex-direction: column;
-    align-items: flex-start;
   }
-  
-  .alternativaItem input[type="text"] {
-    width: 100%;
-  }
-}
 
-/* 3. MOBILE PEQUENO (até 480px) */
-@media (max-width: 480px) {
-  .main h1 {
-    font-size: 1.5rem;
-  }
-  
-  /* Evita zoom em inputs no iOS */
-  .inputField, .textAreaBlock {
-    font-size: 16px;
+  .btnAdd {
+    width: 100%;
+    justify-content: center;
   }
 }

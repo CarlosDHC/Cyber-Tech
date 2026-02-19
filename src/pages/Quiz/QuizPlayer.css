@@ -1,10 +1,10 @@
 .quiz-bg {
     background-color: #f3f4f6;
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    /*padding: 20px; */
     font-family: 'Arial', sans-serif;
 }
 
@@ -214,4 +214,9 @@
     border-radius: 8px;
     font-weight: bold;
     text-decoration: none;
+}
+
+@media (max-width: 80x) {
+  .quiz-bg{margin: 20px;
+  }
 }
