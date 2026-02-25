@@ -48,6 +48,14 @@ function CapitulosRh() {
         Desenvolva competências em gestão de pessoas e legislação com nossos simulados.
       </p>
 
+        {/* Desafio 2 */}
+        <Link to="/desafios/Rh/DesafioRh2" className={styles.challengeCard}>
+          <img
+            src="C:\Users\usrlabeco2N\Documents\GitHub\cyber-tech-v.2.0\public\rh-cursos.jpg"
+          ></img>
+          <p>Treinamento & Desenvolvimento</p> 
+        </Link>
+
       {loading ? (
         <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
       ) : (
