@@ -154,7 +154,6 @@ font-size: 15px;
   overflow-x: hidden;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: var(--sidebar-width-open);
   background: var(--color-primary-light);
@@ -206,7 +205,6 @@ font-size: 15px;
   font-weight: 700;
 }
 
-/* ESTADO COLAPSADO */
 .sidebarCollapsed {
   width: var(--sidebar-width-collapsed) !important;
   padding-left: 10px !important;
@@ -229,7 +227,7 @@ font-size: 15px;
   justify-content: center;
   padding-left: 0;
   padding-right: 0;
-  padding: 5px; /*ADICIONADO*/
+  padding: 5px; 
 }
 
 /* BOTÃO HAMBURGUER */
@@ -565,7 +563,6 @@ font-size: 15px;
   background: #fff;
   border: 1px solid #095e8b;
   cursor: pointer;
-  /*width: 40p*/
   height: 30px;
   border-radius: 6px;
   transition: all 0.2s;

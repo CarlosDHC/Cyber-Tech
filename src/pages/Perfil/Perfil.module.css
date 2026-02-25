@@ -46,7 +46,7 @@
 .activeTab {
     padding: 8px 0;
     font-size: 0.9em;
-    border-bottom: 2px solid #000000; /* Cor da aba ativa */
+    border-bottom: 2px solid #000000; 
     color: #000000;
     font-weight: 500;
 }
@@ -90,7 +90,7 @@
 }
 
 .inputGroup.fullWidth {
-    grid-column: 1 / -1; /* Ocupa as duas colunas */
+    grid-column: 1 / -1; 
 }
 
 .inputGroup label {
@@ -117,9 +117,6 @@
     padding-right: 30px; 
 }
 
-
-/* --- Estilos dos Botões (Mantendo a aparência do código anterior) --- */
-
 .buttonBase {
     /* Estilo base para todos os botões de ação */
     border: 1px solid transparent; 
@@ -134,7 +131,6 @@
 
 }
 
-/* Estilo para o botão primário (Azul) - Usado em 'Salvar' e 'Alterar senha' */
 .primaryButton {
     background-color: #095e8b; 
     color: white;
@@ -157,9 +153,9 @@
 
 /* Estilo do botão de Excluir Conta */
 .dangerButton {
-    background-color: #095e8b; /* Vermelho */
+    background-color: #095e8b; 
     color: white;
-    margin-left: 10px; /* Separa do botão salvar */
+    margin-left: 10px; 
 }
 
 .dangerButton:hover {
