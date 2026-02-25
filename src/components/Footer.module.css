@@ -48,7 +48,6 @@
   opacity: 1;
 }
 
-/* Responsividade simples */
 @media (max-width: 768px) {
   .footerContainer {
     flex-direction: column;
