@@ -21,10 +21,39 @@ function ChallengeList() {
         {/* Desafio 2 */}
         <Link to="/desafios/Rh/DesafioRh2" className={styles.challengeCard}>
           <img
+ 
             src="https://github.com/CarlosDHC/cyber-tech-v.2.0/blob/main/public/img_desafios/pexels-tima-miroshnichenko-5439436.jpg?raw=true"
           ></img>
           <p>Treinamento & Desenvolvimento</p> 
         </Link>
+
+            src="C:\Users\usrlabeco2N\Documents\GitHub\cyber-tech-v.2.0\public\rh-cursos.jpg"
+          ></img>
+          <p>Treinamento & Desenvolvimento</p> 
+        </Link>
+
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+      ) : (
+        <div className={styles.challengeCardsList}>
+          {desafios.length > 0 ? (
+            desafios.map((desafio) => (
+              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
+                <img
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=RH"}
+                  alt={desafio.titulo}
+                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  style={{ objectFit: 'cover' }}
+                />
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                {/* --- EXIBIÇÃO PADRONIZADA: QUESTÕES E TENTATIVAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------------------- */} 
 
         {/* Desafio 3 */}
         <Link to="/desafios/Rh/DesafioRh3" className={styles.challengeCard}>

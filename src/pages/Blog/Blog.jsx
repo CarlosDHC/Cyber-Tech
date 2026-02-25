@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Importamos o mesmo CSS module usado na ChallengeList para garantir o design idêntico
 import styles from "../Home/Home.module.css"; 
 import ForumButton from '../../components/ForumButton';
 
@@ -8,7 +7,6 @@ function Blog() {
   const navigate = useNavigate();
 
   return (
-    // Fragmento para permitir múltiplos elementos raiz (Container + Botão)
     <>
       {/* Container Principal do Conteúdo */}
       <div className={`container ${styles.challengeListContainer}`}>
@@ -20,7 +18,6 @@ function Blog() {
         <div className={styles.challengeCardsList}>
           {/* Tecnologia */}
           <Link to="/tecnologia" className={styles.challengeCard}>
-            {/* Tenta usar a imagem local específica do blog, com fallback */}
             <img 
               src="/Tec-blog.png" 
               alt="Tecnologia" 

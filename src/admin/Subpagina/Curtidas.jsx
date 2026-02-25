@@ -8,7 +8,7 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
 export default function Curtidas() {
   const [curtidas, setCurtidas] = useState([]);
-  const [topPosts, setTopPosts] = useState([]); // Estado para os dados do Top 5
+  const [topPosts, setTopPosts] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -31,11 +31,9 @@ export default function Curtidas() {
 
         setCurtidas(listaCurtidas);
 
-        // PROCESSAMENTO PARA O TOP 5 (TABELA)
         const stats = {};
         
         listaCurtidas.forEach((item) => {
-            // Usa o título do post ou o ID como fallback
             const titulo = item.postTitle || item.postId || "Post sem título";
             
             if (!stats[titulo]) {
@@ -44,17 +42,14 @@ export default function Curtidas() {
             stats[titulo] += 1;
         });
 
-        // Transforma em array: [{ name: "Titulo", likes: 10 }, ...]
         const formattedData = Object.keys(stats).map(key => ({
             name: key,
             likes: stats[key]
         }));
 
-        // Ordena Decrescente (Maior -> Menor) e pega os top 5
         const top5 = formattedData.sort((a, b) => b.likes - a.likes).slice(0, 5);
 
         setTopPosts(top5);
-        //-
 
       } catch (error) {
         console.error("Erro ao buscar curtidas:", error);

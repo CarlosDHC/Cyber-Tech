@@ -10,6 +10,7 @@ function ChallengeList() {
         Hora de praticar! Teste seus conhecimentos jurídicos com nossos desafios.
       </p>
 
+
       <div className={styles.challengeCardsList}>
         {/* Desafio 1 */}
         <Link to="/desafios/Direito/DesafioDir1" className={styles.challengeCard}>
@@ -31,6 +32,28 @@ function ChallengeList() {
           ></img>
           <p>Direitos e Deveres</p> 
         </Link>
+
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+      ) : (
+        <div className={styles.challengeCardsList}>
+          {desafios.length > 0 ? (
+            desafios.map((desafio) => (
+              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
+                <img
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Direito"}
+                  alt={desafio.titulo}
+                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  style={{ objectFit: 'cover' }}
+                />
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+
 
         {/* Desafio 3 */}
         <Link to="/desafios/Direito/DesafioDir4" className={styles.challengeCard}>

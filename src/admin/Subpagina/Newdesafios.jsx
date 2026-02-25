@@ -146,6 +146,7 @@ export default function NewDesafios() {
                     </button>
                 </div>
 
+
                 <div className={styles.editorContainer}>
                     <div className={styles.formColumn}>
 
@@ -153,6 +154,28 @@ export default function NewDesafios() {
                         <div className={styles.metaBox}>
                             <h3 style={{ marginTop: 0, color: '#1E293B' }}>1. Configurações</h3>
 
+
+                {tab === "gerenciar" ? (
+                    <div className={styles.editorContainer}>
+                        <input className={styles.inputField} placeholder="Pesquisar..." value={busca} onChange={e => setBusca(e.target.value)} style={{marginBottom: '20px'}} />
+                        <div className={styles.blocksList}>
+                            {listaDesafios.filter(d => d.titulo.toLowerCase().includes(busca.toLowerCase()) || d.area.toLowerCase().includes(busca.toLowerCase())).map(d => (
+                                <div key={d.id} className={styles.blockItem} style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                                    <div><strong>{d.titulo}</strong> <br/><small>{d.area} • {d.qtdQuestoes} Qs</small></div>
+                                    <div style={{display:'flex', gap:'8px'}}>
+                                        <button onClick={() => prepararEdicao(d)} className={styles.btnAdd} style={{width:'auto', padding:'5px 15px'}}>Editar</button>
+                                        <button onClick={() => excluirDesafioBanco(d.id)} className={styles.btnIcon}><img src="/lixeira.png" alt="X" style={{width:'18px'}}/></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className={styles.editorContainer}>
+                        {/* 1. CONFIGURAÇÕES EM CARD */}
+                        <div className={styles.blockItem}>
+                            <h3 style={{margin:'20px 0 10px'}}>1. Configurações Gerais</h3>
+ 
                             <div className={styles.inputGroup}>
                                 <label className={styles.fieldLabel}>Título Principal</label>
                                 <input

@@ -79,6 +79,7 @@ export default function QuizPlayer() {
     else { mensagem = "Precisa estudar mais. Tente novamente!"; cor = "#EF4444"; }
 
     return (
+
       <div className="quiz-container resultado-container">
         <h1>Resultado Final</h1>
         <div className="score-circle" style={{ borderColor: cor, color: cor }}>
@@ -90,6 +91,90 @@ export default function QuizPlayer() {
         <div className="resultado-actions">
             <button className="btn-restart" onClick={() => window.location.reload()}>Tentar Novamente</button>
             <Link to="/tecnologia" className="btn-sair">Sair para Menu</Link>
+
+      <div className="quiz-bg">
+        <div className="quiz-container resultado-container">
+          <h1>Desafio Finalizado!</h1>
+          <div className="score-circle">{notaAtual} / {desafio.questoes.length}</div>
+          <p>Você completou {tentativasUsadas} de {limite} tentativas.</p>
+          
+          {/* SEÇÃO DE FEEDBACK DAS RESPOSTAS */}
+          <div style={{ marginTop: '30px', maxHeight: '400px', overflowY: 'auto' }}>
+            <h3 style={{ marginBottom: '15px', color: '#333' }}>Suas Respostas:</h3>
+            {desafio.questoes.map((questao, index) => {
+              const respostaAluno = respostasUsuario[index];
+              const estaCorreta = respostaAluno === questao.alternativaCorreta;
+              const textoResposta = questao.alternativas?.[respostaAluno]?.texto || "Não respondida";
+              const textoCorreta = questao.alternativas?.[questao.alternativaCorreta]?.texto;
+              
+              return (
+                <div 
+                  key={index} 
+                  style={{
+                    marginBottom: '15px',
+                    padding: '15px',
+                    borderRadius: '8px',
+                    border: estaCorreta ? '2px solid #10B981' : '2px solid #EF4444',
+                    backgroundColor: estaCorreta ? '#F0FDF4' : '#FEF2F2'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>
+                      {estaCorreta ? '✓' : '✗'}
+                    </span>
+                    <strong style={{ color: '#333' }}>Questão {index + 1}:</strong>
+                    <span style={{ fontSize: '14px', color: estaCorreta ? '#10B981' : '#EF4444' }}>
+                      {estaCorreta ? 'Acertou!' : 'Errou'}
+                    </span>
+                  </div>
+                  
+                  <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}>
+                    <strong>Pergunta:</strong> {questao.perguntaTexto}
+                  </p>
+                  
+                  <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}>
+                    <strong>Sua resposta:</strong> <span style={{ color: estaCorreta ? '#10B981' : '#EF4444' }}>
+                      {respostaAluno?.toUpperCase()}) {textoResposta}
+                    </span>
+                  </p>
+                  
+                  {!estaCorreta && (
+                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#10B981' }}>
+                      <strong>Resposta correta:</strong> {questao.alternativaCorreta?.toUpperCase()}) {textoCorreta}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          <div className="resultado-actions" style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
+              
+              {esgotouTentativas ? (
+                // APARECE APENAS APÓS A SEGUNDA TENTATIVA
+                <button 
+                  className="btn-restart" 
+                  style={{ backgroundColor: '#F59E0B', color: 'white', padding: '12px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }} 
+                  onClick={() => { setMostrarResultado(false); setModoRevisao(true); setIndiceAtual(0); }}
+                >
+                  Ver Gabarito e Justificativas
+                </button>
+              ) : (
+                // APARECE ENQUANTO NÃO ESGOTAR AS TENTATIVAS
+                <button 
+                  className="btn-restart" 
+                  style={{ backgroundColor: '#2d72d9', color: 'white', padding: '12px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }} 
+                  onClick={() => window.location.reload()}
+                >
+                  Repetir tentativa do exercício
+                </button>
+              )}
+
+              <Link to="/desafios" className="btn-sair" style={{ textDecoration: 'none', color: '#666', padding: '12px 20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+                Voltar ao Menu
+              </Link>
+          </div>
+
         </div>
       </div>
     );

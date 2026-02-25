@@ -44,8 +44,6 @@ const Cadastro = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. ATUALIZAÇÃO IMPORTANTE: Vincula o nome ao perfil de autenticação
-      // Isso garante que auth.currentUser.displayName não seja nulo nos desafios
       await updateProfile(user, {
         displayName: nome
       });
@@ -64,14 +62,11 @@ const Cadastro = () => {
       console.log("Usuário cadastrado com sucesso:", user.uid);
       setLoading(false);
 
-      // Redireciona para o login após o sucesso
       navigate("/login");
 
     } catch (err) {
       setLoading(false);
       console.error("Erro detalhado no cadastro:", err);
-
-      // Tratamento de erros amigável para o usuário
       if (err.code === "auth/email-already-in-use") {
         setError("Este e-mail já está em uso.");
       } else if (err.code === "auth/invalid-email") {
@@ -120,7 +115,6 @@ const Cadastro = () => {
               />
             </div>
           </div>
-          {/* FIM DA ALTERAÇÃO */}
 
           <div className={styles.formRow}>
           <div className={styles.formGroup}>

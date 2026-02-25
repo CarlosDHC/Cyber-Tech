@@ -41,9 +41,10 @@ import QuizPlayer from './pages/Quiz/QuizPlayer.jsx';
 // Admin
 import Admin from './admin/Admin.jsx';
 import Newblog from './admin/Subpagina/Newblog.jsx';
-import Comentarios from './admin/Subpagina/Curtidas.jsx';
+import Curtidas from './admin/Subpagina/Curtidas.jsx';
 import Newdesafios from './admin/Subpagina/Newdesafios.jsx';
 import Notas from './admin/Subpagina/Notas.jsx';
+import Comentarios from './admin/Subpagina/Comentarios.jsx';
 
 // Rotas protegidas
 import ProtectedRoute from './context/ProtectedRoute.jsx';
@@ -229,9 +230,10 @@ function App() {
             {/* --- Rotas Admin --- */}
             <Route path="/admin" element={<ProtectedAdminRoute><AnimatedPage><Admin /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/newblog" element={<ProtectedAdminRoute><AnimatedPage><Newblog /></AnimatedPage></ProtectedAdminRoute>} />
-            <Route path="/admin/curtidas" element={<ProtectedAdminRoute><AnimatedPage><Comentarios /></AnimatedPage></ProtectedAdminRoute>} />
+            <Route path="/admin/curtidas" element={<ProtectedAdminRoute><AnimatedPage><Curtidas /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/newdesafios" element={<ProtectedAdminRoute><AnimatedPage><Newdesafios/></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/notas" element={<ProtectedAdminRoute><AnimatedPage><Notas /></AnimatedPage></ProtectedAdminRoute>} />
+            <Route path="/admin/comentarios" element={<ProtectedAdminRoute><AnimatedPage><Comentarios/></AnimatedPage></ProtectedAdminRoute>} />
 
             {/* Rota 404 (Opcional, mas recomendada) */}
             <Route path="*" element={<div style={{textAlign: 'center', padding: '50px'}}>Página não encontrada</div>} />

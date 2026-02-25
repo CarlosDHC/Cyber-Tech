@@ -7,7 +7,7 @@ import { db, auth } from "../../../FirebaseConfig";
 
 import ForumButton from '../../components/ForumButton';
 
-// --- PostCard (Mesmo código) ---
+// PostCard (Mesmo código)
 function PostCard({ post }) {
   const [likesCount, setLikesCount] = useState(0);
   const [userLiked, setUserLiked] = useState(false);

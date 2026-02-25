@@ -7,8 +7,6 @@ import { db, auth } from "../../../FirebaseConfig";
 
 import ForumButton from '../../components/ForumButton';
 
-// ... COPIE A FUNÇÃO PostCard DO ARQUIVO ANTERIOR E COLE AQUI (É IDÊNTICA) ...
-// Para brevidade, assuma que a função PostCard está aqui.
 function PostCard({ post }) {
   const [likesCount, setLikesCount] = useState(0);
   const [userLiked, setUserLiked] = useState(false);

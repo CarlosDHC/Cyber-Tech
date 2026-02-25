@@ -14,9 +14,14 @@ export default function NewBlog() {
   const [capa, setCapa] = useState("");
   const [autor, setAutor] = useState("");
   const [tempoLeitura, setTempoLeitura] = useState("");
+ 
   
   // Estado para categoria
   const [categoria, setCategoria] = useState(""); 
+
+
+  const [categoria, setCategoria] = useState("");
+ 
 
   const [secoes, setSecoes] = useState([
     { id: Date.now(), type: "paragraph", content: "" }
@@ -26,7 +31,6 @@ export default function NewBlog() {
   const [collapsed, setCollapsed] = useState(true);
   const [modoPreview, setModoPreview] = useState(false);
 
-  // --- CÁLCULO AUTOMÁTICO DE TEMPO DE LEITURA ---
   useEffect(() => {
     const textoTotal = secoes.reduce((acc, bloco) => {
       if (bloco.type === 'paragraph' || bloco.type === 'subtitle') {
@@ -36,8 +40,12 @@ export default function NewBlog() {
     }, "");
 
     const contagemPalavras = textoTotal.trim().split(/\s+/).length;
+ 
     
     // Média de leitura: 200 palavras por minuto
+
+
+
     const minutosCalculados = Math.ceil(contagemPalavras / 200);
     const tempoFinal = contagemPalavras > 0 ? minutosCalculados : "";
 
@@ -208,8 +216,12 @@ export default function NewBlog() {
                     <label className={styles.fieldLabel}>Autor</label>
                     <input className={styles.inputField} value={autor} onChange={e => setAutor(e.target.value)} />
                   </div>
+
                   
                   {/* --- CAMPO DE TEMPO MELHORADO --- */}
+
+
+
                   <div className={styles.inputGroup} style={{ flex: 1 }}>
                     <label className={styles.fieldLabel}>
                       Tempo Estimado de Leitura

@@ -21,6 +21,12 @@ export default function Admin() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
 
+
+
+  const [selectedArea, setSelectedArea] = useState('Tecnologia');
+  const [availableAreas, setAvailableAreas] = useState([]);
+
+ 
   const isDashboard = location.pathname === '/admin';
 
   const COLORS = {
@@ -49,6 +55,21 @@ export default function Admin() {
           getCountFromServer(adminsColl).catch(() => ({ data: () => ({ count: 0 }) }))
         ]);
 
+ 
+        const desafioAreaMap = {};
+        const areasEncontradas = new Set(); 
+        
+        desafiosSnap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.titulo && data.area) {
+            desafioAreaMap[data.titulo] = data.area;
+            areasEncontradas.add(data.area);
+          }
+        });
+
+        setAvailableAreas(Array.from(areasEncontradas));
+
+ 
         setStats({
           users: usersSnap.data().count - adminsSnap.data().count,
           posts: blogSnap.data().count,
@@ -108,6 +129,11 @@ export default function Admin() {
     fetchDashboardData();
   }, [isDashboard]);
 
+ 
+  // Filtragem obrigatória por área 
+  const filteredChartData = chartData.filter(item => item.area === selectedArea);
+
+ 
   return (
     <div className={styles.container}>
       <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
@@ -121,6 +147,7 @@ export default function Admin() {
           <li><Link to="/admin/newblog" className={styles.navLink}><img src="/blog.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
           <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
           <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 
