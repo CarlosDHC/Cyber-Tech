@@ -1,6 +1,6 @@
 :root {
   --sidebar-width-open: 250px;
-  --sidebar-width-collapsed: 60px;
+  --sidebar-width-collapsed: 45px;
 
   --header-height: 70px;
 
@@ -185,11 +185,11 @@ font-size: 15px;
 /* ÁREA PRINCIPAL */
 .main {
   flex: 1;
-  padding: 30px;
+  padding: 0 30px;
   width: 100%;
   box-sizing: border-box;
   margin-left: var(--sidebar-width-open);
-  margin-top: 1rem;
+  margin-top: 55px;
 
   /* ANIMAÇÃO SUAVE DO CONTEÚDO */
   transition: margin-left var(--transition-speed) var(--transition-ease);
@@ -209,8 +209,8 @@ font-size: 15px;
 /* ESTADO COLAPSADO */
 .sidebarCollapsed {
   width: var(--sidebar-width-collapsed) !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
   align-items: center;
 }
 
@@ -235,7 +235,7 @@ font-size: 15px;
 /* BOTÃO HAMBURGUER */
 .sidebarCollapsed .toggleBtn {
   justify-content: right;
-  padding: 12px;
+  padding: 4px;
   padding-left: 0;
 }
 
@@ -400,7 +400,7 @@ font-size: 15px;
   font-weight: 500;
 }
 
-/* EDITOR DE BLOG (NewBlog)*/
+/* EDITOR DE BLOG*/
 
 .inputGroup {
   display: flex;
@@ -765,8 +765,8 @@ font-size: 15px;
 /* --- MOBILE (até 600px) -*/
 @media (max-width: 600px) {
   .main {
-    padding: 15px;
-    margin-right: 10px;
+    padding: 10px;
+    margin-right: 1px;
     margin-left: 60px;
     transform: none;
   }

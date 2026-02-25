@@ -9,7 +9,6 @@ import {
 import { db, auth } from "../../../FirebaseConfig";
 import ForumButton from '../../components/ForumButton';
 
-// --- Componente do Card (Reutilizável) ---
 function PostCard({ post }) {
   const [likesCount, setLikesCount] = useState(0);
   const [userLiked, setUserLiked] = useState(false);
@@ -71,7 +70,7 @@ function PostCard({ post }) {
   );
 }
 
-// --- Página Principal ---
+// Página Principal
 function Tecnologia() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -8,7 +8,6 @@ import { FormInput } from 'lucide-react';
 
 import ForumButton from '../../components/ForumButton.jsx';
 
-// --- PostCard (Mesmo código, copiado) ---
 function PostCard({ post }) {
   const [likesCount, setLikesCount] = useState(0);
   const [userLiked, setUserLiked] = useState(false);

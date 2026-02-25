@@ -13,12 +13,9 @@ const PostDinamico = () => {
   const [prevId, setPrevId] = useState(null);
   const [nextId, setNextId] = useState(null);
 
-  // 1. Função que decide para onde o botão "Menu" (Azulejos) vai voltar
-  // Baseado na categoria salva no Firebase
   const getBackLink = (categoria) => {
-    if (!categoria) return '/blog'; // Se não tiver categoria, volta para o início
+    if (!categoria) return '/blog'; 
 
-    // Normaliza para letras minúsculas para evitar erros (Ex: "Direito" ou "direito")
     const cat = categoria.toLowerCase();
 
     switch(cat) {
@@ -35,7 +32,6 @@ const PostDinamico = () => {
     const fetchPost = async () => {
       setLoading(true);
       try {
-        // Busca o post atual pelo ID da URL
         const docRef = doc(db, "blog", id);
         const docSnap = await getDoc(docRef);
 
@@ -43,12 +39,9 @@ const PostDinamico = () => {
           const currentData = docSnap.data();
           setPost(currentData);
 
-          // 2. Lógica de Navegação (Anterior / Próximo)
-          // Só busca vizinhos que sejam da MESMA categoria
           if (currentData.dataCriacao && currentData.categoria) {
             const blogRef = collection(db, "blog");
             
-            // Post Anterior: Mesma categoria, data mais antiga
             const prevQuery = query(
               blogRef, 
               where("categoria", "==", currentData.categoria),
@@ -57,19 +50,16 @@ const PostDinamico = () => {
               limit(1)
             );
             
-            // Post Próximo: Mesma categoria, data mais recente
             const nextQuery = query(
               blogRef, 
               where("categoria", "==", currentData.categoria),
-              where("dataCriacao", ">", currentData.dataCriacao), // Atenção à direção da seta
+              where("dataCriacao", ">", currentData.dataCriacao), 
               orderBy("dataCriacao", "asc"), 
               limit(1)
             );
 
-            // Executa as buscas em paralelo
             const [prevSnap, nextSnap] = await Promise.all([getDocs(prevQuery), getDocs(nextQuery)]);
             
-            // Define os IDs para os botões
             setPrevId(!prevSnap.empty ? prevSnap.docs[0].id : null);
             setNextId(!nextSnap.empty ? nextSnap.docs[0].id : null);
           }
@@ -86,13 +76,11 @@ const PostDinamico = () => {
   if (loading) return <div className="loading-container"><div className="spinner"></div></div>;
   if (!post) return <div className="error-msg">Post não encontrado.</div>;
 
-  // Calcula o link de volta baseado na categoria carregada
   const backLink = getBackLink(post.categoria);
 
   return (
     <div className="blog-post-container">
       <header className="blog-post-header">
-        {/* Mostra a TAG da categoria (Ex: DIREITO) */}
         {post.categoria && (
           <span className={`categoria-tag tag-${post.categoria.toLowerCase()}`}>
             {post.categoria}
@@ -114,7 +102,6 @@ const PostDinamico = () => {
       </header>
 
       <section className="blog-content-body">
-        {/* Renderização do Conteúdo (Suporta texto corrido ou blocos do Admin) */}
         {Array.isArray(post.conteudo) ? (
           post.conteudo.map((bloco, index) => (
             <div key={index} className="content-block">
@@ -125,12 +112,10 @@ const PostDinamico = () => {
             </div>
           ))
         ) : (
-          // Fallback para posts antigos (string simples)
           <div dangerouslySetInnerHTML={{ __html: post.conteudo }} />
         )}
       </section>
 
-      {/* Navegação no Rodapé - CORRIGIDA */}
       <nav className="blog-navigation">
         {nextId ? (
           <Link to={`/blog/post/${nextId}`} className="blog-nav-link">← Anterior</Link>

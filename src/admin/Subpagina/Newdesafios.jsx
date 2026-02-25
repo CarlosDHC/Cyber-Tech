@@ -164,7 +164,7 @@ export default function PainelDesafios() {
                     </div>
                 ) : (
                     <div className={styles.editorContainer}>
-                        {/* 1. CONFIGURAÇÕES EM CARD (IGUAL AO DAS QUESTÕES) */}
+                        {/* 1. CONFIGURAÇÕES EM CARD */}
                         <div className={styles.blockItem}>
                             <h3 style={{margin:'20px 0 10px'}}>1. Configurações Gerais</h3>
                             <div className={styles.inputGroup}>
