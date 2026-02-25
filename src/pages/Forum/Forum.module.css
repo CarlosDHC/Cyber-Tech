@@ -10,6 +10,12 @@
   color: #1e293b;
 }
 
+main{
+  flex: 1;
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 0px;
+}
 .contentWrapper {
   max-width: 1100px; /* Leitura mais confortável */
   margin: 0 auto;

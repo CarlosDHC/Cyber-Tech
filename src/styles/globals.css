@@ -62,7 +62,7 @@ a {
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-primary);
   font-weight: 700;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 /* --- CONTAINER GLOBAL (CORRIGIDO) --- */
@@ -116,7 +116,7 @@ main {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;    
-  padding-top: var(--header-height);
+  padding-top: 20px;
   padding-bottom: 10px;     
 }
 
@@ -153,7 +153,10 @@ footer {
     width: 95%;
   }
   
-  h1 { font-size: 1.8rem; }
+  h1 { font-size: 1.8rem;
+    margin: 5px;
+  }
+  
   h2 { font-size: 1.5rem; }
 }
 
