@@ -48,6 +48,14 @@ function CapitulosRh() {
         Desenvolva competências em gestão de pessoas e legislação com nossos simulados.
       </p>
 
+        {/* Desafio 2 */}
+        <Link to="/desafios/Rh/DesafioRh2" className={styles.challengeCard}>
+          <img
+            src="C:\Users\usrlabeco2N\Documents\GitHub\cyber-tech-v.2.0\public\rh-cursos.jpg"
+          ></img>
+          <p>Treinamento & Desenvolvimento</p> 
+        </Link>
+
       {loading ? (
         <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
       ) : (
@@ -62,6 +70,14 @@ function CapitulosRh() {
                   style={{ objectFit: 'cover' }}
                 />
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                {/* --- EXIBIÇÃO PADRONIZADA: QUESTÕES E TENTATIVAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------------------- */}
 
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}
