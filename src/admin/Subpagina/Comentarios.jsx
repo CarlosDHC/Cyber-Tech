@@ -1,8 +1,8 @@
 // src/admin/Subpagina/Comentarios.jsx
 import React, { useState, useEffect } from "react";
-import { db } from "../../FirebaseConfig"; // Confirme se o caminho está correto
+import { db } from "../../../FirebaseConfig";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import styles from "../Comentarios.module.css";
+import styles from "./Comentarios.module.css";
 
 export default function Comentarios() {
   const [conteudos, setConteudos] = useState([]);
