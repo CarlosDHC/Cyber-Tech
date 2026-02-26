@@ -116,6 +116,7 @@ export default function Notas() {
           <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
           <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
           <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 
@@ -129,7 +130,7 @@ export default function Notas() {
         ) : (
           <>
             <div className={notasStyles.metricsGrid}>
-              
+
               <div className={styles.card}>
                 <h3 style={{ borderBottom: '2px solid #00C49F', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em Destaque</h3>
                 <div className={notasStyles.tableWrapper}>

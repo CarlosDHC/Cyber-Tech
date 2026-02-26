@@ -100,35 +100,12 @@ export default function NewBlog() {
         </button>
         <h2 className={styles.title}>Painel Admin</h2>
         <ul className={styles.navList}>
-          <li>
-            <Link to="/admin" className={styles.navLink}>
-              <img src="/casa.png" alt="H" />
-              <span className={styles.linkText}>Home</span>
-            </Link>
-          </li>
-          <li><Link to="/admin/notas" className={styles.navLink}>
-            <img src="/blog.png" alt="N" />
-            <span className={styles.linkText}>Notas</span>
-          </Link>
-          </li>
-          <li>
-            <Link to="/admin/newblog" className={styles.navLink}>
-              <img src="/inotas.png" alt="B" />
-              <span className={styles.linkText}>Blog</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newdesafios" className={styles.navLink}>
-              <img src="/idesafio.png" alt="D" />
-              <span className={styles.linkText}>Desafios</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/curtidas" className={styles.navLink}>
-              <img src="/curti.png" alt="L" />
-              <span className={styles.linkText}>Like</span>
-            </Link>
-          </li>
+          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
+          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 

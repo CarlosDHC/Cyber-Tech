@@ -729,6 +729,152 @@ font-size: 15px;
   color: #333;
 }
 
+/* =========================================
+   ESTILOS DO FÓRUM / COMENTÁRIOS
+   (Adicionado para a página Comentarios.jsx)
+========================================= */
+
+.postCard {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.postHeader {
+  margin-bottom: 15px;
+}
+
+.postHeader h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.4rem;
+  color: #1e293b;
+}
+
+.postMeta {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 15px;
+}
+
+.postContentBox {
+  background-color: #f8fafc;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.postDivider {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 20px 0;
+}
+
+/* Área de Comentários */
+.commentsSection h4 {
+  color: #475569;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.commentsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.commentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f1f5f9;
+  padding: 12px 15px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.commentText {
+  color: #334155;
+  font-size: 0.95rem;
+  padding-right: 15px;
+}
+
+.commentText strong {
+  color: #0f172a;
+}
+
+/* Botões específicos do Fórum */
+.btnDeletePost {
+      background-color: var(--color-primary-light);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btnDeletePost:hover {
+  background-color: #357abd;
+}
+
+.btnDeleteComment {
+      background-color: var(--color-primary-light);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btnDeleteComment:hover {
+  background-color: #357abd;
+  color: white;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 20px;
+}
+
+.mainContent {
+  margin-left: 250px; /* Ajuste para a largura exata do seu menu aberto */
+  width: calc(100% - 250px);
+  transition: all 0.3s ease;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.contentExpanded {
+  margin-left: 40px; /* Ajuste para a largura do menu encolhido */
+  width: calc(100% - 80px);
+}
+
 /* ESPONSIVIDADE */
 
 /* --- TABLET (até 900px) -*/
