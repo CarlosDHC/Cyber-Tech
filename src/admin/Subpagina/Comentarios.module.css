@@ -1,200 +1,87 @@
-/* =========================================
-   Área de Conteúdo Principal (Fórum)
-========================================= */
-/* =========================================
-   Área de Conteúdo Principal (Fórum)
-========================================= */
-.mainContent {
-  flex: 1; /* Faz o conteúdo preencher apenas o espaço que sobra ao lado do aside */
-  min-width: 0; /* Evita que o conteúdo vaze da tela quebrando o flexbox */
-  height: 100vh; /* Iguala a altura com o menu lateral */
-  padding: 40px;
-  overflow-y: auto; /* Permite rolar apenas a área de conteúdo */
-  box-sizing: border-box; /* Garante que o padding não aumente o tamanho da div */
-  background-color: #f4f7f6; /* Cor de fundo padrão do painel (ajuste se a sua for diferente) */
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  
-  /* Transição suave para acompanhar o aside expandindo/encolhendo */
-  transition: all 0.3s ease; 
+/* src/admin/Subpagina/Comentarios.module.css */
+.container {
+  padding: 2rem;
+  background-color: #f4f7f6;
+  min-height: 100vh;
 }
 
-/* Caso o seu aside no admin.module.css seja "position: fixed", 
-   descomente as duas regras de margin-left abaixo e ajuste os valores consoante o tamanho do seu aside: */
-/*
-.mainContent {
-  margin-left: 250px; 
-}
-.contentExpanded {
-  margin-left: 80px; 
-}
-*/
-
-.pageTitle {
+.title {
+  color: #333;
+  margin-bottom: 1.5rem;
   font-size: 2rem;
-  color: #0f172a;
-  margin-bottom: 5px;
+  border-bottom: 2px solid #00d2ff;
+  padding-bottom: 0.5rem;
 }
 
-.pageSubtitle {
-  color: #64748b;
-  margin-bottom: 30px;
+.tableContainer {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.table th {
+  background-color: #00d2ff;
+  color: white;
+  font-weight: bold;
+}
+
+.table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badgeForum {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.badgeComentario {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btnDelete {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.btnDelete:hover {
+  background-color: #dc2626;
 }
 
 .emptyMessage {
   text-align: center;
-  color: #94a3b8;
+  padding: 2rem;
+  color: #666;
   font-size: 1.2rem;
-  padding: 40px;
-  background: #fff;
-  border-radius: 8px;
-}
-
-/* =========================================
-   Cards de Posts
-========================================= */
-.listaPosts {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.cardPost {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-}
-
-/* Cabeçalho do Post */
-.postHeader {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.postInfo {
-  flex: 1;
-}
-
-.postInfo h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.4rem;
-  color: #1e293b;
-}
-
-.postInfo p {
-  margin: 0 0 5px 0;
-  font-size: 0.9rem;
-  color: #475569;
-}
-
-.postInfo strong {
-  color: #334155;
-}
-
-.postConteudo {
-  margin-top: 15px !important;
-  font-size: 1.05rem !important;
-  color: #334155 !important;
-  line-height: 1.5;
-  background: #f8fafc;
-  padding: 15px;
-  border-radius: 8px;
-  border-left: 4px solid #3b82f6;
-}
-
-/* =========================================
-   Área de Comentários
-========================================= */
-.areaComentarios {
-  background-color: #f8fafc;
-  padding: 20px;
-}
-
-.areaComentarios h4 {
-  margin: 0 0 15px 0;
-  color: #475569;
-  font-size: 1.1rem;
-}
-
-.semComentarios {
-  color: #94a3b8;
-  font-style: italic;
-  margin: 0;
-}
-
-.comentariosList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.itemComentario {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #ffffff;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.comentarioTexto {
-  flex: 1;
-  padding-right: 20px;
-}
-
-.comentarioTexto strong {
-  color: #0f172a;
-}
-
-.comentarioTexto span {
-  color: #334155;
-  font-size: 0.95rem;
-}
-
-.comentarioData {
-  margin-top: 5px;
-  font-size: 0.8rem;
-  color: #94a3b8;
-}
-
-/* =========================================
-   Botões de Exclusão
-========================================= */
-.btnDeletePost {
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  flex-shrink: 0;
-  margin-left: 20px;
-}
-
-.btnDeletePost:hover {
-  background-color: #dc2626;
-}
-
-.btnDeleteComentario {
-  background-color: #fecaca;
-  color: #b91c1c;
-  border: 1px solid #f87171;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-
-.btnDeleteComentario:hover {
-  background-color: #ef4444;
-  color: white;
 }

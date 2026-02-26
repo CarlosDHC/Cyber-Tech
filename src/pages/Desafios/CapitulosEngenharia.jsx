@@ -1,73 +1,90 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css";
+import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
 
-function ChallengeList() {
+// Firebase Imports
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { db } from "../../../FirebaseConfig";
+
+function CapitulosEngenharia() {
+  const [desafios, setDesafios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Define a área desta página como Engenharia
+  const AREA_ATUAL = "Engenharia"; 
+
+  useEffect(() => {
+    const fetchDesafios = async () => {
+      try {
+        setLoading(true);
+        // Busca desafios da coleção 'desafios' filtrados pela área Engenharia
+        const q = query(
+          collection(db, "desafios"),
+          where("area", "==", AREA_ATUAL),
+          orderBy("dataCriacao", "desc")
+        );
+
+        const querySnapshot = await getDocs(q);
+        const listaDesafios = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        setDesafios(listaDesafios);
+      } catch (error) {
+        console.error("Erro ao buscar desafios de Engenharia:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesafios();
+  }, []);
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Engenharia Civil</h1>
+      <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! 
+        Soluções técnicas e inovação: aplique seus conhecimentos em desafios de Engenharia.
       </p>
 
-      <div className={styles.challengeCardsList}>
-           {/* Desafio 1 */}
-               <Link to="/Desafios/Engenharia/DesafioEng1" className={styles.challengeCard}>
-                 <img
-                   src="/img_desafios/proj-estrutural.jpg"
-                 ></img>
-                 <p>Projeto Estrutural</p> 
-               </Link>
-       
-               {/* Desafio 2 */}
-               <Link to="/desafios/Engenharia/DesafioEng2" className={styles.challengeCard}>
-                 <img
-                   src="/img_desafios/planejamento-urbano.jpg"
-                 ></img>
-                 <p>Planejamento Urbano</p> 
-               </Link>
-       
-               {/* Desafio 3 */}
-               <Link to="/desafios/Engenharia/DesafioEng3" className={styles.challengeCard}>
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+      ) : (
+        <div className={styles.challengeCardsList}>
+          {desafios.length > 0 ? (
+            desafios.map((desafio) => (
+              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
                 <img
-                   src="/img_desafios/infra-eng.jpg"
-                 ></img>
-                 <p>Infraestrutura</p>
-               </Link>
-               {/* Desafio 4 */}
-               <Link to="/desafios/Engenharia/DesafioEng4" className={styles.challengeCard}>
-                <img
-                   src="/img_desafios/geo-solos.jpg"
-                 ></img>
-                 <p>Geotecnia e Solos</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng5" className={styles.challengeCard}>
-                <img
-                   src="/img_desafios/pontes-viadutos.jpg"
-                 ></img>
-                 <p>Pontes e Viadutos</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng6" className={styles.challengeCard}>
-                <img
-                   src="/img_desafios/const.jpg"
-                 ></img>
-                 <p>Constituição</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng7" className={styles.challengeCard}>
-                <img
-                   src="/img_desafios/processo-eng.jpg"
-                 ></img>
-                 <p>Processo</p>
-               </Link>
-               <Link to="/desafios/Engenharia/DesafioEng8" className={styles.challengeCard}>
-                <img
-                   src="/img_desafios/fundacoes.jpg"
-                 ></img>
-                 <p>Fundações</p>
-               </Link>
-             </div>
-           </div>
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Engenharia"}
+                  alt={desafio.titulo}
+                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  style={{ objectFit: 'cover' }}
+                />
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS PADRONIZADAS --- */}
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
+                {/* ------------------------------------------------- */}
+
+                <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
+                  {desafio.subcategoria}
+                </span>
+              </Link>
+            ))
+          ) : (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
+              Nenhum desafio encontrado para a área de Engenharia no momento.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
-export default ChallengeList;
+export default CapitulosEngenharia;

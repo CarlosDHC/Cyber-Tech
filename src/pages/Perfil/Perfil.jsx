@@ -134,7 +134,7 @@ export default function Perfil() {
       <motion.div className={styles.profileBox} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
 
         <div className={styles.header}>
-          <h2>MEU PERFIL</h2>
+          <h2>Meu Perfil</h2>
           <div className={styles.tabs}>
             <span className={styles.activeTab}>Dados do Usuário</span>
           </div>
@@ -172,7 +172,7 @@ export default function Perfil() {
               <input name="name" value={form.name} onChange={handleChange} />
             </div>
             <div className={styles.inputGroup}>
-              <label>Sobrenome</label>
+              <label>Apelido</label>
               <input name="apelido" value={form.apelido} onChange={handleChange} placeholder="Como prefere ser chamado" />
             </div>
 

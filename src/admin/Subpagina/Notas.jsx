@@ -19,6 +19,7 @@ export default function Notas() {
       try {
         const q = query(collection(db, "pontuacoes"), orderBy("data", "desc"));
         const snapshot = await getDocs(q);
+
         const agrupamento = {};
 
         snapshot.docs.forEach((doc) => {
@@ -43,6 +44,7 @@ export default function Notas() {
             categoria: dados.categoria || "Geral",
             nota: Number(dados.nota || 0),
             total: Number(dados.total || 1),
+            tentativas: Number(dados.tentativas || 1),
             data: dados.data
           });
         });
@@ -52,24 +54,30 @@ export default function Notas() {
 
           aluno.respostasBrutas.forEach(resp => {
             const chaveDesafio = resp.desafioId || resp.desafio;
-            // Mantém apenas a melhor nota de cada desafio
-            if (!desafiosUnicos[chaveDesafio] || resp.nota > desafiosUnicos[chaveDesafio].nota) {
+            if (!desafiosUnicos[chaveDesafio]) {
               desafiosUnicos[chaveDesafio] = resp;
+            } else {
+              if (resp.nota > desafiosUnicos[chaveDesafio].nota) {
+                desafiosUnicos[chaveDesafio] = resp;
+              }
             }
           });
 
           const respostasFinais = Object.values(desafiosUnicos);
+
           let somaNotasPonderadas = 0;
           respostasFinais.forEach(resp => {
-            somaNotasPonderadas += (resp.nota / resp.total) * 10;
+            const notaBase10 = (resp.nota / resp.total) * 10;
+            somaNotasPonderadas += notaBase10;
           });
 
-          const mediaFinal = respostasFinais.length > 0 ? (somaNotasPonderadas / respostasFinais.length) : 0;
+          const mediaFinal = respostasFinais.length > 0
+            ? (somaNotasPonderadas / respostasFinais.length)
+            : 0;
 
           return {
             ...aluno,
             respostas: respostasFinais,
-            tentativasTotal: aluno.respostasBrutas.length,
             media: mediaFinal
           };
         });
@@ -104,87 +112,133 @@ export default function Notas() {
         <h2 className={styles.title}>Administrador</h2>
         <ul className={styles.navList}>
           <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-          <li><Link to="/admin/notas" className={styles.navLink}><img src="/estrela.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
-          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/blog.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
-          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
-          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Likes</span></Link></li>
-          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="C" /><span className={styles.linkText}>Comentários</span></Link></li>
+          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Like</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 
       <main className={styles.main}>
-        <h1>Painel de Desempenho</h1>
+        <h1>Desempenho dos Alunos</h1>
 
         {loading ? (
-          <p>Carregando dados...</p>
+          <p>Carregando notas...</p>
+        ) : alunos.length === 0 ? (
+          <p>Nenhuma nota registrada ainda.</p>
         ) : (
           <>
-            {/* Seção de Métricas Rápidas */}
-            <div className={notasStyles.metricsGrid} style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-              <div className={styles.card} style={{ flex: 1, borderLeft: '4px solid #00C49F' }}>
-                <h3>Destaques (Média {'>'} 8)</h3>
-                <table className={notasStyles.responsiveTable} style={{ width: '100%' }}>
-                  <tbody>
-                    {topStudents.map((aluno, i) => (
-                      <tr key={i}>
-                        <td>{aluno.nome}</td>
-                        <td style={{ fontWeight: 'bold', color: '#00C49F', textAlign: 'right' }}>{aluno.media.toFixed(1)}</td>
+            <div className={notasStyles.metricsGrid}>
+
+              <div className={styles.card}>
+                <h3 style={{ borderBottom: '2px solid #00C49F', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em Destaque</h3>
+                <div className={notasStyles.tableWrapper}>
+                  <table className={notasStyles.responsiveTable}>
+                    <thead>
+                      <tr style={{ textAlign: 'left', color: '#999' }}>
+                        <th style={{ padding: '8px' }}>Aluno</th>
+                        <th style={{ padding: '8px', textAlign: 'right' }}>Média Geral</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {topStudents.map((aluno, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                          <td style={{ padding: '8px' }}>{aluno.nome}</td>
+                          <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold', color: '#00C49F' }}>{aluno.media.toFixed(1)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div className={styles.card} style={{ flex: 1, borderLeft: '4px solid #FF8042' }}>
-                <h3>Atenção (Média {'<'} 6)</h3>
-                <table className={notasStyles.responsiveTable} style={{ width: '100%' }}>
-                  <tbody>
-                    {riskStudents.map((aluno, i) => (
-                      <tr key={i}>
-                        <td>{aluno.nome}</td>
-                        <td style={{ fontWeight: 'bold', color: '#FF8042', textAlign: 'right' }}>{aluno.media.toFixed(1)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Lista Detalhada de Alunos */}
-            <h2>Lista de Alunos</h2>
-            <div className={styles.cards}>
-              {alunos.map((aluno) => (
-                <div key={aluno.email} className={styles.card}>
-                  <div style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <h3 style={{ color: '#095e8b' }}>{aluno.nome}</h3>
-                      <p style={{ fontSize: '0.8rem', color: '#666' }}>{aluno.email}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{aluno.media.toFixed(1)}</span>
-                      <p style={{ fontSize: '0.7rem' }}>MÉDIA</p>
-                    </div>
-                  </div>
-
-                  <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                    <table style={{ width: '100%', fontSize: '0.85rem' }}>
+              <div className={styles.card} style={{ borderLeft: '4px solid #FF8042' }}>
+                <h3 style={{ borderBottom: '2px solid #FF8042', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em risco</h3>
+                {riskStudents.length > 0 ? (
+                  <div className={notasStyles.tableWrapper}>
+                    <table className={notasStyles.responsiveTable}>
                       <thead>
-                        <tr style={{ color: '#999', textAlign: 'left' }}>
-                          <th>Desafio</th>
-                          <th>Nota</th>
-                          <th>Data</th>
+                        <tr style={{ textAlign: 'left', color: '#999' }}>
+                          <th style={{ padding: '8px' }}>Aluno</th>
+                          <th style={{ padding: '8px', textAlign: 'right' }}>Média Geral</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {aluno.respostas.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.desafio.replace("Desafio ", "")}</td>
-                            <td style={{ color: (item.nota/item.total) >= 0.6 ? 'green' : 'red', fontWeight: 'bold' }}>
-                              {item.nota}/{item.total}
-                            </td>
-                            <td>{formatarData(item.data).split(' às ')[0]}</td>
+                        {riskStudents.map((aluno, i) => (
+                          <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                            <td style={{ padding: '8px' }}>{aluno.nome}</td>
+                            <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold', color: '#FF8042' }}>{aluno.media.toFixed(1)}</td>
                           </tr>
                         ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Tudo certo por aqui!</p>}
+              </div>
+
+            </div>
+
+            <div className={styles.cards}>
+              {alunos.map((aluno) => (
+                <div key={aluno.email} className={styles.card} style={{ display: 'block' }}>
+                  <div style={{ borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ color: '#095e8b', marginBottom: '5px' }}>{aluno.nome}</h3>
+                      <p style={{ fontSize: '0.9rem', color: '#666' }}>{aluno.email}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#999' }}>Média Geral</span>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#333' }}>{aluno.media.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  <div className={notasStyles.tableWrapper} style={{ maxHeight: '300px' }}>
+                    <table className={notasStyles.responsiveTable}>
+                      <thead>
+                        <tr style={{ textAlign: 'left', color: '#999', borderBottom: '1px solid #eee' }}>
+                          <th style={{ padding: '8px' }}>Desafio</th>
+                          <th style={{ padding: '8px' }}>Categoria</th>
+                          <th style={{ padding: '8px' }}>Melhor Nota</th>
+                          <th style={{ padding: '8px', textAlign: 'center' }}>Tentativas</th>
+                          <th style={{ padding: '8px' }}>Última Data</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {aluno.respostas.map((item) => {
+                          const porcentagem = item.nota / item.total;
+                          const aprovado = porcentagem >= 0.6;
+
+                          return (
+                            <tr key={item.id} style={{ borderBottom: '1px solid #f9f9f9' }}>
+                              <td style={{ padding: '8px', color: '#333' }}>
+                                {item.desafio ? item.desafio.replace("Desafio ", "") : "Sem nome"}
+                              </td>
+                              <td style={{ padding: '8px', fontSize: '0.85rem', color: '#666' }}>
+                                {item.categoria}
+                              </td>
+                              <td style={{ padding: '8px' }}>
+                                <span style={{
+                                  fontWeight: "bold",
+                                  color: aprovado ? "green" : "red",
+                                  backgroundColor: aprovado ? "#e6fffa" : "#fff5f5",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px"
+                                }}>
+                                  {item.nota} / {item.total}
+                                </span>
+                              </td>
+                              <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>
+                                {item.tentativas}
+                              </td>
+                              <td style={{ padding: '8px', fontSize: '0.75rem', color: '#777' }}>
+                                {formatarData(item.data).split(' às ')[0]}
+                                <br />
+                                {formatarData(item.data).split(' às ')[1]}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
