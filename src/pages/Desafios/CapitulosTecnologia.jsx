@@ -1,91 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
+import styles from "../Home/Home.module.css";
 
-// Firebase Imports
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db } from "../../../FirebaseConfig";
-
-function CapitulosTecnologia() {
-  const [desafios, setDesafios] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Define a área desta página
-  const AREA_ATUAL = "Tecnologia"; 
-
-  useEffect(() => {
-    const fetchDesafios = async () => {
-      try {
-        setLoading(true);
-        // Busca desafios da coleção 'desafios' filtrados pela área
-        const q = query(
-          collection(db, "desafios"),
-          where("area", "==", AREA_ATUAL),
-          orderBy("dataCriacao", "desc") // Ordena pelos mais novos
-        );
-
-        const querySnapshot = await getDocs(q);
-        const listaDesafios = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
-        setDesafios(listaDesafios);
-      } catch (error) {
-        console.error("Erro ao buscar desafios:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDesafios();
-  }, []);
-
+function ChallengeList() {
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
+      <h1 className={styles.pageTitle}>Tecnologia</h1>
       <p className={styles.pageSubtitle}>
         Hora de praticar! Treine a lógica de programação com nossos desafios.
       </p>
+      <div className={styles.challengeCardsList}>
+        {/* Desafio 1 */}
+        <Link to="/desafios/Tecnologia/DesafioTec1" className={styles.challengeCard}>
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKDz_bFly7KpcwHUB-FxunQc1FLQXJwR0Xxg&s"
+          ></img>
+          <p>Introdução</p> 
+        </Link> 
 
-      {loading ? (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
-      ) : (
-        <div className={styles.challengeCardsList}>
-          {desafios.length > 0 ? (
-            desafios.map((desafio) => (
-              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
-                <img
-                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Quiz"}
-                  alt={desafio.titulo}
-                  // Adiciona um fallback caso a imagem esteja quebrada
-                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
-                  style={{ objectFit: 'cover' }}
-                />
-                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
-                
-                {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS --- */}
-                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
-                  <span>{desafio.qtdQuestoes || 0} Questões</span>
-                  <span> • </span>
-                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
-                </div>
-                {/* ------------------------------------ */}
+        {/* Desafio 2 */}
+        <Link to="/desafios/Tecnologia/DesafioTec2" className={styles.challengeCard}>
+          <img
+            src="https://www.unido.org/sites/default/files/2023-01/technology%20transfer%20%282%29.jpg"
+          ></img>
+          <p>Front-End</p> 
+        </Link>
 
-                <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
-                  {desafio.subcategoria}
-                </span>
-              </Link>
-            ))
-          ) : (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
-              Nenhum desafio encontrado para esta área no momento.
-            </p>
-          )}
-        </div>
-      )}
+        {/* Desafio 3 */}
+        <Link to="/desafios/Tecnologia/DesafioTec3" className={styles.challengeCard}>
+         <img
+            src="https://images.pexels.com/photos/16592498/pexels-photo-16592498.jpeg"
+          ></img>
+          <p>Back-End</p>
+        </Link>
+        <Link to="/desafios/Tecnologia/DesafioTec4" className={styles.challengeCard}>
+         <img
+            src="https://www.aeccglobal.my/images/2022/11/08/study-information--technology-abroad.webp"
+          ></img>
+          <p>Algoritmos</p>
+        </Link>
+        <Link to="/desafios/Tecnologia/DesafioTec5" className={styles.challengeCard}>
+         <img
+            src="https://www.monitoratec.com.br/blog/wp-content/uploads/2020/08/AdobeStock_310133736.jpeg"
+          ></img>
+          <p>Desenvolvimento</p>
+        </Link>
+        <Link to="/desafios/Tecnologia/DesafioTec5" className={styles.challengeCard}>
+         <img
+            src="https://www.deutschland.de/sites/default/files/media/image/EuroHPC%20entwickelt%20Supercomputer%20f%C3%BCr%20Europa.jpg"
+          ></img>
+          <p>Banco de Dados</p>
+        </Link>
+        <Link to="/desafios/Tecnologia/DesafioTec5" className={styles.challengeCard}>
+         <img
+            src="https://miro.medium.com/1*VzexncB2H2chkgC87wcnAA.jpeg"
+          ></img>
+          <p>Conceitos</p>
+        </Link>
+        <Link to="/desafios/Tecnologia/DesafioTec5" className={styles.challengeCard}>
+         <img
+            src="/public/img_desafios/python.png"
+          ></img>
+          <p>Python</p>
+        </Link>
+      </div>
     </div>
   );
 }
 
-export default CapitulosTecnologia;
+export default ChallengeList;

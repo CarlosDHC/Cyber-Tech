@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../Admin.module.css";
 
@@ -27,106 +27,122 @@ export default function PainelDesafios() {
     const [tituloGeral, setTituloGeral] = useState("");
     const [subtitulo, setSubtitulo] = useState("");
     const [capa, setCapa] = useState("");
+    const [tentativas, setTentativas] = useState(1);
     const [area, setArea] = useState("Tecnologia");
+
     const [exercicios, setExercicios] = useState([
         {
             perguntaTexto: "",
             perguntaImagem: "",
-            tipo: "objetiva",
             alternativaCorreta: "",
             alternativas: {
-                a: { texto: "" }, b: { texto: "" }, c: { texto: "" }, d: { texto: "" }
-            },
-            respostaEsperada: ""
+                a: { texto: "", imagem: "" },
+                b: { texto: "", imagem: "" },
+                c: { texto: "", imagem: "" },
+                d: { texto: "", imagem: "" }
+            }
         }
     ]);
 
-    const carregarDesafios = async () => {
+    // Adicionar Nova Questão (COM LIMITE DE 10)
+    const adicionarQuestao = () => {
+        if (exercicios.length >= 10) {
+            alert("Limite máximo de 10 questões atingido!");
+            return;
+        }
+
+        setExercicios([
+            ...exercicios,
+            {
+                perguntaTexto: "",
+                perguntaImagem: "",
+                alternativaCorreta: "",
+                alternativas: {
+                    a: { texto: "", imagem: "" },
+                    b: { texto: "", imagem: "" },
+                    c: { texto: "", imagem: "" },
+                    d: { texto: "", imagem: "" }
+                }
+            }
+        ]);
+    };
+
+    // Remover Questão
+    const excluirQuestao = (indexToDelete) => {
+        if (exercicios.length === 1) {
+            alert("O desafio precisa ter pelo menos uma questão.");
+            return;
+        }
+
+        if (window.confirm("Excluir esta questão?")) {
+            const novaLista = exercicios.filter((_, index) => index !== indexToDelete);
+            setExercicios(novaLista);
+        }
+    };
+
+    // Atualiza campos da questão
+    const handleQuestaoChange = (index, campo, valor) => {
+        const novosExercicios = [...exercicios];
+        novosExercicios[index] = { ...novosExercicios[index], [campo]: valor };
+        setExercicios(novosExercicios);
+    };
+
+    // Atualiza alternativas
+    const handleAltChange = (exIndex, letra, campo, valor) => {
+        const novosExercicios = [...exercicios];
+        novosExercicios[exIndex].alternativas[letra] = {
+            ...novosExercicios[exIndex].alternativas[letra],
+            [campo]: valor
+        };
+        setExercicios(novosExercicios);
+    };
+
+    const salvarDesafios = async () => {
+        if (!tituloGeral || !area) {
+            alert("Preencha o Título Principal e a Área de Conhecimento.");
+            return;
+        }
+
+        const questoesValidas = exercicios.filter(q =>
+            q.perguntaTexto.trim() !== "" && q.alternativaCorreta !== ""
+        );
+
+        if (questoesValidas.length === 0) {
+            alert("Preencha pelo menos uma questão completa.");
+            return;
+        }
+
         setLoading(true);
         try {
-            const q = query(collection(db, "desafios"), orderBy("dataCriacao", "desc"));
-            const querySnapshot = await getDocs(q);
-            const dados = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setListaDesafios(dados);
+            await addDoc(collection(db, "desafios"), {
+                titulo: tituloGeral,
+                subtitulo: subtitulo,
+                area,
+                imagemCapa: capa || "https://placehold.co/600x400?text=Quiz",
+                tentativasPermitidas: Number(tentativas),
+                tipo: "quiz",
+                questoes: questoesValidas,
+                qtdQuestoes: questoesValidas.length,
+                dataCriacao: new Date().toISOString()
+            });
+
+            alert("Desafio publicado com sucesso!");
+            window.location.reload();
         } catch (error) {
-            console.error("Erro ao carregar:", error);
+            console.error("Erro ao salvar:", error);
+            alert("Erro ao publicar o desafio.");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        if (tab === "gerenciar") carregarDesafios();
-    }, [tab]);
-
-    const excluirDesafioBanco = async (id) => {
-        if (window.confirm("Deseja excluir permanentemente este desafio?")) {
-            try {
-                await deleteDoc(doc(db, "desafios", id));
-                setListaDesafios(listaDesafios.filter(d => d.id !== id));
-            } catch (e) {
-                alert("Erro ao excluir.");
-            }
-        }
-    };
-
-    const excluirQuestaoForm = (indexToDelete) => {
-        if (exercicios.length === 1) return alert("O desafio precisa de uma questão.");
-        if (window.confirm("Remover questão?")) {
-            setExercicios(exercicios.filter((_, index) => index !== indexToDelete));
-        }
-    };
-
-    const prepararEdicao = (desafio) => {
-        setEditandoId(desafio.id);
-        setTituloGeral(desafio.titulo);
-        setSubtitulo(desafio.subtitulo || "");
-        setCapa(desafio.imagemCapa || "");
-        setArea(desafio.area);
-        setExercicios(desafio.questoes.map(q => ({
-            ...q,
-            tipo: q.tipo || "objetiva",
-            respostaEsperada: q.respostaEsperada || ""
-        })));
-        setTab("criar");
-    };
-
-    const adicionarQuestao = () => {
-        if (exercicios.length >= 10) return alert("Limite atingido");
-        setExercicios([...exercicios, {
-            perguntaTexto: "", perguntaImagem: "", tipo: "objetiva",
-            alternativaCorreta: "", alternativas: { a: { texto: "" }, b: { texto: "" }, c: { texto: "" }, d: { texto: "" } },
-            respostaEsperada: ""
-        }]);
-    };
-
-    const handleQuestaoChange = (index, campo, valor) => {
-        const novos = [...exercicios];
-        novos[index][campo] = valor;
-        setExercicios(novos);
-    };
-
-    const salvarOuAtualizar = async () => {
-        if (!tituloGeral) return alert("Título obrigatório");
-        setLoading(true);
-        const payload = {
-            titulo: tituloGeral, subtitulo, area,
-            imagemCapa: capa || "https://placehold.co/600x400?text=Quiz",
-            tentativasPermitidas: 2, questoes: exercicios, qtdQuestoes: exercicios.length,
-            ultimaAtualizacao: new Date().toISOString()
-        };
-        try {
-            if (editandoId) { await updateDoc(doc(db, "desafios", editandoId), payload); alert("Atualizado!"); }
-            else { await addDoc(collection(db, "desafios"), { ...payload, dataCriacao: new Date().toISOString() }); alert("Publicado!"); }
-            window.location.reload();
-        } catch (e) { alert("Erro ao salvar."); } finally { setLoading(false); }
-    };
-
     return (
         <div className={styles.container}>
             <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
-                <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}><img src="/menu.png" alt="menu" /></button>
-                <h2 className={styles.title}>Painel Admin</h2>
+                <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
+                    <img src="/menu.png" alt="menu" />
+                </button>
+                <h2 className={styles.title}>Admin</h2>
                 <ul className={styles.navList}>
                     <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
                     <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
@@ -144,9 +160,20 @@ export default function PainelDesafios() {
                 </div>
 
                 <div className={styles.headerFlex}>
-                    <h1>{tab === "criar" ? (editandoId ? "Editar Desafio" : "Novo Desafio") : "Buscar no Banco"}</h1>
-                    {tab === "criar" && <button className={styles.publishBtn} onClick={salvarOuAtualizar} disabled={loading}>{loading ? "..." : "Salvar"}</button>}
+                    <h1>Novo Desafio (Quiz)</h1>
+                    <button className={styles.publishBtn} onClick={salvarDesafios} disabled={loading}>
+                        {loading ? "Salvando..." : "Publicar Quiz"}
+                    </button>
                 </div>
+
+
+                <div className={styles.editorContainer}>
+                    <div className={styles.formColumn}>
+
+                        {/* --- BLOCO 1: CONFIGURAÇÕES (METADADOS) --- */}
+                        <div className={styles.metaBox}>
+                            <h3 style={{ marginTop: 0, color: '#1E293B' }}>1. Configurações</h3>
+
 
                 {tab === "gerenciar" ? (
                     <div className={styles.editorContainer}>
@@ -170,7 +197,13 @@ export default function PainelDesafios() {
                             <h3 style={{ margin: '20px 0 10px' }}>1. Configurações Gerais</h3>
                             <div className={styles.inputGroup}>
                                 <label className={styles.fieldLabel}>Título Principal</label>
-                                <input className={styles.inputField} value={tituloGeral} onChange={e => setTituloGeral(e.target.value)} placeholder="Ex: Módulo 1 - RH" />
+                                <input
+                                    className={styles.inputField}
+                                    placeholder="Ex: Lógica de Programação - Módulo 1"
+                                    value={tituloGeral}
+                                    onChange={e => setTituloGeral(e.target.value)}
+                                    style={{ fontWeight: 'bold' }}
+                                />
                             </div>
 
                             <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
@@ -182,16 +215,53 @@ export default function PainelDesafios() {
                             <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
                                 <div style={{ flex: 1 }}><label className={styles.fieldLabel}>Área</label>
                                     <select className={styles.inputField} value={area} onChange={e => setArea(e.target.value)}>
-                                        <option value="Tecnologia">Tecnologia</option><option value="RH">RH</option>
-                                        <option value="Direito">Direito</option><option value="Engenharia">Engenharia</option><option value="Marketing">Marketing</option>
+                                        <option value="Tecnologia">Tecnologia</option>
+                                        <option value="Engenharia">Engenharia</option>
+                                        <option value="Direito">Direito</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Rh">RH</option>
                                     </select>
                                 </div>
                                 <div style={{ flex: 1 }}><label className={styles.fieldLabel}>Tentativas</label><input className={styles.inputField} value="2 (Bloqueado)" disabled style={{ background: '#eee' }} /></div>
                             </div>
+                            {capa && <img src={capa} alt="Preview" style={{ height: '120px', marginTop: '10px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #ddd' }} onError={(e) => e.target.style.display = 'none'} />}
                         </div>
 
-                        {/* 2. QUESTÕES */}
+                        <hr className={styles.divider} />
+
                         <div className={styles.blocksList}>
+
+                            <div style={{ marginBottom: '25px', paddingBottom: '15px' }}>
+                                <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#095e8b' }}>2. Dados do Desafio</h3>
+
+                                <div className={styles.inputGroup}>
+                                    <label className={styles.fieldLabel}>Título Principal</label>
+                                    <input
+                                        className={styles.inputField}
+                                        placeholder="..."
+                                        value={tituloGeral}
+                                        onChange={e => setTituloGeral(e.target.value)}
+                                        style={{ fontWeight: 'bold' }}
+                                    />
+                                </div>
+
+                                <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
+                                    <label className={styles.fieldLabel}>Subtítulo</label>
+                                    <input
+                                        className={styles.inputField}
+                                        placeholder="..."
+                                        value={subtitulo}
+                                        onChange={e => setSubtitulo(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* LISTA DE QUESTÕES */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                                <h3>3. Perguntas ({exercicios.length}/10)</h3>
+                                {exercicios.length >= 10 && <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.9rem' }}>Máximo atingido!</span>}
+                            </div>
+
                             {exercicios.map((ex, index) => (
                                 <div key={index} className={styles.blockItem}>
                                     <h3 style={{ margin: '20px 0 10px' }}>2. QUESTÕES ({exercicios.length}/10)</h3>
@@ -233,10 +303,20 @@ export default function PainelDesafios() {
                                     )}
                                 </div>
                             ))}
-                            <button onClick={adicionarQuestao} className={styles.btnAdd}>+ Adicionar Questão</button>
+
+                            <div className={styles.addButtons} style={{ marginTop: '15px' }}>
+                                <button
+                                    onClick={adicionarQuestao}
+                                    className={styles.btnAdd}
+                                    disabled={exercicios.length >= 10}
+                                    style={exercicios.length >= 10 ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+                                >
+                                    {exercicios.length >= 10 ? "Máximo de Questões Atingido" : "+ Adicionar Questão"}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                )}
+                </div>
             </main>
         </div>
     );

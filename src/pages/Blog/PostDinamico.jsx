@@ -107,7 +107,7 @@ const PostDinamico = () => {
             <div key={index} className="content-block">
               {bloco.type === 'paragraph' && <p>{bloco.content}</p>}
               {bloco.type === 'subtitle' && <h2>{bloco.content}</h2>}
-              {/* {bloco.type === 'image' && <img src={bloco.content} alt="Detalhe" />} */}
+              {bloco.type === 'image' && <img src={bloco.content} alt="Detalhe" />}
               {bloco.type === 'code' && <pre><code>{bloco.content}</code></pre>}
             </div>
           ))
@@ -116,24 +116,37 @@ const PostDinamico = () => {
         )}
       </section>
 
+
+      {/* Navegação no Rodapé */}
+
+
       <nav className="blog-navigation">
-        {nextId ? (
-          <Link to={`/blog/post/${nextId}`} className="blog-nav-link">← Anterior</Link>
-        ) : (
-          <span className="blog-nav-link disabled">← Anterior</span>
-        )}
-        
-        <Link to="/blog" className="menu-link2">
-          <img src="/azulejos.png" alt="Menu" className="logo-img" />
-        </Link>
-        
-        {prevId ? (
-          <Link to={`/blog/post/${prevId}`} className="blog-nav-link">Próximo →</Link>
-        ) : (
-          <span className="blog-nav-link disabled">Próximo →</span>
-        )}
-        
-        
+        <div className="nav-side left">
+          {prevId ? (
+            <Link to={`/blog/post/${prevId}`} className="nav-btn">
+              <span>← Anterior</span>
+            </Link>
+          ) : (
+            <span className="nav-btn disabled">← Anterior</span>
+          )}
+        </div>
+
+        {/* O BOTÃO CENTRAL IMPORTANTE */}
+        <div className="nav-center">
+          <Link to={backLink} className="menu-azulejos" title={`Voltar para ${post.categoria}`}>
+            <img src="/azulejos.png" alt="Menu Categorias" />
+          </Link>
+        </div>
+
+        <div className="nav-side right">
+          {nextId ? (
+            <Link to={`/blog/post/${nextId}`} className="nav-btn">
+              <span>Próximo →</span>
+            </Link>
+          ) : (
+            <span className="nav-btn disabled">Próximo →</span>
+          )}
+        </div>
       </nav>
     </div>
   );

@@ -1,3 +1,4 @@
+/* src/pages/Home/Home.module.css */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../Admin.module.css"; // Use o mesmo CSS

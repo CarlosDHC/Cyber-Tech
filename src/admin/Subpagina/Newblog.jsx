@@ -14,8 +14,14 @@ export default function NewBlog() {
   const [capa, setCapa] = useState("");
   const [autor, setAutor] = useState("");
   const [tempoLeitura, setTempoLeitura] = useState("");
+ 
+  
+  // Estado para categoria
+  const [categoria, setCategoria] = useState(""); 
+
 
   const [categoria, setCategoria] = useState("");
+ 
 
   const [secoes, setSecoes] = useState([
     { id: Date.now(), type: "paragraph", content: "" }
@@ -34,6 +40,11 @@ export default function NewBlog() {
     }, "");
 
     const contagemPalavras = textoTotal.trim().split(/\s+/).length;
+ 
+    
+    // Média de leitura: 200 palavras por minuto
+
+
 
     const minutosCalculados = Math.ceil(contagemPalavras / 200);
     const tempoFinal = contagemPalavras > 0 ? minutosCalculados : "";
@@ -80,7 +91,7 @@ export default function NewBlog() {
         dataCriacao: new Date().toISOString()
       });
       alert("Post publicado com sucesso!");
-
+      
       setTitulo(""); setResumo(""); setCapa(""); setAutor(""); setTempoLeitura(""); setCategoria("");
       setSecoes([{ id: Date.now(), type: "paragraph", content: "" }]);
       setModoPreview(false);
@@ -126,9 +137,9 @@ export default function NewBlog() {
           <div className="blog-post-container">
             <header className="blog-post-header">
               {categoria && <span style={{
-                background: '#2563EB', color: 'white', padding: '4px 12px',
-                borderRadius: '20px', fontSize: '0.85rem', textTransform: 'uppercase',
-                marginBottom: '10px', display: 'inline-block'
+                  background:'#2563EB', color:'white', padding:'4px 12px', 
+                  borderRadius:'20px', fontSize:'0.85rem', textTransform:'uppercase',
+                  marginBottom:'10px', display:'inline-block'
               }}>{categoria}</span>}
               <h1 className="blog-title">{titulo || "Título do Post"}</h1>
               {resumo && <p className="blog-subtitle">{resumo}</p>}
@@ -153,7 +164,7 @@ export default function NewBlog() {
             <div className={styles.formColumn}>
               <div className={styles.metaBox}>
                 <h3>Metadados (Dados do Firebase)</h3>
-
+                
                 <div className={styles.inputGroup}>
                   <label className={styles.fieldLabel}>Título</label>
                   <input className={styles.inputField} value={titulo} onChange={e => setTitulo(e.target.value)} />
@@ -161,9 +172,9 @@ export default function NewBlog() {
 
                 <div className={styles.inputGroup}>
                   <label className={styles.fieldLabel}>Categoria (Área)</label>
-                  <select
-                    className={styles.inputField}
-                    value={categoria}
+                  <select 
+                    className={styles.inputField} 
+                    value={categoria} 
                     onChange={e => setCategoria(e.target.value)}
                     style={{ height: '45px', background: 'white' }}
                   >
@@ -182,15 +193,20 @@ export default function NewBlog() {
                     <input className={styles.inputField} value={autor} onChange={e => setAutor(e.target.value)} />
                   </div>
 
+                  
+                  {/* --- CAMPO DE TEMPO MELHORADO --- */}
+
+
+
                   <div className={styles.inputGroup} style={{ flex: 1 }}>
                     <label className={styles.fieldLabel}>
                       Tempo Estimado de Leitura
                     </label>
-                    <input
-                      className={styles.inputField}
-                      type="number"
-                      value={tempoLeitura}
-                      onChange={e => setTempoLeitura(e.target.value)}
+                    <input 
+                      className={styles.inputField} 
+                      type="number" 
+                      value={tempoLeitura} 
+                      onChange={e => setTempoLeitura(e.target.value)} 
                       placeholder="Calculado automaticamente..."
                     />
                     {/*<small style={{ color: '#666', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
