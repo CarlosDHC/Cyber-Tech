@@ -17,11 +17,7 @@ export default function NewBlog() {
  
   
   // Estado para categoria
-  const [categoria, setCategoria] = useState(""); 
-
-
-  const [categoria, setCategoria] = useState("");
- 
+  const [categoria, setCategoria] = useState("");  
 
   const [secoes, setSecoes] = useState([
     { id: Date.now(), type: "paragraph", content: "" }
