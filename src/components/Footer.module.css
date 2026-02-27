@@ -16,7 +16,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Para telas menores */
+  flex-wrap: wrap; 
   gap: 1rem;
   width: 100%;
   max-width: 1100px;
@@ -48,7 +48,6 @@
   opacity: 1;
 }
 
-/* Responsividade simples */
 @media (max-width: 768px) {
   .footerContainer {
     flex-direction: column;
