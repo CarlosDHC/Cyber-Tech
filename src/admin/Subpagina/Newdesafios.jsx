@@ -129,24 +129,41 @@ export default function PainelDesafios() {
                 <h2 className={styles.title}>Painel Admin</h2>
                 <ul className={styles.navList}>
                     <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-                    <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão  de Notas</span></Link></li>
+                    <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão de Notas</span></Link></li>
                     <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Criar Blog</span></Link></li>
                     <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
-                    <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
-                    <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
-
+                    <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Histórico de curtidas</span></Link></li>
+                    <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentários Fórum</span></Link></li>
                 </ul>
             </aside>
 
             <main className={styles.main}>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    <button className={styles.publishBtn} onClick={() => { setTab("criar"); setEditandoId(null) }} style={{ backgroundColor: tab === 'criar' ? '#0f172a' : '#095d8bd5' }}>+ Novo</button>
-                    <button className={styles.publishBtn} onClick={() => { setTab("gerenciar"); setEditandoId(null) }} style={{ backgroundColor: tab === 'gerenciar' ? '#0f172a' : '#095d8bd5' }}>Gerenciar</button>
+                
+                {/* BOTÕES DE ABAS PADRONIZADOS */}
+                <div className={styles.tabsContainer}>
+                    <button 
+                        className={styles.publishBtn} 
+                        onClick={() => { setTab("criar"); setEditandoId(null) }} 
+                        style={{ backgroundColor: tab === 'criar' ? '#0f172a' : '#095d8bd5' }}
+                    >
+                        + Novo Desafio
+                    </button>
+                    <button 
+                        className={styles.publishBtn} 
+                        onClick={() => { setTab("gerenciar"); setEditandoId(null) }} 
+                        style={{ backgroundColor: tab === 'gerenciar' ? '#0f172a' : '#095d8bd5' }}
+                    >
+                        Gerenciar Existentes
+                    </button>
                 </div>
 
                 <div className={styles.headerFlex}>
                     <h1>{tab === "criar" ? (editandoId ? "Editar Desafio" : "Novo Desafio") : "Buscar no Banco"}</h1>
-                    {tab === "criar" && <button className={styles.publishBtn} onClick={salvarOuAtualizar} disabled={loading}>{loading ? "..." : "Salvar"}</button>}
+                    {tab === "criar" && (
+                        <button className={styles.publishBtn} onClick={salvarOuAtualizar} disabled={loading}>
+                            {loading ? "Salvando..." : "Salvar Desafio"}
+                        </button>
+                    )}
                 </div>
 
                 {tab === "gerenciar" ? (
@@ -154,11 +171,16 @@ export default function PainelDesafios() {
                         <input className={styles.inputField} placeholder="Pesquisar..." value={busca} onChange={e => setBusca(e.target.value)} style={{ marginBottom: '20px' }} />
                         <div className={styles.blocksList}>
                             {listaDesafios.filter(d => d.titulo.toLowerCase().includes(busca.toLowerCase()) || d.area.toLowerCase().includes(busca.toLowerCase())).map(d => (
-                                <div key={d.id} className={styles.blockItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div><strong>{d.titulo}</strong> <br /><small>{d.area} • {d.qtdQuestoes} Qs</small></div>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                        <button onClick={() => prepararEdicao(d)} className={styles.btnAdd} style={{ width: 'auto', padding: '5px 15px' }}>Editar</button>
-                                        <button onClick={() => excluirDesafioBanco(d.id)} className={styles.btnIcon}><img src="/lixeira.png" alt="X" style={{ width: '18px' }} /></button>
+                                <div key={d.id} className={styles.blockItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+                                    <div>
+                                        <strong>{d.titulo}</strong> <br />
+                                        <small>{d.area} • {d.qtdQuestoes} Questões</small>
+                                    </div>
+                                    <div className={styles.blockActions}>
+                                        <button onClick={() => prepararEdicao(d)} className={styles.btnAdd} style={{ width: 'auto', padding: '0 20px' }}>Editar</button>
+                                        <button onClick={() => excluirDesafioBanco(d.id)} className={styles.btnIcon}>
+                                            <img src="/lixeira.png" alt="X" />
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -168,26 +190,40 @@ export default function PainelDesafios() {
                     <div className={styles.editorContainer}>
                         {/* 1. CONFIGURAÇÕES EM CARD */}
                         <div className={styles.blockItem}>
-                            <h3 style={{ margin: '20px 0 10px' }}>1. Configurações Gerais</h3>
+                            <div className={styles.blockHeader}>
+                                <span className={styles.blockLabel}>1. Configurações Gerais</span>
+                            </div>
+                            
                             <div className={styles.inputGroup}>
                                 <label className={styles.fieldLabel}>Título Principal</label>
                                 <input className={styles.inputField} value={tituloGeral} onChange={e => setTituloGeral(e.target.value)} placeholder="Ex: Módulo 1 - RH" />
                             </div>
 
-                            <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
+                            <div className={styles.inputGroup}>
                                 <label className={styles.fieldLabel}>URL da Imagem de Capa</label>
                                 <input className={styles.inputField} value={capa} onChange={e => setCapa(e.target.value)} placeholder="Cole o link aqui..." />
-                                {capa && <div style={{ marginTop: '10px', textAlign: 'center' }}><img src={capa} alt="Preview Capa" style={{ maxHeight: '150px', borderRadius: '8px', border: '1px solid #ddd' }} onError={(e) => e.target.style.display = 'none'} /></div>}
+                                {capa && (
+                                    <div style={{ marginTop: '15px', textAlign: 'center' }}>
+                                        <img src={capa} alt="Preview Capa" style={{ maxHeight: '150px', borderRadius: '8px', border: '1px solid #ddd' }} onError={(e) => e.target.style.display = 'none'} />
+                                    </div>
+                                )}
                             </div>
 
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-                                <div style={{ flex: 1 }}><label className={styles.fieldLabel}>Área</label>
+                            <div className={styles.headerFlex} style={{ marginBottom: 0 }}>
+                                <div className={styles.inputGroup}>
+                                    <label className={styles.fieldLabel}>Área</label>
                                     <select className={styles.inputField} value={area} onChange={e => setArea(e.target.value)}>
-                                        <option value="Tecnologia">Tecnologia</option><option value="RH">RH</option>
-                                        <option value="Direito">Direito</option><option value="Engenharia">Engenharia</option><option value="Marketing">Marketing</option>
+                                        <option value="Tecnologia">Tecnologia</option>
+                                        <option value="RH">RH</option>
+                                        <option value="Direito">Direito</option>
+                                        <option value="Engenharia">Engenharia</option>
+                                        <option value="Marketing">Marketing</option>
                                     </select>
                                 </div>
-                                <div style={{ flex: 1 }}><label className={styles.fieldLabel}>Tentativas</label><input className={styles.inputField} value="2 (Bloqueado)" disabled style={{ background: '#eee' }} /></div>
+                                <div className={styles.inputGroup}>
+                                    <label className={styles.fieldLabel}>Tentativas</label>
+                                    <input className={styles.inputField} value="2 (Bloqueado)" disabled style={{ background: '#eee', cursor: 'not-allowed' }} />
+                                </div>
                             </div>
                         </div>
 
@@ -195,46 +231,62 @@ export default function PainelDesafios() {
                         <div className={styles.blocksList}>
                             {exercicios.map((ex, index) => (
                                 <div key={index} className={styles.blockItem}>
-                                    <h3 style={{ margin: '20px 0 10px' }}>2. QUESTÕES ({exercicios.length}/10)</h3>
-
                                     <div className={styles.blockHeader}>
-                                        <span className={styles.blockLabel} style={{ background: '#095e8b', color: 'white' }}>QUESTÃO {index + 1}</span>
-                                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                            <select value={ex.tipo} onChange={e => handleQuestaoChange(index, 'tipo', e.target.value)} style={{ padding: '14px 16px', borderRadius: '8px', border: '1px solid #e0e0e0', fontSize: '1rem', backgroundColor: '#f9fafb', transition: 'all 0.2s ease', color: '#333' }}>
-                                                <option value="objetiva">Objetiva</option><option value="justificativa">Justificativa</option>
+                                        <span className={styles.blockLabel}>QUESTÃO {index + 1} de 10</span>
+                                        <div className={styles.blockActions}>
+                                            <select value={ex.tipo} onChange={e => handleQuestaoChange(index, 'tipo', e.target.value)} className={styles.inputField} style={{ width: 'auto', padding: '5px 10px', height: '32px' }}>
+                                                <option value="objetiva">Múltipla Escolha</option>
+                                                <option value="justificativa">Dissertativa</option>
                                             </select>
-                                            <button onClick={() => excluirQuestaoForm(index)} className={styles.btnIcon}><img src="/lixeira.png" alt="X" /></button>
+                                            <button onClick={() => excluirQuestaoForm(index)} className={styles.btnIcon}>
+                                                <img src="/lixeira.png" alt="X" />
+                                            </button>
                                         </div>
                                     </div>
-                                    <textarea className={styles.textAreaBlock} value={ex.perguntaTexto} onChange={e => handleQuestaoChange(index, 'perguntaTexto', e.target.value)} placeholder="Enunciado..." />
+                                    
+                                    <textarea className={styles.textAreaBlock} value={ex.perguntaTexto} onChange={e => handleQuestaoChange(index, 'perguntaTexto', e.target.value)} placeholder="Digite o enunciado da questão aqui..." />
 
-                                    <div className={styles.inputGroup} style={{ marginTop: '10px' }}>
-                                        <label className={styles.fieldLabel}>Link da Imagem da Pergunta</label>
+                                    <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
+                                        <label className={styles.fieldLabel}>Link da Imagem da Pergunta (Opcional)</label>
                                         <input className={styles.inputField} value={ex.perguntaImagem} onChange={e => handleQuestaoChange(index, 'perguntaImagem', e.target.value)} placeholder="https://..." />
                                         {ex.perguntaImagem && <div style={{ marginTop: '8px' }}><img src={ex.perguntaImagem} alt="Preview" style={{ maxHeight: '100px', borderRadius: '5px' }} onError={(e) => e.target.style.display = 'none'} /></div>}
                                     </div>
 
-
                                     {ex.tipo === "objetiva" ? (
-                                        <div style={{ marginTop: '15px', background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
+                                        <div className={styles.alternativasGrid}>
+                                            <label className={styles.fieldLabel}>Selecione a correta e preencha as opções:</label>
                                             {['a', 'b', 'c', 'd'].map(l => (
-                                                <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                                                    <input type="radio" checked={ex.alternativaCorreta === l} onChange={() => handleQuestaoChange(index, 'alternativaCorreta', l)} />
-                                                    <input className={styles.inputField} placeholder={`Opção ${l.toUpperCase()}`} value={ex.alternativas[l].texto} onChange={e => {
-                                                        const n = [...exercicios]; n[index].alternativas[l].texto = e.target.value; setExercicios(n);
-                                                    }} />
+                                                <div key={l} className={styles.radioItem}>
+                                                    <input 
+                                                        type="radio" 
+                                                        name={`questao-${index}`} /* Agrupa os radios corretamente */
+                                                        checked={ex.alternativaCorreta === l} 
+                                                        onChange={() => handleQuestaoChange(index, 'alternativaCorreta', l)} 
+                                                    />
+                                                    <input 
+                                                        className={styles.inputField} 
+                                                        placeholder={`Alternativa ${l.toUpperCase()}`} 
+                                                        value={ex.alternativas[l].texto} 
+                                                        onChange={e => {
+                                                            const n = [...exercicios]; 
+                                                            n[index].alternativas[l].texto = e.target.value; 
+                                                            setExercicios(n);
+                                                        }} 
+                                                    />
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div style={{ marginTop: '15px' }}>
+                                        <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
                                             <label className={styles.fieldLabel}>Justificativa / Gabarito Esperado</label>
-                                            <textarea className={styles.textAreaBlock} style={{ background: '#fffbeb' }} value={ex.respostaEsperada} onChange={e => handleQuestaoChange(index, 'respostaEsperada', e.target.value)} rows={3} />
+                                            <textarea className={styles.textAreaBlock} style={{ background: '#fffbeb' }} value={ex.respostaEsperada} onChange={e => handleQuestaoChange(index, 'respostaEsperada', e.target.value)} rows={3} placeholder="Escreva a resposta esperada para correção manual..." />
                                         </div>
                                     )}
                                 </div>
                             ))}
-                            <button onClick={adicionarQuestao} className={styles.btnAdd}>+ Adicionar Questão</button>
+                            <div className={styles.addButtons}>
+                                <button onClick={adicionarQuestao} className={styles.btnAdd}>+ Adicionar Questão</button>
+                            </div>
                         </div>
                     </div>
                 )}
