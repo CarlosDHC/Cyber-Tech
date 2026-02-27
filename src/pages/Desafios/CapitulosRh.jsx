@@ -45,16 +45,8 @@ function CapitulosRh() {
     <div className={`container ${styles.challengeListContainer}`}>
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Desenvolva competências em gestão de pessoas e legislação com nossos simulados.
+        Desenvolva competências em gestão de pessoas com nossos simulados.
       </p>
-
-        {/* Desafio 2 */}
-        <Link to="/desafios/Rh/DesafioRh2" className={styles.challengeCard}>
-          <img
-            src="C:\Users\usrlabeco2N\Documents\GitHub\cyber-tech-v.2.0\public\rh-cursos.jpg"
-          ></img>
-          <p>Treinamento & Desenvolvimento</p> 
-        </Link>
 
       {loading ? (
         <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
