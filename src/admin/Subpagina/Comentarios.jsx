@@ -5,11 +5,12 @@ import { collection, getDocs, deleteDoc, doc, updateDoc, arrayRemove } from "fir
 
 // Importamos APENAS o CSS global do Admin
 import adminStyles from "../admin.module.css"; 
+import notasStyles from "./Notas.module.css";
 
 export default function Comentarios() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
 
   // Busca os dados do Fórum, agrupando os Comentários dentro dos seus respetivos Posts
   const fetchConteudos = async () => {
@@ -124,10 +125,10 @@ export default function Comentarios() {
         <h2 className={adminStyles.title}>ADMIN</h2>
         <ul className={adminStyles.navList}>
           <li><Link to="/admin" className={adminStyles.navLink}><img src="/casa.png" alt="H" /><span className={adminStyles.linkText}>Home</span></Link></li>
-          <li><Link to="/admin/notas" className={adminStyles.navLink}><img src="/blog.png" alt="N" /><span className={adminStyles.linkText}>Notas</span></Link></li>
-          <li><Link to="/admin/newblog" className={adminStyles.navLink}><img src="/inotas.png" alt="B" /><span className={adminStyles.linkText}>Blog</span></Link></li>
-          <li><Link to="/admin/newdesafios" className={adminStyles.navLink}><img src="/idesafio.png" alt="D" /><span className={adminStyles.linkText}>Desafios</span></Link></li>
-          <li><Link to="/admin/curtidas" className={adminStyles.navLink}><img src="/curti.png" alt="L" /><span className={adminStyles.linkText}>Like</span></Link></li>
+          <li><Link to="/admin/notas" className={adminStyles.navLink}><img src="/blog.png" alt="N" /><span className={adminStyles.linkText}>Gestão  de Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={adminStyles.navLink}><img src="/inotas.png" alt="B" /><span className={adminStyles.linkText}>Criar Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={adminStyles.navLink}><img src="/idesafio.png" alt="D" /><span className={adminStyles.linkText}>Criar Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={adminStyles.navLink}><img src="/curti.png" alt="L" /><span className={adminStyles.linkText}>Historico de curtidas</span></Link></li>
           <li><Link to="/admin/comentarios" className={adminStyles.navLink}><img src="/icomentarios.png" alt="L" /><span className={adminStyles.linkText}>Comentarios Fórum</span></Link></li>
         </ul>
       </aside>

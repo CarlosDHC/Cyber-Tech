@@ -885,11 +885,11 @@
 }
 
 .mainContent {
-  margin-left: 250px;
+  margin-left: 50px;
   /* Ajuste para a largura exata do seu menu aberto */
   width: calc(100% - 250px);
   transition: all 0.3s ease;
-  padding: 40px;
+  padding: 10px;
   box-sizing: border-box;
 }
 
@@ -904,10 +904,12 @@
 /* --- TABLET (até 900px) -*/
 @media (max-width: 900px) {
   .sidebar {
-    width: 60px !important;
-    padding: 10px 5px !important;
+    width: 40px !important;
+    padding: 15px 4.5px !important;
     align-items: center;
   }
+
+  
 
   .toggleBtn,
   .title,
@@ -917,7 +919,7 @@
 
   .navLink {
     justify-content: center;
-    padding: 12px;
+    padding: 5px;
   }
 
   .main {
