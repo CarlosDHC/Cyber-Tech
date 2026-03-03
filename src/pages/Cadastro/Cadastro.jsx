@@ -22,6 +22,27 @@ const Cadastro = () => {
 
   const navigate = useNavigate();
 
+  // --- NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE ---
+  const formatPhone = (value) => {
+    if (!value) return "";
+    
+    // 1. Remove tudo o que não for número (impede letras e símbolos)
+    let v = value.replace(/\D/g, ""); 
+    
+    // 2. Limita a 11 dígitos no máximo
+    v = v.substring(0, 11); 
+    
+    // 3. Aplica a máscara
+    if (v.length >= 3 && v.length <= 7) {
+      v = `(${v.substring(0, 2)}) ${v.substring(2)}`;
+    } else if (v.length >= 8) {
+      v = `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7)}`;
+    }
+    
+    return v;
+  };
+  // ----------------------------------------------
+
   // Função principal de cadastro
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,9 +108,7 @@ const Cadastro = () => {
         <h2>Crie sua conta</h2>
         <p className={styles.loginSubtitle}>É rápido e fácil!</p>
 
-
         <form onSubmit={handleSubmit} noValidate>
-          
           
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
@@ -117,34 +136,36 @@ const Cadastro = () => {
           </div>
 
           <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label htmlFor="dataNascimento">Data de Nascimento</label>
             <div className={styles.formGroup}>
+              <label htmlFor="dataNascimento">Data de Nascimento</label>
+              <div className={styles.formGroup}>
+                <input
+                  type="date"
+                  id="dataNascimento"
+                  value={dataNascimento}
+                  onChange={(e) => setDataNascimento(e.target.value)}
+                  min="1900-01-01"
+                  max="2099-12-31"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="telefone">Telefone</label>
+              {/* O onChange usa formatPhone, e o maxLength foi para 15 */}
               <input
-                type="date"
-                id="dataNascimento"
-                value={dataNascimento}
-                onChange={(e) => setDataNascimento(e.target.value)}
-                min="1900-01-01"
-                max="2099-12-31"
-                required
+                type="tel"
+                id="telefone"
+                value={telefone}
+                onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                placeholder="(11) 99999-9999"
+                maxLength="15"
               />
             </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="telefone">Telefone</label>
-            <input
-              type="tel"
-              id="telefone"
-              value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
-              placeholder="999999999"         // Exemplo de formato
-                maxLength="9"
-            />
-          </div>
-        </div>
-           <div className={styles.formGroup}>
             <label htmlFor="email">E-mail</label>
             <input
               type="email"
@@ -155,31 +176,33 @@ const Cadastro = () => {
               required
             />
           </div>
-<div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Senha</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
-              required
-            />
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Senha</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 6 caracteres"
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="confirmPassword">Confirmar Senha</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repita a senha"
+                required
+              />
+            </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirmar Senha</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repita a senha"
-              required
-            />
-          </div>
-</div>
           {error && <p className={styles.errorMessage}>{error}</p>}
 
           <button

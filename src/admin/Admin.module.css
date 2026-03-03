@@ -434,14 +434,11 @@
   background-color: #eff6ff;
 }
 
-/* =========================================
-   MEDIA QUERIES (RESPONSIVIDADE PADRÃO)
-========================================= */
+/* RESPONSIVIDADE */
 
-/* --- TABLETS E TELAS MENORES (até 900px) --- */
+/* TABLETS E TELAS MENORES (até 900px)  */
 @media (max-width: 900px) {
 
-  /* Força a sidebar a ficar com 60px independentemente do state collapsed */
   .sidebar {
     width: var(--sidebar-mobile-width) !important;
     padding: 15px 5px !important;
@@ -452,7 +449,6 @@
   .linkText,
   .toggleBtn {
     display: none !important;
-    /* Esconde textos e botão toggle */
   }
 
   .navLink {
@@ -460,7 +456,6 @@
     padding: 15px 0;
   }
 
-  /* Main ajusta a margem para 60px da nova sidebar */
   .main {
     margin-left: var(--sidebar-mobile-width) !important;
     padding: 25px;
@@ -475,7 +470,6 @@
 @media (max-width: 600px) {
   .main {
     padding: 15px;
-    /* Reduz espaçamento interno da página inteira */
     margin-left: var(--sidebar-mobile-width) !important;
     margin-top: 40px;
   }
@@ -493,10 +487,8 @@
   .formColumn,
   .chartFullWidth {
     padding: 15px;
-    /* Reduz padding interno dos blocos no celular */
   }
 
-  /* No celular, os flex de 2 colunas caem para 1 */
   .headerFlex {
     flex-direction: column;
     align-items: stretch;
@@ -514,7 +506,6 @@
     justify-content: center;
   }
 
-  /* Seção de criar blocos empilha os botões */
   .blockHeader {
     flex-direction: column;
     align-items: flex-start;
@@ -526,7 +517,6 @@
     justify-content: flex-end;
   }
 
-  /* Inputs que estavam lado a lado viram 1 coluna */
   .inputGroup {
     margin-bottom: 15px;
   }
@@ -613,9 +603,7 @@
   border: 1px solid var(--color-border);
 }
 
-/* =========================================
-   ABAS (TABS) E ALINHAMENTOS ESPECÍFICOS
-========================================= */
+
 .tabsContainer {
   display: flex;
   gap: 15px;
@@ -625,17 +613,14 @@
 
 .tabsContainer button {
   flex: 1;
-  /* Faz os botões dividirem o espaço igualmente */
   min-width: 150px;
+  margin-top: 30px;
 }
 
-/* Garante o alinhamento das alternativas no Desafio */
 .radioItem {
   display: flex;
   align-items: center;
-  /* Centraliza verticalmente */
   justify-content: flex-start;
-  /* Força tudo para a esquerda */
   gap: 15px;
   margin-bottom: 12px;
   width: 100%;
@@ -646,14 +631,10 @@
   height: 22px;
   cursor: pointer;
   flex-shrink: 0;
-  /* Impede que a bolinha amasse no celular */
   accent-color: var(--color-primary-blue);
-  /* Deixa a bolinha azul */
 }
 
 .radioItem .inputField {
   flex: 1;
-  /* Faz o input de texto ocupar todo o resto do espaço */
   margin-bottom: 0 !important;
-  /* Remove margens extras */
 }
