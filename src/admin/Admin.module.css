@@ -418,6 +418,8 @@
 }
 
 .btnAdd {
+  height: 50px;
+  width: 200px;
   background-color: #fff;
   border: 1px dashed #94a3b8;
   color: #64748b;
