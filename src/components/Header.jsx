@@ -123,10 +123,10 @@ export default function Header() {
             to="/admin" 
             onClick={() => handleNavClick("/admin")}
             style={{
-              textAlign: 'center',
+              //textAlign: 'center',
               color: '#F0F0F0', 
               fontWeight: 'bold',
-              padding: '5px 10px',
+              padding: '10px 14px',
               borderRadius: '5px',
               marginRight: '10px'
             }}
@@ -158,7 +158,7 @@ export default function Header() {
       </nav>
 
       <button
-        className={`${styles.hamburger} ${menuOpen ? styles.active : ""}`}
+        className={`${styles.hamburger}`}
         onClick={toggleMenu}
         aria-label="Abrir menu"
       >

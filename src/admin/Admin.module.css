@@ -63,6 +63,7 @@
   overflow: hidden;
   white-space: nowrap;
   margin-top: 60px;
+  z-index: 10;
 }
 
 /* SIDEBAR ENCOLHIDA (DESKTOP) */
@@ -639,4 +640,31 @@
 .radioItem .inputField {
   flex: 1;
   margin-bottom: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .headerFlex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .main {
+    padding: 15px;
+    width: 100%;
+    margin-left: 0; 
+  }
+
+  .publishBtn, 
+  .btnAdd {
+    width: 350px;
+    text-align: center;
+    margin-left: 0 !important; 
+  }
+
+  .blockHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }

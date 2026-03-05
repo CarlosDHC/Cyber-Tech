@@ -183,7 +183,7 @@ export default function NewBlog() {
               : (modoPreview ? "Visualização do Post" : "Editor Profissional")}
           </h1>
           
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
             <button 
               className={styles.publishBtn} onClick={() => { setActiveTab("create"); setModoPreview(false); }}
             >
@@ -218,47 +218,49 @@ export default function NewBlog() {
             {loadingPosts ? (
               <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>Carregando artigos...</p>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #e5e7eb', color: '#4b5563' }}>
-                    <th style={{ padding: '12px' }}>Título do Artigo</th>
-                    <th style={{ padding: '12px' }}>Categoria</th>
-                    <th style={{ padding: '12px' }}>Autor</th>
-                    <th style={{ padding: '12px' }}>Data</th>
-                    <th style={{ padding: '12px', textAlign: 'center' }}>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {postsPublicados.length === 0 ? (
-                    <tr>
-                      <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
-                        Nenhum artigo publicado ainda.
-                      </td>
+              <div style={{ overflowX: 'auto', width: '100%' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e5e7eb', color: '#4b5563' }}>
+                      <th style={{ padding: '12px' }}>Título do Artigo</th>
+                      <th style={{ padding: '12px' }}>Categoria</th>
+                      <th style={{ padding: '12px' }}>Autor</th>
+                      <th style={{ padding: '12px' }}>Data</th>
+                      <th style={{ padding: '12px', textAlign: 'center' }}>Ações</th>
                     </tr>
-                  ) : (
-                    postsPublicados.map((post) => (
-                      <tr key={post.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f9fafb'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                        <td style={{ padding: '12px', fontWeight: '500', color: '#111827' }}>{post.titulo}</td>
-                        <td style={{ padding: '12px' }}>
-                          <span style={{ background: '#eff6ff', color: '#2563eb', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                            {post.categoria}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px', color: '#4b5563' }}>{post.autor}</td>
-                        <td style={{ padding: '12px', color: '#6b7280', fontSize: '0.9rem' }}>{formatarData(post.dataCriacao)}</td>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>
-                          <button 
-                            onClick={() => excluirPost(post.id, post.titulo)}
-                            style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}
-                          >
-                            Excluir
-                          </button>
+                  </thead>
+                  <tbody>
+                    {postsPublicados.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
+                          Nenhum artigo publicado ainda.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      postsPublicados.map((post) => (
+                        <tr key={post.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f9fafb'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                          <td style={{ padding: '12px', fontWeight: '500', color: '#111827' }}>{post.titulo}</td>
+                          <td style={{ padding: '12px' }}>
+                            <span style={{ background: '#eff6ff', color: '#2563eb', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                              {post.categoria}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px', color: '#4b5563' }}>{post.autor}</td>
+                          <td style={{ padding: '12px', color: '#6b7280', fontSize: '0.9rem' }}>{formatarData(post.dataCriacao)}</td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            <button 
+                              onClick={() => excluirPost(post.id, post.titulo)}
+                              style={{ background: '#095d8bd5', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}
+                            >
+                              Excluir
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
@@ -322,13 +324,13 @@ export default function NewBlog() {
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <div className={styles.inputGroup} style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  <div className={styles.inputGroup} style={{ flex: '1 1 100%', minWidth: '250px' }}>
                     <label className={styles.fieldLabel}>Autor</label>
                     <input className={styles.inputField} value={autor} onChange={e => setAutor(e.target.value)} />
                   </div>
 
-                  <div className={styles.inputGroup} style={{ flex: 1 }}>
+                  <div className={styles.inputGroup} style={{ flex: '1 1 100%', minWidth: '250px' }}>
                     <label className={styles.fieldLabel}>Tempo Estimado de Leitura</label>
                     <input
                       className={styles.inputField}
