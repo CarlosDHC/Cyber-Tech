@@ -1,87 +1,82 @@
-/* Perfil.module.css */
-
 .container {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    /*min-height: 100vh;*/
-    padding: 5px;
+    padding: 16px;
 }
 
-/* Card principal que simula o modal */
 .profileBox {
     width: 100%;
-    max-width: 650px; 
-    background-color: whitesmoke;
-    border: 2px solid #095e8b;
-    box-shadow: 0 4px 8px #095e8b;
-    border-radius: 7px;
-    margin-top: 50px;
+    max-width: 650px;
+    background-color: #f5f7fa;
+    border: 1px solid #095e8bcc;
+    box-shadow: 0 10px 20px rgba(9, 94, 139, 0.25);
+    border-radius: 12px;
+    margin-top: 40px;
 }
 
-/* --- Cabeçalho e Abas --- */
+
 .header {
-    padding: 15px 25px 0 25px;
-    border-bottom:#ffffff;
+    padding: 16px 24px;
 }
 
 .header h2 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 1.5em;
-    font-weight: 400;
-    color: white;
+    margin: 0;
+    padding: 10px;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #fff;
     text-align: center;
-    background-color: #095e8b;
-    border-radius: 8px;
-    border: solid 1px #084c70;
-    box-shadow: 0 4px 8px #095e8b
+    background: linear-gradient(135deg, #095e8bcc, #084e74cc);
+    border-radius: 10px;
 }
 
 .tabs {
     display: flex;
-    margin-top: 10px;
+    justify-content: center;
+    margin-top: 12px;
 }
 
 .activeTab {
-    padding: 8px 0;
-    font-size: 0.9em;
-    border-bottom: 2px solid #000000; 
-    color: #000000;
-    font-weight: 500;
+    font-size: 0.9rem;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #095e8b;
+    color: #095e8b;
+    font-weight: 600;
 }
 
-/* --- Corpo e Layout da Imagem/Login --- */
+
+
+
 .content {
-    padding: 25px;
+    padding: 24px;
 }
+
 
 .imageAndLogin {
     display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 20px; 
+    gap: 16px;
+    margin-bottom: 24px;
 }
-
 
 .loginGroup {
-    flex-grow: 1;
     display: flex;
-    align-items: flex-end; 
-    gap: 10px;
+    gap: 12px;
+    align-items: flex-end;
+    width: 100%;
 }
 
-/* Estilo para o campo de Login desabilitado */
 .loginInput {
-    background-color: #ffffff;
+    background-color: #eef3f7;
     color: #095e8b;
-    cursor: default;
+    cursor: not-allowed;
 }
+
 
 .formGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px 20px; 
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 20px;
 }
 
 .inputGroup {
@@ -90,108 +85,103 @@
 }
 
 .inputGroup.fullWidth {
-    grid-column: 1 / -1; 
+    grid-column: 1 / -1;
 }
 
 .inputGroup label {
-    font-size: 0.8em;
-    color: #000000;
-    margin-bottom: 4px;
+    font-size: 0.8rem;
+    color: #333;
+    margin-bottom: 6px;
 }
 
 .inputGroup input,
 .inputGroup select {
-    padding: 10px;
-    border: 1px solid #095e8b;
-    border-radius: 4px;
-    font-size: 1em;
-    box-sizing: border-box; 
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Estilo do Dropdown Prestador */
-.inputGroup select {
-    appearance: none; 
-    background-color: #fff;
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 30px; 
+.inputGroup input:focus,
+.inputGroup select:focus {
+    outline: none;
+    border-color: #095e8b;
+    box-shadow: 0 0 0 2px rgba(9, 94, 139, 0.2);
 }
+
+.inputGroup select {
+    appearance: none;
+    background-color: #fff;
+    padding-right: 32px;
+}
+
+
 
 .buttonBase {
-    /* Estilo base para todos os botões de ação */
-    border: 1px solid transparent; 
-    padding: 10px 15px;
-    border-radius: 4px;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: 500;
-    text-align: center;
-    transition: background-color 0.2s, opacity 0.2s, border-color 0.2s;
-    white-space: nowrap; 
-    margin-left: 200px;
+    transition: background-color 0.2s, transform 0.3s, opacity 0.2s;
+    white-space: nowrap;
+    
+}
 
+.buttonBase:active {
+    transform: scale(0.97);
 }
 
 .primaryButton {
-    background-color: #095e8b; 
-    color: white;
+    background-color: #095e8b;
+    color: #fff;
 }
 
 .primaryButton:hover:not(:disabled) {
-    background-color: #074668;
+    background-color: #0b6fa4;
 }
 
 .primaryButton:disabled {
-    background-color: #074668;
+    opacity: 0.6;
     cursor: not-allowed;
-    opacity: 0.8;
 }
 
-/* Estilo para o botão 'Alterar Senha' para ter a altura do input */
-.changePasswordButton {
-    height: 40px; 
-}
 
-/* Estilo do botão de Excluir Conta */
 .dangerButton {
-    background-color: #095e8b; 
-    color: white;
-    margin-left: 10px; 
+    background-color: #095e8b;
+    color: #fff;
 }
 
 .dangerButton:hover {
-    background-color: #074668;
+    background-color: #e74c3c;
 }
 
-/* --- Rodapé de Ações --- */
+
+
 .actions {
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
+    gap: 12px;
     margin-top: 30px;
-    padding-top: 15px; 
 }
 
 
 @media (max-width: 600px) {
     .formGrid {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
     }
+
     .imageAndLogin {
         flex-direction: column;
-        align-items: flex-start;
     }
+
     .loginGroup {
         flex-direction: column;
-        width: 100%;
         align-items: stretch;
     }
-    .changePasswordButton {
-        width: 100%;
-    }
+
     .actions {
         flex-direction: column;
-        gap: 10px;
-    }
-    .dangerButton {
-        margin-left: 0;
     }
 }

@@ -3,10 +3,10 @@ import { useAuth } from "../../context/AuthContext";
 import styles from "./Perfil.module.css";
 import { motion } from "framer-motion";
 
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { deleteUser } from "firebase/auth";
 import { db, auth } from "../../../FirebaseConfig";
-import { useNavigate } from "react-router-dom"; // Import necessário
+import { useNavigate } from "react-router-dom"; 
 
 export default function Perfil() {
   const { currentUser } = useAuth();
@@ -64,11 +64,34 @@ export default function Perfil() {
     );
   }
 
-  const handleChange = (e) => {
-    setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
+  //  NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE JAJAJA
+  const formatPhone = (value) => {
+    if (!value) return "";
+    
+    let v = value.replace(/\D/g, ""); 
+    
+    v = v.substring(0, 11); 
+    
+    if (v.length >= 3 && v.length <= 7) {
+      v = `(${v.substring(0, 2)}) ${v.substring(2)}`;
+    } else if (v.length >= 8) {
+      v = `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7)}`;
+    }
+    
+    return v;
   };
 
- const handleSave = async () => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === "telefone") {
+      setForm((s) => ({ ...s, telefone: formatPhone(value) }));
+    } else {
+      setForm((s) => ({ ...s, [name]: value }));
+    }
+  };
+
+  const handleSave = async () => {
     if (!form.name.trim()) {
       alert("Por favor, informe o nome completo.");
       return;
@@ -77,14 +100,14 @@ export default function Perfil() {
     try {
       const userRef = doc(db, "users", currentUser.uid);
 
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         name: form.name, 
         dataNascimento: form.dataNascimento || "",
         telefone: form.telefone || "",
         apelido: form.apelido || "",
-        Escolaridade: form.Escolaridade || "Ensino Fundamental", // Corrigido aqui
+        Escolaridade: form.Escolaridade || "Ensino Fundamental", 
         updatedAt: new Date(),
-      });
+      }, { merge: true });
 
       setProfile({ ...profile, ...form });
       alert("Perfil atualizado com sucesso!");
@@ -96,7 +119,6 @@ export default function Perfil() {
     }
   };
 
-  // Função para o botão "Alterar Senha"
   const handleNavigateToChangePassword = () => {
     navigate("/alterar-senha");
   };
@@ -134,7 +156,7 @@ export default function Perfil() {
       <motion.div className={styles.profileBox} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
 
         <div className={styles.header}>
-          <h2>MEU PERFIL</h2>
+          <h2>Meu Perfil</h2>
           <div className={styles.tabs}>
             <span className={styles.activeTab}>Dados do Usuário</span>
           </div>
@@ -172,31 +194,29 @@ export default function Perfil() {
               <input name="name" value={form.name} onChange={handleChange} />
             </div>
             <div className={styles.inputGroup}>
-              <label>Sobrenome</label>
+              <label>Apelido</label>
               <input name="apelido" value={form.apelido} onChange={handleChange} placeholder="Como prefere ser chamado" />
             </div>
 
             {/* Linha 2 */}
             <div className={styles.inputGroup}>
               <label>Telefone</label>
-              <input name="telefone" value={form.telefone} onChange={handleChange} placeholder="(xx) xxxx-xxxx" 
-              id="telefone" 
-              
-               maxLength="9"
+              <input 
+                name="telefone" 
+                value={form.telefone} 
+                onChange={handleChange} 
+                placeholder="(11) 99999-9999" 
+                id="telefone" 
+                maxLength="15" 
               />
             </div>
             <div className={styles.inputGroup}>
               <label>Data de Nascimento</label>
               <input name="dataNascimento" type="date" value={form.dataNascimento} onChange={handleChange}
-              
-                
                 id="dataNascimento"
-                
-               
                 min="1900-01-01"
                 max="2099-12-31"
-                />
-             
+              />
             </div>
 
             {/* Linha 3 */}

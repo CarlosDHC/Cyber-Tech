@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-// Lembre-se de verificar este caminho de import:
 import { auth, db } from "../../FirebaseConfig"; 
 
-// 🔹 Criação do contexto
+//  Criação do contexto
 const AuthContext = createContext();
 
-// 🔹 Provedor global
+//  Provedor global
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false); // O estado de admin

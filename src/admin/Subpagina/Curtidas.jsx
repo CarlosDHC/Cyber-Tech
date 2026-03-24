@@ -8,9 +8,9 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
 export default function Curtidas() {
   const [curtidas, setCurtidas] = useState([]);
-  const [topPosts, setTopPosts] = useState([]); 
+  const [topPosts, setTopPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -32,19 +32,19 @@ export default function Curtidas() {
         setCurtidas(listaCurtidas);
 
         const stats = {};
-        
+
         listaCurtidas.forEach((item) => {
-            const titulo = item.postTitle || item.postId || "Post sem título";
-            
-            if (!stats[titulo]) {
-                stats[titulo] = 0;
-            }
-            stats[titulo] += 1;
+          const titulo = item.postTitle || item.postId || "Post sem título";
+
+          if (!stats[titulo]) {
+            stats[titulo] = 0;
+          }
+          stats[titulo] += 1;
         });
 
         const formattedData = Object.keys(stats).map(key => ({
-            name: key,
-            likes: stats[key]
+          name: key,
+          likes: stats[key]
         }));
 
         const top5 = formattedData.sort((a, b) => b.likes - a.likes).slice(0, 5);
@@ -87,36 +87,12 @@ export default function Curtidas() {
         <h2 className={styles.title}>Administrador</h2>
 
         <ul className={styles.navList}>
-          <li>
-            <Link to="/admin" data-tooltip="Home" className={styles.navLink}>
-              <img src="/casa.png" alt="Home" />
-              <span className={styles.linkText}>Home</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/notas" data-tooltip="Notas" className={styles.navLink}>
-              <img src="/estrela.png" alt="Notas" />
-              <span className={styles.linkText}>Notas</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newblog" data-tooltip="Blog" className={styles.navLink}>
-              <img src="/blog.png" alt="Blog" />
-              <span className={styles.linkText}>Blog</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newdesafios" data-tooltip="Desafios" className={styles.navLink}>
-              <img src="/desafio.png" alt="Desafios" />
-              <span className={styles.linkText}>Desafios</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/curtidas" data-tooltip="like" className={styles.navLink}>
-              <img src="/curti.png" alt="curti" />
-              <span className={styles.linkText}>like</span>
-            </Link>
-          </li>
+          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
+          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão de Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Criar Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 
@@ -131,50 +107,50 @@ export default function Curtidas() {
           <>
             {/* TABELA DE TOP 5 CURTIDAS */}
             <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-                <h3 style={{ marginBottom: '15px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '10px' }}>
-                    Top 5 Posts Mais Populares
-                </h3>
-                
-                {topPosts.length > 0 ? (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-                            <thead>
-                                <tr style={{ background: '#f8f9fa' }}>
-                                    <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057', width: '50px' }}>#</th>
-                                    <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057' }}>Título do Post</th>
-                                    <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057', textAlign: 'center', width: '120px' }}>Total Curtidas</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {topPosts.map((post, index) => (
-                                    <tr key={index} style={{ borderBottom: "1px solid #f1f3f5" }}>
-                                        <td style={{ padding: "12px", fontWeight: 'bold', color: '#2563EB' }}>{index + 1}º</td>
-                                        <td style={{ padding: "12px", fontWeight: '500' }}>{post.name}</td>
-                                        <td style={{ padding: "12px", textAlign: 'center' }}>
-                                            <span style={{ 
-                                                background: '#dbeafe', 
-                                                color: '#1e40af', 
-                                                padding: '4px 12px', 
-                                                borderRadius: '20px',
-                                                fontWeight: 'bold',
-                                                fontSize: '0.9rem'
-                                            }}>
-                                                {post.likes}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <p style={{ color: '#888', fontStyle: 'italic' }}>Dados insuficientes para o ranking.</p>
-                )}
+              <h3 style={{ marginBottom: '15px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '10px' }}>
+                Post mais populares
+              </h3>
+
+              {topPosts.length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                    <thead>
+                      <tr style={{ background: '#f8f9fa' }}>
+                        <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057', width: '50px' }}>#</th>
+                        <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057' }}>Título do Post</th>
+                        <th style={{ padding: "12px", borderBottom: "2px solid #e9ecef", color: '#495057', textAlign: 'center', width: '120px' }}>Total Curtidas</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topPosts.map((post, index) => (
+                        <tr key={index} style={{ borderBottom: "1px solid #f1f3f5" }}>
+                          <td style={{ padding: "12px", fontWeight: 'bold', color: '#2563EB' }}>{index + 1}º</td>
+                          <td style={{ padding: "12px", fontWeight: '500' }}>{post.name}</td>
+                          <td style={{ padding: "12px", textAlign: 'center' }}>
+                            <span style={{
+                              background: '#dbeafe',
+                              color: '#1e40af',
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontWeight: 'bold',
+                              fontSize: '0.9rem'
+                            }}>
+                              {post.likes}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p style={{ color: '#888', fontStyle: 'italic' }}>Dados insuficientes para o ranking.</p>
+              )}
             </div>
 
             {/* LISTA GERAL / TABELA DE HISTÓRICO */}
             <h3 style={{ marginTop: '40px', marginBottom: '15px', color: '#666' }}>Últimas Curtidas Recebidas</h3>
-            
+
             {isMobile ? (
               <div className={styles.mobileCardsContainer}>
                 {curtidas.map((c) => (

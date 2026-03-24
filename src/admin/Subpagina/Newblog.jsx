@@ -2,35 +2,45 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../Admin.module.css";
 
-// FirebaseA
+// Firebase
 import { db } from "../../../FirebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  deleteDoc, 
+  doc, 
+  query, 
+  orderBy 
+} from "firebase/firestore";
 
 import "../../pages/Blog/BlogPost.css";
 
 export default function NewBlog() {
+  // Controle de Abas: "create" ou "manage"
+  const [activeTab, setActiveTab] = useState("create");
+  
+  // Estados para Criação
   const [titulo, setTitulo] = useState("");
   const [resumo, setResumo] = useState("");
   const [capa, setCapa] = useState("");
   const [autor, setAutor] = useState("");
   const [tempoLeitura, setTempoLeitura] = useState("");
- 
-  
-  // Estado para categoria
-  const [categoria, setCategoria] = useState(""); 
-
-
   const [categoria, setCategoria] = useState("");
- 
-
   const [secoes, setSecoes] = useState([
     { id: Date.now(), type: "paragraph", content: "" }
   ]);
-
   const [loading, setLoading] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
   const [modoPreview, setModoPreview] = useState(false);
 
+  // Estados para Gerenciamento
+  const [postsPublicados, setPostsPublicados] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
+
+  // Layout
+  const [collapsed, setCollapsed] = useState(false);
+
+  // Cálculo de tempo de leitura automático
   useEffect(() => {
     const textoTotal = secoes.reduce((acc, bloco) => {
       if (bloco.type === 'paragraph' || bloco.type === 'subtitle') {
@@ -40,19 +50,20 @@ export default function NewBlog() {
     }, "");
 
     const contagemPalavras = textoTotal.trim().split(/\s+/).length;
- 
-    
-    // Média de leitura: 200 palavras por minuto
-
-
-
     const minutosCalculados = Math.ceil(contagemPalavras / 200);
     const tempoFinal = contagemPalavras > 0 ? minutosCalculados : "";
 
     setTempoLeitura(tempoFinal.toString());
-
   }, [secoes]);
 
+  // Carregar posts quando entrar na aba "manage"
+  useEffect(() => {
+    if (activeTab === "manage") {
+      fetchPosts();
+    }
+  }, [activeTab]);
+
+  // --- FUNÇÕES DE CRIAÇÃO ---
   const adicionarBloco = (tipo) => {
     setSecoes([...secoes, { id: Date.now(), type: tipo, content: "" }]);
   };
@@ -91,10 +102,12 @@ export default function NewBlog() {
         dataCriacao: new Date().toISOString()
       });
       alert("Post publicado com sucesso!");
-      
+
+      // Limpar formulário
       setTitulo(""); setResumo(""); setCapa(""); setAutor(""); setTempoLeitura(""); setCategoria("");
       setSecoes([{ id: Date.now(), type: "paragraph", content: "" }]);
       setModoPreview(false);
+      setActiveTab("manage"); // Redireciona para o gerenciador para ver o post criado
     } catch (error) {
       console.error("Erro ao salvar:", error);
       alert("Erro ao salvar o post. Veja o console.");
@@ -102,6 +115,47 @@ export default function NewBlog() {
       setLoading(false);
     }
   }
+
+  // --- FUNÇÕES DE GERENCIAMENTO ---
+  async function fetchPosts() {
+    setLoadingPosts(true);
+    try {
+      const q = query(collection(db, "blog"), orderBy("dataCriacao", "desc"));
+      const querySnapshot = await getDocs(q);
+      const posts = [];
+      querySnapshot.forEach((docSnap) => {
+        posts.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      setPostsPublicados(posts);
+    } catch (error) {
+      console.error("Erro ao buscar posts:", error);
+      alert("Erro ao carregar os posts.");
+    } finally {
+      setLoadingPosts(false);
+    }
+  }
+
+  async function excluirPost(id, tituloPost) {
+    const confirmar = window.confirm(`Tem certeza que deseja excluir permanentemente o post:\n"${tituloPost}"?`);
+    if (!confirmar) return;
+
+    try {
+      await deleteDoc(doc(db, "blog", id));
+      // Remove o post excluído da lista na tela sem precisar recarregar o banco
+      setPostsPublicados(postsPublicados.filter(post => post.id !== id));
+      alert("Post excluído com sucesso.");
+    } catch (error) {
+      console.error("Erro ao excluir post:", error);
+      alert("Erro ao excluir. Verifique sua conexão e permissões.");
+    }
+  }
+
+  // Helper para formatar data
+  const formatarData = (dataIso) => {
+    if (!dataIso) return "-";
+    const data = new Date(dataIso);
+    return data.toLocaleDateString("pt-BR", { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
 
   return (
     <div className={styles.container}>
@@ -111,59 +165,115 @@ export default function NewBlog() {
         </button>
         <h2 className={styles.title}>Painel Admin</h2>
         <ul className={styles.navList}>
-          <li>
-            <Link to="/admin" data-tooltip="Home" className={styles.navLink}>
-              <img src="/casa.png" alt="Home" />
-              <span className={styles.linkText}>Home</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/notas" data-tooltip="Notas" className={styles.navLink}>
-              <img src="/estrela.png" alt="Notas" />
-              <span className={styles.linkText}>Notas</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newblog" data-tooltip="Blog" className={styles.navLink}>
-              <img src="/blog.png" alt="Blog" />
-              <span className={styles.linkText}>Blog</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newdesafios" data-tooltip="Desafios" className={styles.navLink}>
-              <img src="/desafio.png" alt="Desafios" />
-              <span className={styles.linkText}>Desafios</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/curtidas" data-tooltip="like" className={styles.navLink}>
-              <img src="/curti.png" alt="curti" />
-              <span className={styles.linkText}>like</span>
-            </Link>
-          </li>
+          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
+          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão de Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Criar Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 
       <main className={styles.main}>
+        {/* CABEÇALHO E ABAS */}
         <div className={styles.headerFlex}>
-          <h1>{modoPreview ? "Visualização do Post" : "Editor Profissional"}</h1>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className={styles.btnAdd} onClick={() => setModoPreview(!modoPreview)}>
-              {modoPreview ? "Voltar ao Editor" : "Ver Prévia"}
+          <h1>
+            {activeTab === "manage" 
+              ? "Gerenciar Artigos Publicados" 
+              : (modoPreview ? "Visualização do Post" : "Editor Profissional")}
+          </h1>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+            <button 
+              className={styles.publishBtn} onClick={() => { setActiveTab("create"); setModoPreview(false); }}
+            >
+              Criar Novo
             </button>
-            <button className={styles.publishBtn} onClick={salvarPost} disabled={loading}>
-              {loading ? "Publicando..." : "Publicar Artigo"}
+            <button 
+              className={styles.btnAdd} 
+              onClick={() => setActiveTab("manage")}
+            >
+              Gerenciar Publicados
             </button>
+            
+            {activeTab === "create" && (
+              <>
+                <button className={styles.btnAdd} onClick={() => setModoPreview(!modoPreview)} style={{marginLeft: '15px'}}>
+                  {modoPreview ? "Voltar ao Editor" : "Ver Prévia"}
+                </button>
+                <button className={styles.publishBtn} onClick={salvarPost} disabled={loading}>
+                  {loading ? "Publicando..." : "Publicar Artigo"}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {modoPreview ? (
-          <div className="blog-post-container">
+        {/* ÁREA DE CONTEÚDO */}
+        {activeTab === "manage" ? (
+          /* =========================================
+             ABA 2: GERENCIADOR DE POSTS
+             ========================================= */
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', marginTop: '20px' }}>
+            {loadingPosts ? (
+              <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>Carregando artigos...</p>
+            ) : (
+              <div style={{ overflowX: 'auto', width: '100%' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e5e7eb', color: '#4b5563' }}>
+                      <th style={{ padding: '12px' }}>Título do Artigo</th>
+                      <th style={{ padding: '12px' }}>Categoria</th>
+                      <th style={{ padding: '12px' }}>Autor</th>
+                      <th style={{ padding: '12px' }}>Data</th>
+                      <th style={{ padding: '12px', textAlign: 'center' }}>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {postsPublicados.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
+                          Nenhum artigo publicado ainda.
+                        </td>
+                      </tr>
+                    ) : (
+                      postsPublicados.map((post) => (
+                        <tr key={post.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f9fafb'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                          <td style={{ padding: '12px', fontWeight: '500', color: '#111827' }}>{post.titulo}</td>
+                          <td style={{ padding: '12px' }}>
+                            <span style={{ background: '#eff6ff', color: '#2563eb', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                              {post.categoria}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px', color: '#4b5563' }}>{post.autor}</td>
+                          <td style={{ padding: '12px', color: '#6b7280', fontSize: '0.9rem' }}>{formatarData(post.dataCriacao)}</td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            <button 
+                              onClick={() => excluirPost(post.id, post.titulo)}
+                              style={{ background: '#095d8bd5', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}
+                            >
+                              Excluir
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+        ) : modoPreview ? (
+          /* =========================================
+             ABA 1: PRÉVIA DO POST
+             ========================================= */
+          <div className="blog-post-container" style={{ marginTop: '20px' }}>
             <header className="blog-post-header">
               {categoria && <span style={{
-                  background:'#2563EB', color:'white', padding:'4px 12px', 
-                  borderRadius:'20px', fontSize:'0.85rem', textTransform:'uppercase',
-                  marginBottom:'10px', display:'inline-block'
+                background: '#2563EB', color: 'white', padding: '4px 12px',
+                borderRadius: '20px', fontSize: '0.85rem', textTransform: 'uppercase',
+                marginBottom: '10px', display: 'inline-block'
               }}>{categoria}</span>}
               <h1 className="blog-title">{titulo || "Título do Post"}</h1>
               {resumo && <p className="blog-subtitle">{resumo}</p>}
@@ -184,11 +294,14 @@ export default function NewBlog() {
             </section>
           </div>
         ) : (
+          /* =========================================
+             ABA 1: EDITOR DO POST
+             ========================================= */
           <div className={styles.editorContainer}>
             <div className={styles.formColumn}>
               <div className={styles.metaBox}>
                 <h3>Metadados (Dados do Firebase)</h3>
-                
+
                 <div className={styles.inputGroup}>
                   <label className={styles.fieldLabel}>Título</label>
                   <input className={styles.inputField} value={titulo} onChange={e => setTitulo(e.target.value)} />
@@ -196,9 +309,9 @@ export default function NewBlog() {
 
                 <div className={styles.inputGroup}>
                   <label className={styles.fieldLabel}>Categoria (Área)</label>
-                  <select 
-                    className={styles.inputField} 
-                    value={categoria} 
+                  <select
+                    className={styles.inputField}
+                    value={categoria}
                     onChange={e => setCategoria(e.target.value)}
                     style={{ height: '45px', background: 'white' }}
                   >
@@ -211,31 +324,21 @@ export default function NewBlog() {
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <div className={styles.inputGroup} style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  <div className={styles.inputGroup} style={{ flex: '1 1 100%', minWidth: '250px' }}>
                     <label className={styles.fieldLabel}>Autor</label>
                     <input className={styles.inputField} value={autor} onChange={e => setAutor(e.target.value)} />
                   </div>
 
-                  
-                  {/* --- CAMPO DE TEMPO MELHORADO --- */}
-
-
-
-                  <div className={styles.inputGroup} style={{ flex: 1 }}>
-                    <label className={styles.fieldLabel}>
-                      Tempo Estimado de Leitura
-                    </label>
-                    <input 
-                      className={styles.inputField} 
-                      type="number" 
-                      value={tempoLeitura} 
-                      onChange={e => setTempoLeitura(e.target.value)} 
+                  <div className={styles.inputGroup} style={{ flex: '1 1 100%', minWidth: '250px' }}>
+                    <label className={styles.fieldLabel}>Tempo Estimado de Leitura</label>
+                    <input
+                      className={styles.inputField}
+                      type="number"
+                      value={tempoLeitura}
+                      onChange={e => setTempoLeitura(e.target.value)}
                       placeholder="Calculado automaticamente..."
                     />
-                    {/*<small style={{ color: '#666', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
-                      Estimativa de quanto tempo o usuário levará para ler o artigo.
-                    </small>*/}
                   </div>
                 </div>
 

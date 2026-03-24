@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
-// ✅ Caminho corrigido — o FirebaseConfig está fora da pasta src
+// Caminho corrigido — o FirebaseConfig está fora da pasta src
 import { auth } from "../../../FirebaseConfig.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -18,20 +18,25 @@ const Login = () => {
     setError(null);
     setLoading(true);
 
+    const cleanEmail = email.trim();
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
       navigate("/");
     } catch (err) {
       console.error("Erro detalhado no login:", err);
       const code = err?.code || "";
+      
       if (
         code.includes("user-not-found") ||
         code.includes("wrong-password") ||
         code.includes("invalid-credential")
       ) {
-        setError("E-mail ou senha inválidos.");
+        setError("E-mail ou palavra-passe inválidos. Verifique os seus dados.");
+      } else if (code.includes("too-many-requests")) {
+        setError("Muitas tentativas falhadas. Tente novamente mais tarde.");
       } else {
-        setError("Ocorreu um erro ao tentar fazer login.");
+        setError("Ocorreu um erro ao tentar iniciar sessão.");
       }
     } finally {
       setLoading(false);

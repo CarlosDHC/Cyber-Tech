@@ -261,6 +261,70 @@ const Forum = () => {
             </div>
           </div>
 
+          <div className={styles.newQuestionArea}>
+            <h3>Iniciar nova discussão</h3>
+            {!auth.currentUser ? (
+              <p className={styles.loginWarn}>Faça login para participar.</p>
+            ) : (
+              <form onSubmit={handlePublish} className={styles.inputGroup}>
+                <input 
+                  type="text" 
+                  placeholder="Título da discussão" 
+                  value={newTitle} 
+                  onChange={(e) => setNewTitle(e.target.value)} 
+                  disabled={isSubmitting} 
+                  className={styles.cleanInput} 
+                />
+                
+                <div className={styles.tagInputContainer}>
+                  <div className={styles.tagsWrapper}>
+                    {selectedTags.map(tag => (
+                      <span key={tag} className={styles.cleanTag}>{tag} <button type="button" onClick={() => removeTag(tag)}>×</button></span>
+                    ))}
+                    <input 
+                      type="text" 
+                      list="tagSuggestions" 
+                      placeholder="Tags (ex: Tecnologia, React)" 
+                      value={tagInput} 
+                      onChange={(e) => setTagInput(e.target.value)} 
+                      onKeyDown={handleTagKeyDown} 
+                      className={styles.tagTextInput} 
+                    />
+                    <datalist id="tagSuggestions">{tagSuggestions.map(tag => <option key={tag} value={tag} />)}</datalist>
+                    <button type="button" onClick={handleManualAddTag} className={styles.addTagBtn}>+</button>
+                  </div>
+                </div>
+
+                <div className={styles.imageInputContainer}>
+                  <input 
+                    type="url" 
+                    placeholder="Cole aqui o link da imagem (http://...)" 
+                    value={imageLink} 
+                    onChange={(e) => setImageLink(e.target.value)} 
+                    disabled={isSubmitting} 
+                    className={styles.cleanInput}
+                  />
+                  {imageLink && (
+                    <div className={styles.miniPreview}>
+                      <span className={styles.previewLabel}>Pré-visualização:</span>
+                      <img src={imageLink} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
+                    </div>
+                  )}
+                </div>
+
+                <textarea 
+                  rows="3" 
+                  placeholder="No que você está pensando?" 
+                  value={newContent} 
+                  onChange={(e) => setNewContent(e.target.value)} 
+                  disabled={isSubmitting} 
+                  className={styles.cleanTextarea} 
+                />
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>Publicar</button>
+              </form>
+            )}
+          </div>
+
           {loading && <p className={styles.loadingMsg}>Carregando...</p>}
 
           {!loading && displayedPosts.length === 0 && (
@@ -344,69 +408,7 @@ const Forum = () => {
             );
           })}
 
-          <div className={styles.newQuestionArea}>
-            <h3>Iniciar nova discussão</h3>
-            {!auth.currentUser ? (
-              <p className={styles.loginWarn}>Faça login para participar.</p>
-            ) : (
-              <form onSubmit={handlePublish} className={styles.inputGroup}>
-                <input 
-                  type="text" 
-                  placeholder="Título da discussão" 
-                  value={newTitle} 
-                  onChange={(e) => setNewTitle(e.target.value)} 
-                  disabled={isSubmitting} 
-                  className={styles.cleanInput} 
-                />
-                
-                <div className={styles.tagInputContainer}>
-                  <div className={styles.tagsWrapper}>
-                    {selectedTags.map(tag => (
-                      <span key={tag} className={styles.cleanTag}>{tag} <button type="button" onClick={() => removeTag(tag)}>×</button></span>
-                    ))}
-                    <input 
-                      type="text" 
-                      list="tagSuggestions" 
-                      placeholder="Tags (ex: Tecnologia, React)" 
-                      value={tagInput} 
-                      onChange={(e) => setTagInput(e.target.value)} 
-                      onKeyDown={handleTagKeyDown} 
-                      className={styles.tagTextInput} 
-                    />
-                    <datalist id="tagSuggestions">{tagSuggestions.map(tag => <option key={tag} value={tag} />)}</datalist>
-                    <button type="button" onClick={handleManualAddTag} className={styles.addTagBtn}>+</button>
-                  </div>
-                </div>
-
-                <div className={styles.imageInputContainer}>
-                  <input 
-                    type="url" 
-                    placeholder="Cole aqui o link da imagem (http://...)" 
-                    value={imageLink} 
-                    onChange={(e) => setImageLink(e.target.value)} 
-                    disabled={isSubmitting} 
-                    className={styles.cleanInput}
-                  />
-                  {imageLink && (
-                    <div className={styles.miniPreview}>
-                      <span className={styles.previewLabel}>Pré-visualização:</span>
-                      <img src={imageLink} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
-                    </div>
-                  )}
-                </div>
-
-                <textarea 
-                  rows="3" 
-                  placeholder="No que você está pensando?" 
-                  value={newContent} 
-                  onChange={(e) => setNewContent(e.target.value)} 
-                  disabled={isSubmitting} 
-                  className={styles.cleanTextarea} 
-                />
-                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>Publicar</button>
-              </form>
-            )}
-          </div>
+          
         </main>
         
         <aside className={styles.sidebarSection}>

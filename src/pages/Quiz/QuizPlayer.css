@@ -9,7 +9,11 @@
 }
 
 .quiz-container {
-    background: white;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    background: rgb(255, 255, 255);
     width: 100%;
     max-width: 700px;
     padding: 30px;
