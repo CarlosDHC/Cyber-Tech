@@ -22,15 +22,15 @@ export default function NewDesafios() {
             perguntaImagem: "",
             alternativaCorreta: "",
             alternativas: {
-                a: { texto: "", imagem: "" },
-                b: { texto: "", imagem: "" },
-                c: { texto: "", imagem: "" },
-                d: { texto: "", imagem: "" }
+                a: { texto: "" },
+                b: { texto: "" },
+                c: { texto: "" },
+                d: { texto: "" }
             }
         }
     ]);
 
-    // Adicionar Nova Questão (COM LIMITE DE 10)
+    // Adicionar questão (máx 10)
     const adicionarQuestao = () => {
         if (exercicios.length >= 10) {
             alert("Limite máximo de 10 questões atingido!");
@@ -44,53 +44,50 @@ export default function NewDesafios() {
                 perguntaImagem: "",
                 alternativaCorreta: "",
                 alternativas: {
-                    a: { texto: "", imagem: "" },
-                    b: { texto: "", imagem: "" },
-                    c: { texto: "", imagem: "" },
-                    d: { texto: "", imagem: "" }
+                    a: { texto: "" },
+                    b: { texto: "" },
+                    c: { texto: "" },
+                    d: { texto: "" }
                 }
             }
         ]);
     };
 
-    // Remover Questão
-    const excluirQuestao = (indexToDelete) => {
+    // Remover questão
+    const excluirQuestao = (index) => {
         if (exercicios.length === 1) {
             alert("O desafio precisa ter pelo menos uma questão.");
             return;
         }
 
         if (window.confirm("Excluir esta questão?")) {
-            const novaLista = exercicios.filter((_, index) => index !== indexToDelete);
+            const novaLista = exercicios.filter((_, i) => i !== index);
             setExercicios(novaLista);
         }
     };
 
-    // Atualiza campos da questão
+    // Atualiza pergunta
     const handleQuestaoChange = (index, campo, valor) => {
-        const novosExercicios = [...exercicios];
-        novosExercicios[index] = { ...novosExercicios[index], [campo]: valor };
-        setExercicios(novosExercicios);
+        const novos = [...exercicios];
+        novos[index] = { ...novos[index], [campo]: valor };
+        setExercicios(novos);
     };
 
-    // Atualiza alternativas
-    const handleAltChange = (exIndex, letra, campo, valor) => {
-        const novosExercicios = [...exercicios];
-        novosExercicios[exIndex].alternativas[letra] = {
-            ...novosExercicios[exIndex].alternativas[letra],
-            [campo]: valor
-        };
-        setExercicios(novosExercicios);
+    // Atualiza alternativa
+    const handleAltChange = (exIndex, letra, valor) => {
+        const novos = [...exercicios];
+        novos[exIndex].alternativas[letra].texto = valor;
+        setExercicios(novos);
     };
 
     const salvarDesafios = async () => {
         if (!tituloGeral || !area) {
-            alert("Preencha o Título Principal e a Área de Conhecimento.");
+            alert("Preencha o Título Principal e a Área.");
             return;
         }
 
-        const questoesValidas = exercicios.filter(q =>
-            q.perguntaTexto.trim() !== "" && q.alternativaCorreta !== ""
+        const questoesValidas = exercicios.filter(
+            q => q.perguntaTexto.trim() !== "" && q.alternativaCorreta !== ""
         );
 
         if (questoesValidas.length === 0) {
@@ -99,10 +96,11 @@ export default function NewDesafios() {
         }
 
         setLoading(true);
+
         try {
             await addDoc(collection(db, "desafios"), {
                 titulo: tituloGeral,
-                subtitulo: subtitulo,
+                subtitulo,
                 area,
                 imagemCapa: capa || "https://placehold.co/600x400?text=Quiz",
                 tentativasPermitidas: Number(tentativas),
@@ -130,203 +128,121 @@ export default function NewDesafios() {
                 </button>
                 <h2 className={styles.title}>Admin</h2>
                 <ul className={styles.navList}>
-                    <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-                    <li><Link to="/admin/notas" className={styles.navLink}><img src="/estrela.png" alt="N" /><span className={styles.linkText}>Notas</span></Link></li>
-                    <li><Link to="/admin/newblog" className={styles.navLink}><img src="/blog.png" alt="B" /><span className={styles.linkText}>Blog</span></Link></li>
-                    <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/desafio.png" alt="D" /><span className={styles.linkText}>Desafios</span></Link></li>
-                    <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Curtidas</span></Link></li>
+                    <li><Link to="/admin" className={styles.navLink}>Home</Link></li>
+                    <li><Link to="/admin/newdesafios" className={styles.navLink}>Desafios</Link></li>
                 </ul>
             </aside>
 
             <main className={styles.main}>
                 <div className={styles.headerFlex}>
                     <h1>Novo Desafio (Quiz)</h1>
-                    <button className={styles.publishBtn} onClick={salvarDesafios} disabled={loading}>
+                    <button 
+                        className={styles.publishBtn} 
+                        onClick={salvarDesafios} 
+                        disabled={loading}
+                    >
                         {loading ? "Salvando..." : "Publicar Quiz"}
                     </button>
                 </div>
-
-
+                
                 <div className={styles.editorContainer}>
-                    <div className={styles.formColumn}>
+                    <div className={styles.blockItem}>
+                        <h3>1. Configurações Gerais</h3>
 
-                        {/* --- BLOCO 1: CONFIGURAÇÕES (METADADOS) --- */}
-                        <div className={styles.metaBox}>
-                            <h3 style={{ marginTop: 0, color: '#1E293B' }}>1. Configurações</h3>
+                        <input
+                            className={styles.inputField}
+                            placeholder="Título Principal"
+                            value={tituloGeral}
+                            onChange={e => setTituloGeral(e.target.value)}
+                        />
 
+                        <input
+                            className={styles.inputField}
+                            placeholder="Subtítulo"
+                            value={subtitulo}
+                            onChange={e => setSubtitulo(e.target.value)}
+                        />
 
-                {tab === "gerenciar" ? (
-                    <div className={styles.editorContainer}>
-                        <input className={styles.inputField} placeholder="Pesquisar..." value={busca} onChange={e => setBusca(e.target.value)} style={{marginBottom: '20px'}} />
-                        <div className={styles.blocksList}>
-                            {listaDesafios.filter(d => d.titulo.toLowerCase().includes(busca.toLowerCase()) || d.area.toLowerCase().includes(busca.toLowerCase())).map(d => (
-                                <div key={d.id} className={styles.blockItem} style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                                    <div><strong>{d.titulo}</strong> <br/><small>{d.area} • {d.qtdQuestoes} Qs</small></div>
-                                    <div style={{display:'flex', gap:'8px'}}>
-                                        <button onClick={() => prepararEdicao(d)} className={styles.btnAdd} style={{width:'auto', padding:'5px 15px'}}>Editar</button>
-                                        <button onClick={() => excluirDesafioBanco(d.id)} className={styles.btnIcon}><img src="/lixeira.png" alt="X" style={{width:'18px'}}/></button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <select
+                            className={styles.inputField}
+                            value={area}
+                            onChange={e => setArea(e.target.value)}
+                        >
+                            <option value="Tecnologia">Tecnologia</option>
+                            <option value="Engenharia">Engenharia</option>
+                            <option value="Direito">Direito</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Rh">RH</option>
+                        </select>
+
+                        <input
+                            className={styles.inputField}
+                            type="number"
+                            min="1"
+                            value={tentativas}
+                            onChange={e => setTentativas(e.target.value)}
+                        />
+
+                        <input
+                            className={styles.inputField}
+                            placeholder="URL da imagem de capa"
+                            value={capa}
+                            onChange={e => setCapa(e.target.value)}
+                        />
                     </div>
-                ) : (
-                    <div className={styles.editorContainer}>
-                        {/* 1. CONFIGURAÇÕES EM CARD */}
-                        <div className={styles.blockItem}>
-                            <h3 style={{margin:'20px 0 10px'}}>1. Configurações Gerais</h3>
- 
-                            <div className={styles.inputGroup}>
-                                <label className={styles.fieldLabel}>Título Principal</label>
-                                <input
-                                    className={styles.inputField}
-                                    placeholder="Ex: Lógica de Programação - Módulo 1"
-                                    value={tituloGeral}
-                                    onChange={e => setTituloGeral(e.target.value)}
-                                    style={{ fontWeight: 'bold' }}
-                                />
-                            </div>
 
-                            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                                <div className={styles.inputGroup} style={{ flex: 1, minWidth: '200px' }}>
-                                    <label className={styles.fieldLabel}>Área</label>
-                                    <select className={styles.inputField} value={area} onChange={e => setArea(e.target.value)}>
-                                        <option value="Tecnologia">Tecnologia</option>
-                                        <option value="Engenharia">Engenharia</option>
-                                        <option value="Direito">Direito</option>
-                                        <option value="Marketing">Marketing</option>
-                                        <option value="Rh">RH</option>
-                                    </select>
-                                </div>
+                    <h3 style={{ marginTop: "30px" }}>
+                        2. Perguntas ({exercicios.length}/10)
+                    </h3>
 
-                                <div className={styles.inputGroup} style={{ flex: 1, minWidth: '150px' }}>
-                                    <label className={styles.fieldLabel}>Tentativas</label>
+                    {exercicios.map((ex, index) => (
+                        <div key={index} className={styles.blockItem}>
+                            <h4>Questão {index + 1}</h4>
+
+                            <textarea
+                                className={styles.textAreaBlock}
+                                placeholder="Digite a pergunta..."
+                                value={ex.perguntaTexto}
+                                onChange={e => handleQuestaoChange(index, "perguntaTexto", e.target.value)}
+                            />
+
+                            {["a", "b", "c", "d"].map(letra => (
+                                <div key={letra} style={{ display: "flex", gap: "10px", marginBottom: "8px" }}>
+                                    <input
+                                        type="radio"
+                                        name={`correta-${index}`}
+                                        checked={ex.alternativaCorreta === letra}
+                                        onChange={() =>
+                                            handleQuestaoChange(index, "alternativaCorreta", letra)
+                                        }
+                                    />
                                     <input
                                         className={styles.inputField}
-                                        type="number"
-                                        min="1"
-                                        value={tentativas}
-                                        onChange={e => setTentativas(e.target.value)}
+                                        placeholder={`Alternativa ${letra.toUpperCase()}`}
+                                        value={ex.alternativas[letra].texto}
+                                        onChange={e =>
+                                            handleAltChange(index, letra, e.target.value)
+                                        }
                                     />
-                                </div>
-                            </div>
-
-                            <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
-                                <label className={styles.fieldLabel}>Imagem de Capa (URL)</label>
-                                <input className={styles.inputField} placeholder="https://..." value={capa} onChange={e => setCapa(e.target.value)} />
-                            </div>
-                            {capa && <img src={capa} alt="Preview" style={{ height: '120px', marginTop: '10px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #ddd' }} onError={(e) => e.target.style.display = 'none'} />}
-                        </div>
-
-                        <hr className={styles.divider} />
-
-                        <div className={styles.blocksList}>
-
-                            <div style={{ marginBottom: '25px', paddingBottom: '15px' }}>
-                                <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#095e8b' }}>2. Dados do Desafio</h3>
-
-                                <div className={styles.inputGroup}>
-                                    <label className={styles.fieldLabel}>Título Principal</label>
-                                    <input
-                                        className={styles.inputField}
-                                        placeholder="..."
-                                        value={tituloGeral}
-                                        onChange={e => setTituloGeral(e.target.value)}
-                                        style={{ fontWeight: 'bold' }}
-                                    />
-                                </div>
-
-                                <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
-                                    <label className={styles.fieldLabel}>Subtítulo</label>
-                                    <input
-                                        className={styles.inputField}
-                                        placeholder="..."
-                                        value={subtitulo}
-                                        onChange={e => setSubtitulo(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* LISTA DE QUESTÕES */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                                <h3>3. Perguntas ({exercicios.length}/10)</h3>
-                                {exercicios.length >= 10 && <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.9rem' }}>Máximo atingido!</span>}
-                            </div>
-
-                            {exercicios.map((ex, index) => (
-                                <div key={index} className={styles.blockItem}>
-                                    <div className={styles.blockHeader}>
-                                        <span className={styles.blockLabel} style={{ background: '#095e8b', color: 'white' }}>
-                                            QUESTÃO {index + 1}
-                                        </span>
-
-                                        <div className={styles.blockActions}>
-                                            <button
-                                                onClick={() => excluirQuestao(index)}
-                                                className={styles.btnIcon}
-                                                title="Excluir Questão"
-                                            >
-                                                <img src="/lixeira.png" alt="Excluir" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.fieldLabel}>Enunciado</label>
-                                        <textarea
-                                            className={styles.textAreaBlock}
-                                            placeholder="Digite a pergunta..."
-                                            value={ex.perguntaTexto}
-                                            onChange={e => handleQuestaoChange(index, 'perguntaTexto', e.target.value)}
-                                            rows={2}
-                                        />
-                                    </div>
-
-                                    <div className={styles.inputGroup}>
-                                        <input className={styles.inputField} placeholder="URL da imagem (opcional)" value={ex.perguntaImagem} onChange={e => handleQuestaoChange(index, 'perguntaImagem', e.target.value)} />
-                                        {ex.perguntaImagem && <img src={ex.perguntaImagem} alt="" style={{ height: '60px', marginTop: '5px', borderRadius: '4px' }} onError={(e) => e.target.style.display = 'none'} />}
-                                    </div>
-
-                                    {/* Alternativas */}
-                                    <div style={{ marginTop: '15px', background: '#f1f5f9', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '10px', color: '#475569' }}>ALTERNATIVAS (Marque a correta):</p>
-
-                                        {['a', 'b', 'c', 'd'].map((letra) => (
-                                            <div key={letra} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', gap: '10px' }}>
-                                                <input
-                                                    type="radio"
-                                                    name={`correta-${index}`}
-                                                    checked={ex.alternativaCorreta === letra}
-                                                    onChange={() => handleQuestaoChange(index, 'alternativaCorreta', letra)}
-                                                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563EB' }}
-                                                />
-                                                <span style={{ fontWeight: 'bold', width: '25px', textTransform: 'uppercase', color: '#334155' }}>{letra})</span>
-
-                                                <input
-                                                    className={styles.inputField}
-                                                    placeholder={`Resposta ${letra.toUpperCase()}`}
-                                                    value={ex.alternativas[letra].texto}
-                                                    onChange={e => handleAltChange(index, letra, 'texto', e.target.value)}
-                                                    style={{ flex: 1, background: 'white' }}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
                                 </div>
                             ))}
 
-                            <div className={styles.addButtons} style={{ marginTop: '15px' }}>
-                                <button
-                                    onClick={adicionarQuestao}
-                                    className={styles.btnAdd}
-                                    disabled={exercicios.length >= 10}
-                                    style={exercicios.length >= 10 ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
-                                >
-                                    {exercicios.length >= 10 ? "Máximo de Questões Atingido" : "+ Adicionar Questão"}
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => excluirQuestao(index)}
+                                className={styles.btnIcon}
+                            >
+                                Excluir Questão
+                            </button>
                         </div>
-                    </div>
+                    ))}
+
+                    <button
+                        onClick={adicionarQuestao}
+                        disabled={exercicios.length >= 10}
+                        className={styles.btnAdd}
+                    >
+                        + Adicionar Questão
+                    </button>
                 </div>
             </main>
         </div>
