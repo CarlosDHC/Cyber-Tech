@@ -139,7 +139,7 @@ export default function PainelDesafios() {
 
             <main className={styles.main}>
                 
-                {/* BOTÕES DE ABAS PADRONIZADOS */}
+                {/* BOTÕES DE ABAS */}
                 <div className={styles.tabsContainer}>
                     <button 
                         className={styles.publishBtn} 
@@ -188,7 +188,7 @@ export default function PainelDesafios() {
                     </div>
                 ) : (
                     <div className={styles.editorContainer}>
-                        {/* 1. CONFIGURAÇÕES EM CARD */}
+                        {/* 1. CONFIGURAÇÕES DO CARD AQYI*/}
                         <div className={styles.blockItem}>
                             <div className={styles.blockHeader}>
                                 <span className={styles.blockLabel}>1. Configurações Gerais</span>
@@ -259,7 +259,7 @@ export default function PainelDesafios() {
                                                 <div key={l} className={styles.radioItem}>
                                                     <input 
                                                         type="radio" 
-                                                        name={`questao-${index}`} /* Agrupa os radios corretamente */
+                                                        name={`questao-${index}`} 
                                                         checked={ex.alternativaCorreta === l} 
                                                         onChange={() => handleQuestaoChange(index, 'alternativaCorreta', l)} 
                                                     />

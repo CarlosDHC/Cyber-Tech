@@ -17,10 +17,8 @@ import {
 import "../../pages/Blog/BlogPost.css";
 
 export default function NewBlog() {
-  // Controle de Abas: "create" ou "manage"
   const [activeTab, setActiveTab] = useState("create");
   
-  // Estados para Criação
   const [titulo, setTitulo] = useState("");
   const [resumo, setResumo] = useState("");
   const [capa, setCapa] = useState("");
@@ -33,14 +31,11 @@ export default function NewBlog() {
   const [loading, setLoading] = useState(false);
   const [modoPreview, setModoPreview] = useState(false);
 
-  // Estados para Gerenciamento
   const [postsPublicados, setPostsPublicados] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
 
-  // Layout
   const [collapsed, setCollapsed] = useState(false);
 
-  // Cálculo de tempo de leitura automático
   useEffect(() => {
     const textoTotal = secoes.reduce((acc, bloco) => {
       if (bloco.type === 'paragraph' || bloco.type === 'subtitle') {
@@ -56,14 +51,13 @@ export default function NewBlog() {
     setTempoLeitura(tempoFinal.toString());
   }, [secoes]);
 
-  // Carregar posts quando entrar na aba "manage"
   useEffect(() => {
     if (activeTab === "manage") {
       fetchPosts();
     }
   }, [activeTab]);
 
-  // --- FUNÇÕES DE CRIAÇÃO ---
+  // FUNÇÕES DE CRIAÇÃO
   const adicionarBloco = (tipo) => {
     setSecoes([...secoes, { id: Date.now(), type: tipo, content: "" }]);
   };
@@ -103,11 +97,10 @@ export default function NewBlog() {
       });
       alert("Post publicado com sucesso!");
 
-      // Limpar formulário
       setTitulo(""); setResumo(""); setCapa(""); setAutor(""); setTempoLeitura(""); setCategoria("");
       setSecoes([{ id: Date.now(), type: "paragraph", content: "" }]);
       setModoPreview(false);
-      setActiveTab("manage"); // Redireciona para o gerenciador para ver o post criado
+      setActiveTab("manage"); 
     } catch (error) {
       console.error("Erro ao salvar:", error);
       alert("Erro ao salvar o post. Veja o console.");
@@ -116,7 +109,7 @@ export default function NewBlog() {
     }
   }
 
-  // --- FUNÇÕES DE GERENCIAMENTO ---
+  //FUNÇÕES DE GERENCIAMENTO 
   async function fetchPosts() {
     setLoadingPosts(true);
     try {
@@ -141,7 +134,7 @@ export default function NewBlog() {
 
     try {
       await deleteDoc(doc(db, "blog", id));
-      // Remove o post excluído da lista na tela sem precisar recarregar o banco
+        
       setPostsPublicados(postsPublicados.filter(post => post.id !== id));
       alert("Post excluído com sucesso.");
     } catch (error) {
@@ -150,7 +143,6 @@ export default function NewBlog() {
     }
   }
 
-  // Helper para formatar data
   const formatarData = (dataIso) => {
     if (!dataIso) return "-";
     const data = new Date(dataIso);
@@ -211,9 +203,7 @@ export default function NewBlog() {
 
         {/* ÁREA DE CONTEÚDO */}
         {activeTab === "manage" ? (
-          /* =========================================
-             ABA 2: GERENCIADOR DE POSTS
-             ========================================= */
+          /*ABA 2: GERENCIADOR DE POSTS*/
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', marginTop: '20px' }}>
             {loadingPosts ? (
               <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>Carregando artigos...</p>
@@ -265,9 +255,7 @@ export default function NewBlog() {
           </div>
 
         ) : modoPreview ? (
-          /* =========================================
-             ABA 1: PRÉVIA DO POST
-             ========================================= */
+          /*ABA 1: PRÉVIA DO POST*/
           <div className="blog-post-container" style={{ marginTop: '20px' }}>
             <header className="blog-post-header">
               {categoria && <span style={{
@@ -294,9 +282,7 @@ export default function NewBlog() {
             </section>
           </div>
         ) : (
-          /* =========================================
-             ABA 1: EDITOR DO POST
-             ========================================= */
+          /*ABA 1: EDITOR DO POST*/
           <div className={styles.editorContainer}>
             <div className={styles.formColumn}>
               <div className={styles.metaBox}>
