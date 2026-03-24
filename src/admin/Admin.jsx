@@ -134,7 +134,7 @@ export default function Admin() {
     fetchDashboardData();
   }, [isDashboard]);
 
-  // Filtragem obrigatória por área 
+  // FiltrO
   const filteredChartData = chartData.filter(item => item.area === selectedArea);
 
   return (
@@ -181,6 +181,7 @@ export default function Admin() {
                   </div>
                 </div>
 
+                {/* Gráfico de barras */}
                 <div className={styles.chartFullWidth}>
                   <div className={styles.chartHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3>Média de Notas: {selectedArea}</h3>

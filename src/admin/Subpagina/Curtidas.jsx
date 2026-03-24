@@ -148,7 +148,7 @@ export default function Curtidas() {
               )}
             </div>
 
-            {/* LISTA GERAL / TABELA DE HISTÓRICO */}
+            {/* LISTA GERAL  TABELA DE HISTÓRICO */}
             <h3 style={{ marginTop: '40px', marginBottom: '15px', color: '#666' }}>Últimas Curtidas Recebidas</h3>
 
             {isMobile ? (
