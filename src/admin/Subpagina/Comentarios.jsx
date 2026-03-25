@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { db } from "../../../FirebaseConfig"; 
+import { db } from "../../../FirebaseConfig";
 import { collection, getDocs, deleteDoc, doc, updateDoc, arrayRemove } from "firebase/firestore";
 
 // Importamos APENAS o CSS global do Admin
-import adminStyles from "../admin.module.css"; 
+import adminStyles from "../admin.module.css";
 import notasStyles from "./Notas.module.css";
 
 export default function Comentarios() {
@@ -21,7 +21,7 @@ export default function Comentarios() {
 
       forumSnapshot.docs.forEach(documento => {
         const postData = documento.data();
-        
+
         const post = {
           id: documento.id,
           autor: postData.author || "Desconhecido",
@@ -40,7 +40,7 @@ export default function Comentarios() {
             createdAt: new Date(comentario.createdAt).getTime(),
             objetoOriginal: comentario // Necessário para o Firebase saber qual item apagar do array
           }));
-          
+
           // Ordena os comentários do mais antigo para o mais recente
           post.comentarios.sort((a, b) => a.createdAt - b.createdAt);
         }
@@ -50,7 +50,7 @@ export default function Comentarios() {
 
       // Ordena os posts principais do mais recente para o mais antigo
       todosPosts.sort((a, b) => b.createdAt - a.createdAt);
-      
+
       setPosts(todosPosts);
     } catch (error) {
       console.error("Erro ao procurar conteúdos:", error);
@@ -67,11 +67,11 @@ export default function Comentarios() {
   // Função para excluir o Post INTEIRO (e todos os comentários dentro dele)
   const handleExcluirPost = async (postId) => {
     const confirmacao = window.confirm("Tens a certeza de que desejas excluir este POST e TODOS os seus comentários?");
-    
+
     if (confirmacao) {
       try {
         await deleteDoc(doc(db, "forum_posts", postId));
-        
+
         // Atualiza a interface removendo o post apagado
         setPosts(prev => prev.filter(p => p.id !== postId));
         alert("Post excluído com sucesso!");
@@ -85,27 +85,27 @@ export default function Comentarios() {
   // Função para excluir APENAS um comentário específico de dentro de um Post
   const handleExcluirComentario = async (postId, comentario) => {
     const confirmacao = window.confirm("Tens a certeza de que desejas excluir este COMENTÁRIO?");
-    
+
     if (confirmacao) {
       try {
         const postRef = doc(db, "forum_posts", postId);
-        
+
         // Remove o objeto do comentário do array 'comments' no Firestore
         await updateDoc(postRef, {
           comments: arrayRemove(comentario.objetoOriginal)
         });
-        
+
         // Atualiza a interface removendo apenas aquele comentário do post correspondente
         setPosts(prev => prev.map(post => {
           if (post.id === postId) {
-            return { 
-              ...post, 
-              comentarios: post.comentarios.filter(c => c.id !== comentario.id) 
+            return {
+              ...post,
+              comentarios: post.comentarios.filter(c => c.id !== comentario.id)
             };
           }
           return post;
         }));
-        
+
         alert("Comentário excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir o comentário:", error);
@@ -115,8 +115,8 @@ export default function Comentarios() {
   };
 
   return (
-    <div className={adminStyles.container}> 
-      
+    <div className={adminStyles.container}>
+
       {/* Menu Lateral */}
       <aside className={`${adminStyles.sidebar} ${collapsed ? adminStyles.sidebarCollapsed : ""}`}>
         <button className={adminStyles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
@@ -132,9 +132,9 @@ export default function Comentarios() {
           <li><Link to="/admin/comentarios" className={adminStyles.navLink}><img src="/icomentarios.png" alt="L" /><span className={adminStyles.linkText}>Comentarios Fórum</span></Link></li>
         </ul>
       </aside>
-      
+
       {/* Área Principal */}
-      <main className={`${adminStyles.mainContent} ${collapsed ? adminStyles.contentExpanded : ""}`}>
+      <main className={adminStyles.main}>
         <h1>Moderação do Fórum</h1>
         <p>Gere as publicações e as respostas da comunidade.</p>
 
@@ -147,7 +147,7 @@ export default function Comentarios() {
             ) : (
               posts.map((post) => (
                 <div key={post.id} className={adminStyles.postCard}>
-                  
+
                   {/* Informações do Post */}
                   <div className={adminStyles.postHeader}>
                     <h3>{post.titulo}</h3>
@@ -157,9 +157,9 @@ export default function Comentarios() {
                     <div className={adminStyles.postContentBox}>
                       {post.conteudo}
                     </div>
-                    
-                    <button 
-                      className={adminStyles.btnDeletePost} 
+
+                    <button
+                      className={adminStyles.btnDeletePost}
                       onClick={() => handleExcluirPost(post.id)}
                     >
                       Excluir Post Inteiro
@@ -180,8 +180,8 @@ export default function Comentarios() {
                             <div className={adminStyles.commentText}>
                               <strong>{comentario.autor}:</strong> {comentario.texto}
                             </div>
-                            <button 
-                              className={adminStyles.btnDeleteComment} 
+                            <button
+                              className={adminStyles.btnDeleteComment}
                               onClick={() => handleExcluirComentario(post.id, comentario)}
                             >
                               Excluir

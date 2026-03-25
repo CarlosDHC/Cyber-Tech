@@ -169,7 +169,38 @@ export default function QuizPlayer() {
               const estaCorreta = respostaAluno === questao.alternativaCorreta;
               const textoResposta = questao.alternativas?.[respostaAluno]?.texto || "Não respondida";
               const textoCorreta = questao.alternativas?.[questao.alternativaCorreta]?.texto;
-              
+
+              // Só revelar o gabarito (resposta correta) quando as tentativas estiverem esgotadas
+              if (!esgotouTentativas) {
+                return (
+                  <div 
+                    key={index}
+                    style={{
+                      marginBottom: '15px',
+                      padding: '15px',
+                      borderRadius: '8px',
+                      border: '1px solid #E5E7EB',
+                      backgroundColor: '#FFFFFF'
+                    }}
+                  >
+                    <div style={{ marginBottom: '8px' }}>
+                      <strong style={{ color: '#333' }}>Questão {index + 1}:</strong>
+                    </div>
+
+                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}>
+                      <strong>Pergunta:</strong> {questao.perguntaTexto}
+                    </p>
+
+                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}>
+                      <strong>Sua resposta:</strong> <span style={{ color: '#374151' }}>
+                        {respostaAluno ? `${respostaAluno.toUpperCase()}) ${textoResposta}` : 'Não respondida'}
+                      </span>
+                    </p>
+                  </div>
+                );
+              }
+
+              // Se esgotou as tentativas, mostra gabarito (com destaque correto/errado)
               return (
                 <div 
                   key={index} 
