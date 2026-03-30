@@ -1,72 +1,134 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './Tecnologia.css';
+import './Blog.css'; // CSS ÚNICO
 
-// 1. DADOS DAS MATÉRIAS (Cada objeto é um card único)
-const listaMaterias = [
-  {
-    id: 'tech',
-    titulo: "Tecnologia",
-    rota: "/Blog",
-    imagem: "/Tec-blog.png",
-    descricao: "Inovação, IA e o futuro digital.",
-    tempo: "15 min"
-  },
-  {
-    id: 'direito',
-    titulo: "Direito",
-    rota: "/Direito",
-    imagem: "/Dir-blog.png",
-    descricao: "Justiça, leis e atualizações jurídicas.",
-    tempo: "12 min"
-  },
-  {
-    id: 'engenharia',
-    titulo: "Engenharia",
-    rota: "/Engenharia",
-    imagem: "/Eng-blog.png",
-    descricao: "Cálculos, obras e novas tecnologias.",
-    tempo: "20 min"
-  },
-];
+import {
+  collection, getDocs, orderBy, query,
+  addDoc, deleteDoc, where, onSnapshot, doc
+} from "firebase/firestore";
+import { db, auth } from "../../../FirebaseConfig";
+import ForumButton from '../../components/ForumButton';
 
-// 2. COMPONENTE DO CARD (Não mudar nada aqui)
-function MateriaCard({ materia }) {
+function PostCard({ post }) {
+  const [likesCount, setLikesCount] = useState(0);
+  const [userLiked, setUserLiked] = useState(false);
+  const [likeDocId, setLikeDocId] = useState(null);
+
+  useEffect(() => {
+    const q = query(collection(db, "likes"), where("postId", "==", post.id));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setLikesCount(snapshot.size);
+      if (auth.currentUser) {
+        const meuLike = snapshot.docs.find(d => d.data().userId === auth.currentUser.uid);
+        if (meuLike) { setUserLiked(true); setLikeDocId(meuLike.id); }
+        else { setUserLiked(false); setLikeDocId(null); }
+      } else { setUserLiked(false); }
+    });
+    return () => unsubscribe();
+  }, [post.id]);
+
+  const handleLike = async (e) => {
+    e.preventDefault();
+    if (!auth.currentUser) return alert("Você precisa estar logado para curtir!");
+    try {
+      if (userLiked && likeDocId) await deleteDoc(doc(db, "likes", likeDocId));
+      else await addDoc(collection(db, "likes"), {
+        postId: post.id, postTitle: post.titulo,
+        userId: auth.currentUser.uid, userEmail: auth.currentUser.email,
+        userName: auth.currentUser.displayName || "Usuário", data: new Date().toISOString()
+      });
+    } catch (error) { console.error("Erro ao curtir:", error); }
+  };
+
+  const linkDestino = post.slug ? `/${post.slug}` : `/blog/post/${post.id}`;
+
+  {
+    console.log("Renderizando PostCard para:", post);
+  }
   return (
     <div className="post-card-alg">
-      <Link to={materia.rota} className="read-more-link">
+      <Link to={linkDestino} className="read-more-link">
         <div className="post-image">
-          <img src={materia.imagem} alt={materia.titulo} className="post-img-blog" />
+          <img src={post.imagemUrl || "/placeholder-blog.png"} alt={post.titulo} className="post-img-blog" onError={(e) => e.target.src = "https://placehold.co/600x400?text=CyberTech"} />
         </div>
         <div className="post-info">
-          <h3 className="post-title">{materia.titulo}</h3>
-          <p className="post-description" style={{color: '#666', fontSize: '0.9rem', marginBottom: '10px'}}>
-            {materia.descricao}
-          </p>
+          <h3 className="post-title">{post.titulo}</h3>
           <div className="post-meta">
-            <p><img src='/user.png' className='user' alt="" /> Equipe Editorial</p>
-            <p><img src='/time-left.png' className='user' alt="" /> {materia.tempo}</p>
+            <p><img src='/user.png' className='user' alt="Autor" /> {post.autor || "Equipe"}</p>
+            <p><img src='/calendar.png' alt="Data" className='user' /> {post.data}</p>
+            <p><img src='/time-left.png' className='user' alt="Tempo" /> {post.tempoLeitura} (Tempo de Leitura)</p>
           </div>
         </div>
       </Link>
+      <div className="post-feedback">
+        <button className={`like-btn ${userLiked ? 'curtido' : ''}`} onClick={handleLike}>
+          <span className="heart-icon" style={{ fontSize: '1.4rem' }}>{userLiked ? '❤️' : '🤍'}</span>
+          <span style={{ fontWeight: 'bold', color: '#555', fontSize: '1rem' }}>{likesCount > 0 ? likesCount : ''}</span>
+        </button>
+      </div>
     </div>
   );
 }
 
-// 3. COMPONENTE PRINCIPAL (O nome aqui deve ser EXATAMENTE 'Tecnologia')
+// Página Principal
 function Tecnologia() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [mostrarMais, setMostrarMais] = useState(false);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        // FILTRO: Tecnologia
+        const q = query(
+          collection(db, "blog"),
+          where("categoria", "==", "Tecnologia"),
+          orderBy("dataCriacao", "desc")
+        );
+        const querySnapshot = await getDocs(q);
+        const lista = querySnapshot.docs.map(doc => ({
+          id: doc.id, ...doc.data(),
+          data: doc.data().dataCriacao ? new Date(doc.data().dataCriacao).toLocaleDateString('pt-BR') : "Recente",
+          tempoLeitura: doc.data().tempoLeitura ? `${doc.data().tempoLeitura} min` : "Leitura rápida"
+        }));
+        setPosts(lista);
+      } catch (error) { console.error("Erro:", error); }
+      finally { setLoading(false); }
+    };
+    fetchPosts();
+  }, []);
+
   return (
-    <div className="blog-page">
-      <div className='hero-section'>
+    <>
+      <div className="blog-page">
+        <div className='hero-section hero-tec'>
+        </div>
+
+        <div className="post-container-blog">
+          {loading && <p style={{ textAlign: 'center' }}>Carregando...</p>}
+          {!loading && posts.length === 0 && <p style={{ textAlign: 'center' }}>Nenhum post encontrado.</p>}
+          {posts.map((post) => <PostCard key={post.id} post={post} />)}
+        </div>
+
+        <div className="curiosidade-card" style={{ borderLeftColor: '#0f2027' }}>
+          <h2>Curiosidades Tech</h2>
+          <strong>O primeiro bug</strong>
+          <p>O primeiro "bug" de computador foi uma mariposa real presa em um relé do computador Mark II em 1947.</p>
+
+          {mostrarMais && (
+            <div className="conteudo-extra">
+              <strong>Dados Quânticos</strong>
+              <p>A computação quântica promete resolver problemas em segundos que levariam milênios para supercomputadores atuais.</p>
+            </div>
+          )}
+          <button className="btn-ver-mais" onClick={() => setMostrarMais(!mostrarMais)}>
+            {mostrarMais ? 'Ver menos ▲' : 'Ver mais curiosidades ▼'}
+          </button>
+        </div>
       </div>
-      <div className="post-container-blog">
-        {listaMaterias.map((item) => (
-          <MateriaCard key={item.id} materia={item} />
-        ))}
-      </div>
-    </div>
+      <ForumButton />
+    </>
   );
 }
 
-// 4. O EXPORT DEVE SER 'Tecnologia'
 export default Tecnologia;

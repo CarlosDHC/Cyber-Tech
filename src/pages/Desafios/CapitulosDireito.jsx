@@ -1,54 +1,88 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css";
+import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
 
-function ChallengeList() {
+// Firebase Imports
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { db } from "../../../FirebaseConfig";
+
+function CapitulosDireito() {
+  const [desafios, setDesafios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Define a área desta página como Direito
+  const AREA_ATUAL = "Direito"; 
+
+  useEffect(() => {
+    const fetchDesafios = async () => {
+      try {
+        setLoading(true);
+        // Busca desafios da coleção 'desafios' filtrados pela área Direito
+        const q = query(
+          collection(db, "desafios"),
+          where("area", "==", AREA_ATUAL),
+          orderBy("dataCriacao", "desc")
+        );
+
+        const querySnapshot = await getDocs(q);
+        const listaDesafios = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        setDesafios(listaDesafios);
+      } catch (error) {
+        console.error("Erro ao buscar desafios de Direito:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesafios();
+  }, []);
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
-      <h1 className={styles.pageTitle}>Desafios</h1>
+      <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Hora de praticar! 
+        Explore os fundamentos jurídicos e resolva os desafios desta área.
       </p>
 
-      <div className={styles.challengeCardsList}>
-        {/* Desafio 1 */}
-        <Link to="/desafios/Direito/DesafioDir1" className={styles.challengeCard}>
-          <img
-            src="https://imgur.com/oBy3VFB.jpg"
-          ></img>
-          <p>Legislação</p> 
-        </Link> 
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+      ) : (
+        <div className={styles.challengeCardsList}>
+          {desafios.length > 0 ? (
+            desafios.map((desafio) => (
+              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
+                <img
+                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Direito"}
+                  alt={desafio.titulo}
+                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  style={{ objectFit: 'cover' }}
+                />
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+                
+                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
+                  <span>{desafio.qtdQuestoes || 0} Questões</span>
+                  <span> • </span>
+                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
+                </div>
 
-        {/* Desafio 2 */}
-        <Link to="/desafios/Direito/DesafioDir2" className={styles.challengeCard}>
-          <img
-            src="https://imgur.com/pKlyga5.jpg"
-          ></img>
-          <p>Ética do sistema judiciário</p> 
-        </Link>
-
-        {/* Desafio 3 */}
-        <Link to="/desafios/Direito/DesafioDir3" className={styles.challengeCard}>
-         <img
-            src="https://imgur.com/0cMEy3T.jpg"
-          ></img>
-          <p>Direitos & Deveres</p>
-        </Link>
-        <Link to="/desafios/Direito/DesafioDir4" className={styles.challengeCard}>
-         <img
-            src="https://imgur.com/wcyzeFf.jpg"
-          ></img>
-          <p>Advocacia</p>
-        </Link>
-        <Link to="/desafios/Direito/DesafioDir5" className={styles.challengeCard}>
-         <img
-            src="https://imgur.com/XAHCgaS.jpg"
-          ></img>
-          <p>Constituição e Jurisprudência</p>
-        </Link>
-      </div>
+                <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
+                  {desafio.subcategoria}
+                </span>
+              </Link>
+            ))
+          ) : (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
+              Nenhum desafio encontrado para a área de Direito no momento.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-export default ChallengeList;
+export default CapitulosDireito;

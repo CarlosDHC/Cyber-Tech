@@ -1,0 +1,31 @@
+/* src/admin/Subpagina/Notas.module.css */
+
+/* Controla o grid do topo (Destaques e Risco) */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+/* Garante que a tabela tenha scroll horizontal no celular em vez de quebrar a tela */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Suaviza o scroll no iPhone/iOS */
+}
+
+/* Impede que a tabela esprema muito as colunas no celular */
+.responsiveTable {
+  width: 100%;
+  min-width: 40px; 
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Quando a tela for menor que 768px (Celulares e Tablets menores) */
+@media (max-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: 1fr; /* Coloca um card embaixo do outro */
+  }
+}

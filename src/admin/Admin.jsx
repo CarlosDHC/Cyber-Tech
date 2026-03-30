@@ -5,37 +5,31 @@ import styles from "./Admin.module.css";
 import { db } from "../../FirebaseConfig";
 import { collection, getCountFromServer, getDocs, query } from "firebase/firestore";
 
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
 export default function Admin() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [stats, setStats] = useState({ users: 0, posts: 0 });
   const [chartData, setChartData] = useState([]);
+  const [topStudents, setTopStudents] = useState([]);
+  const [riskStudents, setRiskStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Definimos como 'true' para começar sempre reduzida
-  const [collapsed, setCollapsed] = useState(true);
+  const [selectedArea, setSelectedArea] = useState('Tecnologia');
+  const [availableAreas, setAvailableAreas] = useState([]);
 
   const isDashboard = location.pathname === '/admin';
 
-  const COLORS = {
-    'Desafio 1': '#0088FE',
-    'Desafio 2': '#00C49F',
-    'Desafio 3': '#FFBB28',
-    'Desafio 4': '#FF8042',
-    'Geral': '#8884d8'
-  };
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   const GABARITO_TOTAIS = {
-    "Desafio 1": 6,
-    "Desafio 2": 7,
-    "Desafio 3": 5,
-    "Desafio 4": 5
+    "Desafio 1": 6, "Desafio 2": 7, "Desafio 3": 5, "Desafio 4": 5
   };
 
   useEffect(() => {
@@ -44,17 +38,31 @@ export default function Admin() {
     async function fetchDashboardData() {
       setLoading(true);
       setErrorMsg(null);
-      
       try {
         const usersColl = collection(db, "users");
         const blogColl = collection(db, "blog");
         const adminsColl = collection(db, "admins");
-        
-        const [usersSnap, blogSnap, adminsSnap] = await Promise.all([
-            getCountFromServer(usersColl).catch(() => ({ data: () => ({ count: 0 }) })), 
-            getCountFromServer(blogColl).catch(() => ({ data: () => ({ count: 0 }) })),
-            getCountFromServer(adminsColl).catch(() => ({ data: () => ({ count: 0 }) }))
+        const desafiosColl = collection(db, "desafios");
+
+        const [usersSnap, blogSnap, adminsSnap, desafiosSnap] = await Promise.all([
+          getCountFromServer(usersColl).catch(() => ({ data: () => ({ count: 0 }) })),
+          getCountFromServer(blogColl).catch(() => ({ data: () => ({ count: 0 }) })),
+          getCountFromServer(adminsColl).catch(() => ({ data: () => ({ count: 0 }) })),
+          getDocs(desafiosColl).catch(() => ({ docs: [] }))
         ]);
+
+        const desafioAreaMap = {};
+        const areasEncontradas = new Set(); 
+        
+        desafiosSnap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.titulo && data.area) {
+            desafioAreaMap[data.titulo] = data.area;
+            areasEncontradas.add(data.area);
+          }
+        });
+
+        setAvailableAreas(Array.from(areasEncontradas));
 
         setStats({
           users: usersSnap.data().count - adminsSnap.data().count,
@@ -64,164 +72,153 @@ export default function Admin() {
         const pontuacoesRef = collection(db, "pontuacoes");
         const querySnapshot = await getDocs(query(pontuacoesRef));
         
-        const agrupamento = {
-          "Geral": { somaNotas: 0, quantidade: 0 }
-        };
+        const agrupamento = {};
+        const alunosMap = {};
 
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          const nomeDesafio = data.desafio ? data.desafio.split(" - ")[0].trim() : "Outros"; 
-          
+          const nomeDesafio = data.desafio ? data.desafio.split(" - ")[0].trim() : "Outros";
+          const areaDoDesafio = desafioAreaMap[nomeDesafio] || data.categoria || "Outros";
+
           if (!agrupamento[nomeDesafio]) {
-            agrupamento[nomeDesafio] = { somaNotas: 0, quantidade: 0 };
+            agrupamento[nomeDesafio] = { 
+              somaNotas: 0, 
+              quantidade: 0, 
+              area: areaDoDesafio 
+            };
           }
 
           const notaBruta = Number(data.nota || 0);
-          let totalQuestoes = Number(data.total);
-          if (!totalQuestoes || totalQuestoes === 0) {
-             totalQuestoes = GABARITO_TOTAIS[nomeDesafio] || 1; 
-          }
-
+          let totalQuestoes = Number(data.total) || GABARITO_TOTAIS[nomeDesafio] || 1;
           const nota0a10 = (notaBruta / totalQuestoes) * 10;
+
           agrupamento[nomeDesafio].somaNotas += nota0a10;
           agrupamento[nomeDesafio].quantidade += 1;
-          agrupamento["Geral"].somaNotas += nota0a10;
-          agrupamento["Geral"].quantidade += 1;
+
+          if (data.email) {
+            if (!alunosMap[data.email]) {
+              alunosMap[data.email] = {
+                nome: data.nome || data.usuario || data.email.split('@')[0],
+                somaMedia: 0, qtd: 0
+              };
+            }
+            alunosMap[data.email].somaMedia += nota0a10;
+            alunosMap[data.email].qtd += 1;
+          }
         });
 
         const dadosGrafico = Object.keys(agrupamento)
           .filter(chave => chave !== "Outros")
           .map(chave => {
             const item = agrupamento[chave];
-            const media = item.quantidade > 0 ? (item.somaNotas / item.quantidade) : 0;
             return {
               name: chave,
-              media: Number(media.toFixed(1)),
-              qtd: item.quantidade
+              media: Number((item.somaNotas / item.quantidade || 0).toFixed(1)),
+              area: item.area 
             };
           });
 
-        dadosGrafico.sort((a, b) => {
-            if (a.name === 'Geral') return 1;
-            if (b.name === 'Geral') return -1;
-            return a.name.localeCompare(b.name);
-        });
-
         setChartData(dadosGrafico);
-      } catch (error) {
-        console.error("Erro Dashboard:", error);
-        setErrorMsg("Erro ao carregar dados.");
-      } finally {
-        setLoading(false);
-      }
-    }
+        const listaAlunos = Object.values(alunosMap).map(aluno => ({
+          nome: aluno.nome,
+          media: aluno.somaMedia / aluno.qtd
+        }));
 
+        setTopStudents([...listaAlunos].sort((a, b) => b.media - a.media).slice(0, 3));
+        setRiskStudents([...listaAlunos].filter(a => a.media < 6.0).sort((a, b) => a.media - b.media).slice(0, 3));
+      } catch (e) { 
+        console.error(e);
+        setErrorMsg("Erro ao carregar dados."); 
+      } finally { setLoading(false); }
+    }
     fetchDashboardData();
   }, [isDashboard]);
 
+  // FiltrO
+  const filteredChartData = chartData.filter(item => item.area === selectedArea);
+
   return (
     <div className={styles.container}>
-      {/* Sidebar usa o estado 'collapsed' para alternar as classes */}
       <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
-        <button
-          className={styles.toggleBtn}
-          onClick={() => setCollapsed(!collapsed)} // Permite abrir e fechar
-          aria-label={collapsed ? "Abrir menu" : "Fechar menu"}
-        >
+        <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
           <img src="/menu.png" alt="menu" />
         </button>
-
-        <h2 className={styles.title}>Administrador</h2>
-
+        <h2 className={styles.title}>ADMIN</h2>
         <ul className={styles.navList}>
-          <li>
-            <Link to="/admin" data-tooltip="Home" className={styles.navLink}>
-              <img src="/casa.png" alt="Home" />
-              <span className={styles.linkText}>Home</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/notas" data-tooltip="Notas" className={styles.navLink}>
-              <img src="/estrela.png" alt="Notas" />
-              <span className={styles.linkText}>Notas</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newblog" data-tooltip="Blog" className={styles.navLink}>
-              <img src="/blog.png" alt="Blog" />
-              <span className={styles.linkText}>Blog</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/newdesafios" data-tooltip="Desafios" className={styles.navLink}>
-              <img src="/desafio.png" alt="Desafios" />
-              <span className={styles.linkText}>Desafios</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/curtidas" data-tooltip="like" className={styles.navLink}>
-              <img src="/curti.png" alt="curti" />
-              <span className={styles.linkText}>like</span>
-            </Link>
-          </li>
+          <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
+          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão de Notas</span></Link></li>
+          <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Criar Blog</span></Link></li>
+          <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
         </ul>
       </aside>
 
       <main className={styles.main}>
         {isDashboard ? (
-           <div className="dashboard-content">
-             <h1 style={{color: '#333'}}>Visão Geral</h1>
-             {errorMsg && <p style={{color:'red'}}>{errorMsg}</p>}
-             {loading ? <p>Carregando...</p> : (
-               <>
-                 <div className={styles.cards} style={{marginBottom: '30px', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))'}}>
-                   <div className={styles.card}>
-                    <img src="/ialuno.png" alt="iconealuno" />
-                     <h3>Alunos</h3>
-                     <p style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#095e8b', margin: '10px 0'}}>{stats.users}</p>
-                     <p>Cadastrados</p>
-                   </div>
-                   <div className={styles.card}>
-                    <img src="/iblog.png" alt="iconeblog" />
-                     <h3>Posts</h3>
-                     <p style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#095e8b', margin: '10px 0'}}>{stats.posts}</p>
-                     <p>Publicados</p>
-                   </div>
-                 </div>
+          <div className={styles.dashboardContent}>
+            <h1 className={styles.mainTitle}>Visão Geral - {selectedArea}</h1>
+            {loading ? <p>Carregando...</p> : (
+              <>
+                <div className={styles.metricsGrid}>
+                  <div className={styles.cardCompact}><span className={styles.cardHeaderMini}>Total de Alunos</span><strong className={styles.bigNumber}>{stats.users}</strong></div>
+                  <div className={styles.cardCompact}><span className={styles.cardHeaderMini}>Total de Posts</span><strong className={styles.bigNumber}>{stats.posts}</strong></div>
+                  <div className={styles.cardCompact}>
+                    <span className={styles.cardHeaderMini}>Destaques</span>
+                    <div className={styles.miniList}>
+                      {topStudents.map((aluno, i) => (
+                        <div key={i} className={styles.miniItem}><span className={styles.truncate}>{aluno.nome}</span><span className={styles.highScore}>{aluno.media.toFixed(1)}</span></div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className={`${styles.cardCompact} ${styles.riskBorder}`}>
+                    <span className={styles.cardHeaderMini}>Em Risco</span>
+                    <div className={styles.miniList}>
+                      {riskStudents.length > 0 ? riskStudents.map((aluno, i) => (
+                        <div key={i} className={styles.miniItem}><span className={styles.truncate}>{aluno.nome}</span><span className={styles.lowScore}>{aluno.media.toFixed(1)}</span></div>
+                      )) : <div className={styles.okMsg}>Tudo em ordem!</div>}
+                    </div>
+                  </div>
+                </div>
 
-                 <div className={styles.card} style={{ minHeight: '400px' }}>
-                  <img src="/igrafico.png" alt="iconegrafico" />
-                    <h3>Média de Notas (0 - 10)</h3>
-                    {chartData.length > 0 ? (
-                      <div style={{ width: '100%', height: 300, marginTop: '20px' }}>
-                        <ResponsiveContainer>
-                          <BarChart data={chartData}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" stroke="#666" fontSize={12} tick={{ fill: '#333' }} />
-                            <YAxis domain={[0, 10]} stroke="#666" fontSize={12} allowDecimals={false} />
-                            <Tooltip 
-                              cursor={{fill: '#f3f4f6'}} 
-                              formatter={(value) => [value, "Média"]}
-                              labelStyle={{ color: '#333' }}
-                              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                            />
-                            <Bar dataKey="media" name="Média" radius={[6, 6, 0, 0]} barSize={50}>
-                              {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[entry.name] || '#8884d8'} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    ) : (
-                      <p style={{marginTop:'20px', color:'#999'}}>Sem dados de notas ainda.</p>
-                    )}
-                 </div>
-               </>
-             )}
-           </div>
+                {/* Gráfico de barras */}
+                <div className={styles.chartFullWidth}>
+                  <div className={styles.chartHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3>Média de Notas: {selectedArea}</h3>
+                    <div className={styles.filterArea}>
+                      <select 
+                        value={selectedArea} 
+                        onChange={(e) => setSelectedArea(e.target.value)}
+                        style={{ padding:'14px 16px', borderRadius:'8px', border:'1px solid #e0e0e0', fontSize:'1rem', backgroundColor:'#f9fafb', transition:'all 0.2s ease', color:'#333' }}
+                      >
+                        {availableAreas.map(area => (
+                          <option key={area} value={area}>{area}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.chartWrapper}>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <BarChart data={filteredChartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" fontSize={11} interval={0} angle={-10} textAnchor="end" height={60} />
+                        <YAxis domain={[0, 10]} fontSize={11} />
+                        <Tooltip cursor={{ fill: '#f5f5f5' }} />
+                        <Bar dataKey="media" radius={[4, 4, 0, 0]} barSize={45}>
+                          {filteredChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         ) : (
-           <Outlet />
+          <Outlet />
         )}
       </main>
     </div>

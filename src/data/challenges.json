@@ -26,5 +26,22 @@
     "title": "Dia ou Noite?",
     "concept": "Determine a rotina baseado no período.",
     "icon": "sun-moon"
+  },
+
+  {
+    "id": 5,
+    "slug": "Marketing",
+    "title": "Marketing Digital",
+    "concept": "Venha ser um empreendedor.",
+    "icon": "sun-moon"
+  },
+
+    {
+    "id": 6,
+    "slug": "Recursos Humanos",
+    "title": "Recursos Humanos",
+    "concept": "pessoas.",
+    "icon": "sun-moon"
   }
+
 ]

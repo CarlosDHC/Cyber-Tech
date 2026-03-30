@@ -1,187 +1,209 @@
-/* LAYOUT GERAL */
+/* --- Layout Geral --- */
 .blog-page {
-  display: flex;
-  flex-direction: column;
   width: 100%;
   min-height: 100vh;
-  /*background-color: #f4f4f4;*/
+  background-color: #f4f4f9;
+  padding-bottom: 4rem;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-}
-
-/* HERO */
-.hero-section-tec{
+/* --- Hero Section (Cabeçalho Colorido) --- */
+.hero-section {
   width: 100%;
-  height: 250px;
-  background: linear-gradient(to bottom, #095e8b, #0541617c),
-              url('/Tec-blog.png'); 
-  background-size: cover;
-  background-position: center;
-}
-
-/* GRID DOS POSTS */
-.post-container-blog {
+  min-height: 220px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  padding: 5% 20px;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  padding: 0 20px;
 }
 
-/* CARDS PRINCIPAIS */
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Variantes de cores por área */
+.hero-tec{
+  background: url(Tec-blog.png) no-repeat center center/cover;
+}
+.hero-eng {
+  background: url(Eng-blog.png) no-repeat center center/cover;
+}
+.hero-dir {
+  background: url(Dir-blog.png) no-repeat center center/cover;
+}         
+.hero-mkt {
+  background: url(Mk-blog.png) no-repeat center center/cover;
+}
+.hero-rh  {
+  background: url(Rh-blog.png) no-repeat center center/cover;
+}
+
+/* --- Container dos Posts (Grid) --- */
+.post-container-blog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+  padding: 0 20px;
+}
+
+/* --- Card do Post --- */
 .post-card-alg {
-  background-color: #c0dcee;
+  background: #fff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  width: 300px;
-  transition: transform .2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  position: relative;
 }
 
 .post-card-alg:hover {
-  transform: scale(1.03);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .read-more-link {
   text-decoration: none;
   color: inherit;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.post-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background-color: #eee;
 }
 
 .post-img-blog {
   width: 100%;
-  aspect-ratio: 16/9;
+  height: 100%;
   object-fit: cover;
-  display: block;
+  transition: transform 0.5s ease;
+}
+
+.post-card-alg:hover .post-img-blog {
+  transform: scale(1.05);
 }
 
 .post-info {
-  background-color: #c0dcee;
-  padding: 20px;
-  color: #233568;
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .post-title {
-  font-weight: bold;
-  margin-bottom: 12px;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  font-weight: 700;
 }
 
-/* METADADOS */
+.post-meta {
+  margin-top: auto;
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .post-meta p {
   display: flex;
   align-items: center;
-  margin: 5px 0;
-  font-size: 0.9rem;
+  gap: 8px;
+  margin: 0;
 }
 
-.user {
+.post-meta img.user {
   width: 16px;
   height: 16px;
-  margin-right: 8px;
+  opacity: 0.6;
 }
 
-/* ESTILO PARA A SEÇÃO DE CURIOSIDADES */
-.curiosidade-card {
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 0 3rem auto; /* Mantido conforme seu pedido para Desktop */
-  width: 95%;
-  max-width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  text-align: left;
-  color: #333;
+/* --- Botão de Like --- */
+.post-feedback {
+  padding: 10px 1.5rem 1.5rem 1.5rem;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
 }
 
-/* BOTÃO VER MAIS */
-.btn-ver-mais {
-  background-color: #6aa2c5;
-  color: #fff;
-  padding: 14px 22px;
-  border-radius: 6px;
+.like-btn {
+  background: none;
   border: none;
   cursor: pointer;
-  margin-top: 1rem;
-  width: 100%;
-  font-weight: bold;
-}
-
-.btn-ver-mais:hover {
-  background-color: #233568;
-}
-
-.conteudo-extra {
-  margin-top: 15px;
-  animation: aparecer .4s ease;
-  padding-top: 10px;
-  border-top: 1px solid #eee;
-}
-
-@keyframes aparecer {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* FEEDBACK BUTTONS (Área do like) */
-.post-feedback {
-  margin-top: auto;              /* Empurra o bloco para o final do card */
-  display: flex;
-  justify-content: flex-end;     /* Alinha o coração à direita */
-  align-items: center;
-  padding: 12px 15px;
-  background-color: #c0dcee; 
-  border-top: 1px solid #aac6d6; /* Linha suave separando do conteúdo */
-}
-
-/* BOTÃO DE LIKE - ESTADO NORMAL */
-.like-btn {
-  background-color: rgba(255, 255, 255, 0.5);
-  border: 1px solid transparent;
-  padding: 8px;
-  border-radius: 50%; 
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
+  gap: 6px;
+  font-size: 1rem;
+  transition: transform 0.2s;
 }
 
 .like-btn:hover {
-  background-color: #fff;
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
-/* ESTADO CURTIDO  */
-.like-btn.curtido {
-  background-color: #095e8b;
-  border: 1px solid #000000;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  transform: scale(1.12);
+/* --- Card de Curiosidades --- */
+.curiosidade-card {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  border-left: 5px solid #2563EB; /* Cor padrão, pode variar */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* --- CORREÇÃO DE RESPONSIVIDADE (MOBILE) --- */
+.curiosidade-card h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.curiosidade-card strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #2563EB;
+  margin-top: 1rem;
+}
+
+.curiosidade-card p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.btn-ver-mais {
+  margin-top: 1.5rem;
+  background: none;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.btn-ver-mais:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
-  /* Ajusta margens apenas no celular para não cortar a tela */
-  .curiosidade-card {
-    margin: 20px auto; 
-    width: 90%;
-  }
-
-  /* Ajusta container para não ter padding excessivo nas laterais */
-  .post-container-blog {
-    padding: 20px 10px;
-  }
-
-  /* Garante que os cards não estourem a largura no mobile */
-  .post-card-alg {
-    width: 100%;
-    max-width: 320px;
-  }
+  .hero-section h1 { font-size: 1.8rem; }
+  .post-container-blog { grid-template-columns: 1fr; }
 }

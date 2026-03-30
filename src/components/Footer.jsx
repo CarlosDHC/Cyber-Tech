@@ -1,4 +1,4 @@
-// src/components/Footer.jsx
+
 import React from 'react';
 import styles from './Footer.module.css';
 

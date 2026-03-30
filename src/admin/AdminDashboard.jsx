@@ -1,16 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../Admin.module.css"; // Use o mesmo CSS
-// import { useAuth } from "../../context/AuthContext"; // Ajuste o caminho se precisar
+import styles from "../Admin.module.css"; 
 
-// Este é o conteúdo que estava no seu Admin.jsx original
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  // const { currentUser } = useAuth();
-  const username = "Admin"; // ou currentUser.nome
+  const username = "Admin"; 
 
-  // Dados mocados (substitua por dados reais)
   const media = "8.5/10";
   const posts = 15;
   const drafts = 3;
