@@ -1,0 +1,65 @@
+.container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:#f5f7fa;
+}
+
+.certificado{
+  width:800px;
+  padding:60px;
+  background:white;
+  border: groove 3px #1e3a8a;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+  font-family: Georgia, serif;
+}
+
+.titulo{
+  font-size:48px;
+  color:#1e3a8a;
+  margin-bottom:40px;
+  letter-spacing:4px;
+}
+
+.paragrafo{
+  font-size:20px;
+  color:#333;
+  line-height:1.8;
+  margin-bottom:30px;
+}
+
+.cargaHoraria{
+      color:#095e8b;
+}
+
+.nome{
+  font-weight:bold;
+  font-size:20px;
+  color:#095e8b;
+}
+
+.curso{
+  font-weight:bold;
+  color:#095e8b;
+}
+
+.data{
+  margin-top:20px;
+  font-size:16px;
+  color:#555;
+}
+
+.assinatura{
+  margin-top:70px;
+  width:200px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.linha{
+  border-top:2px solid black;
+  margin-bottom:8px;
+}
