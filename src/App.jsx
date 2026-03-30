@@ -15,6 +15,7 @@ import Home from './pages/Home/Home.jsx';
 import Blog from './pages/Blog/Blog.jsx';
 import ChallengeList from './pages/ChallengeList/ChallengeList.jsx';
 import Forum from './pages/Forum/Forum.jsx';
+import Certificado from './pages/Certificado/Certificado.jsx';
 
 // Blog Pages (Categorias)
 import Tecnologia from "./pages/Blog/Tecnologia.jsx";
@@ -33,8 +34,8 @@ import EsqueciSenha from './pages/EsqueciSenha/EsqueciSenha.jsx';
 import EsqueciSenhaPerfil from './pages/EsqueciSenha/EsqueciSenhaPerfil.jsx';
 import Perfil from './pages/Perfil/Perfil.jsx';
 
-// --- JOGO DO QUIZ ---
-import QuizPlayer from './pages/Quiz/QuizPlayer.jsx'; 
+// JOGO DO QUIZ
+import QuizPlayer from './pages/Quiz/QuizPlayer.jsx';
 
 // Admin
 import Admin from './admin/Admin.jsx';
@@ -86,7 +87,7 @@ function App() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
 
-            {/* --- Rotas Públicas --- */}
+            {/* Rotas Públicas */}
             <Route path="/" element={<AnimatedPage><Home /></AnimatedPage>} />
             <Route path="/login" element={<AnimatedPage><Login /></AnimatedPage>} />
             <Route path="/cadastro" element={<AnimatedPage><Cadastro /></AnimatedPage>} />
@@ -94,7 +95,7 @@ function App() {
             <Route path="/sobre" element={<AnimatedPage><Sobre /></AnimatedPage>} />
             <Route path="/privacidade" element={<AnimatedPage><Privacidade /></AnimatedPage>} />
 
-            {/* --- Rotas Protegidas Blog --- */}
+            {/* Rotas Protegidas Blog --- */}
             <Route path="/blog" element={<ProtectedRoute><AnimatedPage><Blog /></AnimatedPage></ProtectedRoute>} />
             <Route path="/tecnologia" element={<ProtectedRoute><AnimatedPage><Tecnologia /></AnimatedPage></ProtectedRoute>} />
             <Route path="/engenharia" element={<ProtectedRoute><AnimatedPage><Engenharia /></AnimatedPage></ProtectedRoute>} />
@@ -105,41 +106,49 @@ function App() {
             <Route path="/blog/post/:id" element={
               <ProtectedRoute><AnimatedPage><PostDinamico /></AnimatedPage></ProtectedRoute>
             } />
-            
-            {/* --- ROTA DE JOGO (QUIZ) --- */}
+
+            <Route path="/certificado/:id" element={
+              <ProtectedRoute>
+                <AnimatedPage>
+                  <Certificado />
+                </AnimatedPage>
+              </ProtectedRoute>
+            } />
+
+            {/* ROTA DE JOGO (QUIZ) */}
             <Route path="/quiz/:id" element={
               <ProtectedRoute><AnimatedPage><QuizPlayer /></AnimatedPage></ProtectedRoute>
             } />
 
-            {/* --- MENU PRINCIPAL DE DESAFIOS (A CORREÇÃO ESTÁ AQUI) --- */}
+            {/* MENU PRINCIPAL DE DESAFIOS (A CORREÇÃO ESTÁ AQUI) */}
             <Route path="/desafios" element={
               <ProtectedRoute><AnimatedPage><ChallengeList /></AnimatedPage></ProtectedRoute>
             } />
 
-            {/* --- Rotas Capítulos --- */}
+            {/* Rotas Capítulos */}
             <Route path="/desafios" element={<ProtectedRoute><AnimatedPage><ChallengeList /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulostecnologia" element={<ProtectedRoute><AnimatedPage><CapitulosTecnologia /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosengenharia" element={<ProtectedRoute><AnimatedPage><CapitulosEngenharia /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosdireito" element={<ProtectedRoute><AnimatedPage><CapitulosDireito /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosmarketing" element={<ProtectedRoute><AnimatedPage><CapitulosMarketing /></AnimatedPage></ProtectedRoute>} />
             <Route path="/desafios/capitulosrh" element={<ProtectedRoute><AnimatedPage><CapitulosRh /></AnimatedPage></ProtectedRoute>} />
-            
-            
-            {/* --- Perfil e Fórum --- */}
+
+
+            {/* Perfil e Fórum */}
             <Route path="/perfil" element={<ProtectedRoute><AnimatedPage><Perfil /></AnimatedPage></ProtectedRoute>} />
             <Route path="/forum" element={<ProtectedRoute><AnimatedPage><Forum /></AnimatedPage></ProtectedRoute>} />
             <Route path="/alterar-senha" element={<ProtectedRoute><AnimatedPage><EsqueciSenhaPerfil /></AnimatedPage></ProtectedRoute>} />
 
-            {/* --- Rotas Admin --- */}
+            {/* Rotas Admin */}
             <Route path="/admin" element={<ProtectedAdminRoute><AnimatedPage><Admin /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/newblog" element={<ProtectedAdminRoute><AnimatedPage><Newblog /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/curtidas" element={<ProtectedAdminRoute><AnimatedPage><Curtidas /></AnimatedPage></ProtectedAdminRoute>} />
-            <Route path="/admin/newdesafios" element={<ProtectedAdminRoute><AnimatedPage><Newdesafios/></AnimatedPage></ProtectedAdminRoute>} />
+            <Route path="/admin/newdesafios" element={<ProtectedAdminRoute><AnimatedPage><Newdesafios /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/notas" element={<ProtectedAdminRoute><AnimatedPage><Notas /></AnimatedPage></ProtectedAdminRoute>} />
-            <Route path="/admin/comentarios" element={<ProtectedAdminRoute><AnimatedPage><Comentarios/></AnimatedPage></ProtectedAdminRoute>} />
+            <Route path="/admin/comentarios" element={<ProtectedAdminRoute><AnimatedPage><Comentarios /></AnimatedPage></ProtectedAdminRoute>} />
 
             {/* Rota 404 */}
-            <Route path="*" element={<div style={{textAlign: 'center', padding: '50px'}}>Página não encontrada</div>} />
+            <Route path="*" element={<div style={{ textAlign: 'center', padding: '50px' }}>Página não encontrada</div>} />
 
           </Routes>
         </AnimatePresence>

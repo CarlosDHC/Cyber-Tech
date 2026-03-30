@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { doc, getDoc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { deleteUser } from "firebase/auth";
 import { db, auth } from "../../../FirebaseConfig";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 export default function Perfil() {
   const { currentUser } = useAuth();
@@ -67,23 +67,23 @@ export default function Perfil() {
   //  NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE JAJAJA
   const formatPhone = (value) => {
     if (!value) return "";
-    
-    let v = value.replace(/\D/g, ""); 
-    
-    v = v.substring(0, 11); 
-    
+
+    let v = value.replace(/\D/g, "");
+
+    v = v.substring(0, 11);
+
     if (v.length >= 3 && v.length <= 7) {
       v = `(${v.substring(0, 2)}) ${v.substring(2)}`;
     } else if (v.length >= 8) {
       v = `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7)}`;
     }
-    
+
     return v;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === "telefone") {
       setForm((s) => ({ ...s, telefone: formatPhone(value) }));
     } else {
@@ -101,11 +101,11 @@ export default function Perfil() {
       const userRef = doc(db, "users", currentUser.uid);
 
       await setDoc(userRef, {
-        name: form.name, 
+        name: form.name,
         dataNascimento: form.dataNascimento || "",
         telefone: form.telefone || "",
         apelido: form.apelido || "",
-        Escolaridade: form.Escolaridade || "Ensino Fundamental", 
+        Escolaridade: form.Escolaridade || "Ensino Fundamental",
         updatedAt: new Date(),
       }, { merge: true });
 
@@ -162,6 +162,17 @@ export default function Perfil() {
           </div>
         </div>
 
+        <div className={styles.certificateSection}>
+          <h3>Meus Certificados</h3>
+          {/* Exemplo de link para um certificado específico */}
+          <button
+            className={`${styles.buttonBase} ${styles.primaryButton}`}
+            onClick={() => navigate(`/certificado/ID_DO_DESAFIO`)}
+          >
+            Visualizar Certificado
+          </button>
+        </div>
+
         <div className={styles.content}>
           <div className={styles.imageAndLogin}>
 
@@ -201,13 +212,13 @@ export default function Perfil() {
             {/* Linha 2 */}
             <div className={styles.inputGroup}>
               <label>Telefone</label>
-              <input 
-                name="telefone" 
-                value={form.telefone} 
-                onChange={handleChange} 
-                placeholder="(11) 99999-9999" 
-                id="telefone" 
-                maxLength="15" 
+              <input
+                name="telefone"
+                value={form.telefone}
+                onChange={handleChange}
+                placeholder="(11) 99999-9999"
+                id="telefone"
+                maxLength="15"
               />
             </div>
             <div className={styles.inputGroup}>
@@ -227,7 +238,7 @@ export default function Perfil() {
                 <option value="ENSINO MEDIO">Ensino Médio</option>
                 <option value="ENSINO SUPERIOR">Ensino Superior</option>
               </select>
-            </div> 
+            </div>
 
           </div>
 
