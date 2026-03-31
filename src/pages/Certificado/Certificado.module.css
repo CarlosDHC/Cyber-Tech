@@ -1,65 +1,365 @@
 .container{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:#f5f7fa;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+height:100vh;
+background:linear-gradient(135deg,#eef2f7,#dbe3f1);
 }
 
 .certificado{
-  width:800px;
-  padding:60px;
-  background:white;
-  border: groove 3px #1e3a8a;
-  border-radius:12px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.15);
-  font-family: Georgia, serif;
+
+width:900px;
+height:600px;
+
+padding:70px;
+
+background:white;
+
+border:6px solid #0b3a75;
+
+margin-top: 40px;
+
+position:relative;
+
+text-align:center;
+
+font-family:"Times New Roman", serif;
+
+box-shadow:0 25px 60px rgba(0,0,0,0.25);
+
+overflow:hidden;
+
 }
+
+/* moldura interna */
+
+.certificado:after{
+
+content:"";
+
+position:absolute;
+
+top:15px;
+
+left:15px;
+
+right:15px;
+
+bottom:15px;
+
+border:10px double  #FFD700;
+
+pointer-events:none;
+
+}
+
+/* marca d'agua */
+
+.certificados:before{
+
+content:"CyberTech";
+
+position:absolute;
+
+font-size:120px;
+
+color:rgba(0,0,0,0.04);
+
+top:45%;
+
+left:50%;
+
+transform:translate(-50%,-50%) rotate(-20deg);
+
+white-space:nowrap;
+
+}
+
+/* linha decorativa superior */
+
+.topo{
+
+position:absolute;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:2px;
+
+background:linear-gradient(90deg,#0b3a75,#1e5bb8,#0b3a75);
+
+}
+
+/* titulo */
 
 .titulo{
-  font-size:48px;
-  color:#1e3a8a;
-  margin-bottom:40px;
-  letter-spacing:4px;
+
+font-size:52px;
+
+letter-spacing:5px;
+
+color:#0b3a75;
+
+margin-bottom:20px;
+
 }
 
-.paragrafo{
-  font-size:20px;
-  color:#333;
-  line-height:1.8;
-  margin-bottom:30px;
+/* subtitulo */
+
+.subtitulo{
+
+font-size:14px;
+
+letter-spacing:3px;
+
+margin-bottom:25px;
+
+color:#555;
+
 }
 
-.cargaHoraria{
-      color:#095e8b;
-}
+/* nome */
 
 .nome{
-  font-weight:bold;
-  font-size:20px;
-  color:#095e8b;
+
+font-size:48px;
+
+font-family:cursive;
+
+color:#0b3a75;
+
+margin-bottom:25px;
+
 }
 
-.curso{
-  font-weight:bold;
-  color:#095e8b;
+/* texto */
+
+.texto{
+
+font-size:18px;
+
+line-height:1.8;
+
+color:#333;
+
+margin-bottom:25px;
+
 }
+
+/* data */
 
 .data{
-  margin-top:20px;
-  font-size:16px;
-  color:#555;
+
+font-size:16px;
+
+color:#444;
+
 }
 
+/* selo */
+
+
+.selo{
+position:absolute;
+top:40px;
+right:40px;
+}
+
+.selo img{
+width:90px;
+height:auto;
+}
+
+/* assinatura */
+
 .assinatura{
-  margin-top:70px;
-  width:200px;
-  margin-left:auto;
-  margin-right:auto;
+
+position:absolute;
+
+bottom:50px;
+
+left:50%;
+
+transform:translateX(-50%);
+
+text-align:center;
+
+width:250px;
+
 }
 
 .linha{
-  border-top:2px solid black;
-  margin-bottom:8px;
+
+border-top:2px solid #0b3a75;
+
+margin-bottom:4px;
+
+}
+
+/* botão */
+
+.botao{
+
+margin-top:30px;
+
+padding:12px 28px;
+
+border:none;
+
+background:#0b3a75;
+
+color:white;
+
+font-size:16px;
+
+cursor:pointer;
+
+border-radius:6px;
+
+transition:0.3s;
+
+}
+
+.botao:hover{
+
+background:#07264e;
+
+transform:scale(1.05);
+
+}
+
+/* marca d'agua */
+
+.certificado::before{
+
+content:"CyberTech";
+
+position:absolute;
+
+font-size:120px;
+
+color:rgba(0,0,0,0.04);
+
+top:40%;
+
+left:50%;
+
+transform:translate(-50%,-50%) rotate(-20deg);
+
+white-space:nowrap;
+
+}
+
+/* titulo */
+
+.titulo{
+
+font-size:50px;
+
+letter-spacing:4px;
+
+color:#0b3a75;
+
+margin-bottom:20px;
+
+}
+
+.subtitulo{
+
+font-size:14px;
+
+letter-spacing:2px;
+
+margin-bottom:30px;
+
+color:#555;
+
+}
+
+.nome{
+
+font-size:46px;
+
+font-family:'Times New Roman', Times, serif;
+
+color:#0b3a75;
+
+margin-bottom:30px;
+
+}
+
+.texto{
+
+font-size:18px;
+
+line-height:1.8;
+
+color:#333;
+
+margin-bottom:30px;
+
+}
+
+.data{
+
+font-size:16px;
+
+color:#444;
+
+}
+
+.assinatura{
+
+position:absolute;
+
+bottom:50px;
+
+left:50%;
+
+transform:translateX(-50%);
+
+text-align:center;
+
+width:250px;
+
+}
+
+.linha{
+
+border-top:2px solid #0b3a75;
+
+margin-bottom:0.2px;
+
+}
+
+.botao{
+
+margin-top:30px;
+
+padding:12px 25px;
+
+border:none;
+
+background:#0b3a75;
+
+color:white;
+
+font-size:16px;
+
+cursor:pointer;
+
+border-radius:6px;
+
+transition:0.3s;
+
+}
+
+.botao:hover{
+
+background:#082a55;
+
 }
