@@ -48,7 +48,7 @@ right:15px;
 
 bottom:15px;
 
-border:10px double  #FFD700;
+border:10px double  #e2c000;
 
 pointer-events:none;
 
@@ -161,6 +161,17 @@ width:160px;
 height:auto;
 }
 
+.logo{
+position:absolute;
+bottom:40px;
+left:40px;
+}
+
+.logo img{
+width:160px;
+height:auto;
+}
+
 .assinatura{
 
 position:absolute;
@@ -238,14 +249,11 @@ white-space:nowrap;
 }
 
 .titulo{
-
-font-size:50px;
-
-letter-spacing:4px;
-
+font-size:54px;
+letter-spacing:6px;
 color:#0b3a75;
-
-margin-bottom:20px;
+margin-bottom:15px;
+font-weight:bold;
 
 }
 
@@ -297,7 +305,7 @@ color:#444;
 
 position:absolute;
 
-bottom:50px;
+bottom:30px;
 
 left:50%;
 
@@ -310,10 +318,11 @@ width:250px;
 }
 
 .assinatura p{
-font-family: 'Lato', sans-serif;}
+   font-family: 'Courier New', Courier, monospace;
+}
 
 .linha{
-
+padding-bottom: px;
 border-top:2px solid #0b3a75;
 
 margin-bottom:0.2px;

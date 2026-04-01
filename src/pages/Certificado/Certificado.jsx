@@ -19,6 +19,11 @@ export default function Certificado() {
         <p className={styles.subtitulo}>
           ESTE CERTIFICADO COMPROVA QUE
         </p>
+
+<div className={styles.logo}>
+  <img src="/LogoEniacDourada.png" alt="logo" />
+</div>
+
 <div className={styles.selo}>
   <img src="/Selo.jpg" alt="Selo" />
 </div>
@@ -35,20 +40,25 @@ export default function Certificado() {
           Emitido em {data}
         </p>
 
-        <div className={styles.assinatura}>
-          <div>
-            <p>CyberTech</p>
-        </div>
-          <div className={styles.linha}></div>
-          <span>Diretoria Responsável</span>
-        </div>
+  <div className={styles.assinatura}>
+  
+  <div className={styles.imagemAssinatura}>
+    <p>CyberTech</p> 
+    
+  </div>
 
-      </div>
+  <div className={styles.linha}></div>
 
-      <button className={styles.botao}>
-        Baixar Certificado
-      </button>
+  <span>Diretoria Responsável</span>
 
-    </div>
-  );
+</div>
+
+</div>
+
+<button className={styles.botao}>
+  Baixar Certificado
+</button>
+
+</div>
+);
 }
