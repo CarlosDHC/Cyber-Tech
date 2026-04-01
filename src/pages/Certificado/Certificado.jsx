@@ -26,7 +26,7 @@ export default function Certificado() {
         <h2 className={styles.nome}>{usuario}</h2>
 
         <p className={styles.texto}>
-          concluiu com êxito o curso <strong>{curso}</strong>,
+          Concluiu com êxito o curso <strong>{curso}</strong>,
           com carga horária de <strong>{cargaHoraria}</strong>,
           demonstrando dedicação e desempenho exemplares.
         </p>
@@ -36,8 +36,10 @@ export default function Certificado() {
         </p>
 
         <div className={styles.assinatura}>
+          <div>
+            <p>CyberTech</p>
+        </div>
           <div className={styles.linha}></div>
-          <p>CyberTech</p>
           <span>Diretoria Responsável</span>
         </div>
 

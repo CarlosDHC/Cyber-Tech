@@ -94,8 +94,6 @@ background:linear-gradient(90deg,#0b3a75,#1e5bb8,#0b3a75);
 
 }
 
-/* titulo */
-
 .titulo{
 
 font-size:52px;
@@ -107,8 +105,6 @@ color:#0b3a75;
 margin-bottom:20px;
 
 }
-
-/* subtitulo */
 
 .subtitulo{
 
@@ -122,21 +118,17 @@ color:#555;
 
 }
 
-/* nome */
+/* nome da pessoa */
 
 .nome{
 
 font-size:48px;
-
-font-family:cursive;
-
+font-family: 'Brush Script MT', cursive;
 color:#0b3a75;
 
 margin-bottom:25px;
 
 }
-
-/* texto */
 
 .texto{
 
@@ -150,8 +142,6 @@ margin-bottom:25px;
 
 }
 
-/* data */
-
 .data{
 
 font-size:16px;
@@ -160,9 +150,6 @@ color:#444;
 
 }
 
-/* selo */
-
-
 .selo{
 position:absolute;
 top:40px;
@@ -170,11 +157,9 @@ right:40px;
 }
 
 .selo img{
-width:90px;
+width:160px;
 height:auto;
 }
-
-/* assinatura */
 
 .assinatura{
 
@@ -199,8 +184,6 @@ border-top:2px solid #0b3a75;
 margin-bottom:4px;
 
 }
-
-/* botão */
 
 .botao{
 
@@ -253,8 +236,6 @@ transform:translate(-50%,-50%) rotate(-20deg);
 white-space:nowrap;
 
 }
-
-/* titulo */
 
 .titulo{
 
@@ -327,6 +308,9 @@ text-align:center;
 width:250px;
 
 }
+
+.assinatura p{
+font-family: 'Lato', sans-serif;}
 
 .linha{
 
