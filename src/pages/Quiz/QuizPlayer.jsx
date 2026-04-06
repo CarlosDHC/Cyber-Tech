@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import './QuizPlayer.css';
 
 import { db, auth } from '../../../FirebaseConfig';
+import { onAuthStateChanged } from "firebase/auth"; 
 import { 
   doc, 
   getDoc, 
@@ -20,6 +21,7 @@ export default function QuizPlayer() {
   // Estados de Histórico
   const [tentativasUsadas, setTentativasUsadas] = useState(0);
   const [melhorNotaAnterior, setMelhorNotaAnterior] = useState(0);
+  
   const [modoRevisao, setModoRevisao] = useState(false);
 
   // Estados do Jogo
@@ -29,56 +31,64 @@ export default function QuizPlayer() {
   const [notaAtual, setNotaAtual] = useState(0);
   const [salvando, setSalvando] = useState(false);
 
-  // 1. Efeito único para carregar TUDO ao iniciar
+  // Efeito reescrito para aguardar o Firebase carregar a conta do utilizador
   useEffect(() => {
-    const inicializarDados = async () => {
-      if (!id || !auth.currentUser) return;
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!id) return;
       
-      try {
-        setLoading(true);
+      // Se o utilizador estiver autenticado e a sessão carregada
+      if (user) {
+        try {
+          setLoading(true);
 
-        // Busca o Desafio
-        const docRef = doc(db, "desafios", id);
-        const docSnap = await getDoc(docRef);
+          // Busca o Desafio
+          const docRef = doc(db, "desafios", id);
+          const docSnap = await getDoc(docRef);
 
-        if (!docSnap.exists()) {
-          alert("Desafio não encontrado!");
-          navigate('/desafios');
-          return;
-        }
-        const dadosD = docSnap.data();
-        setDesafio(dadosD);
+          if (!docSnap.exists()) {
+            alert("Desafio não encontrado!");
+            navigate('/desafios');
+            return;
+          }
+          const dadosD = docSnap.data();
+          setDesafio(dadosD);
 
-        // Busca a Pontuação
-        const scoreId = `${auth.currentUser.uid}_${id}`;
-        const scoreRef = doc(db, "pontuacoes", scoreId);
-        const scoreSnap = await getDoc(scoreRef);
+          // Busca a Pontuação ANTERIOR no banco usando o UID do 'user' carregado
+          const scoreId = `${user.uid}_${id}`;
+          const scoreRef = doc(db, "pontuacoes", scoreId);
+          const scoreSnap = await getDoc(scoreRef);
 
-        if (scoreSnap.exists()) {
-          const dadosS = scoreSnap.data();
-          const jaFeitas = dadosS.tentativas || 0;
-          const limite = dadosD.tentativasPermitidas || 2;
+          if (scoreSnap.exists()) {
+            const dadosS = scoreSnap.data();
+            const jaFeitas = dadosS.tentativas || 0;
+            const limite = dadosD.tentativasPermitidas || 2;
 
-          setTentativasUsadas(jaFeitas);
-          setMelhorNotaAnterior(dadosS.nota || 0);
+            setTentativasUsadas(jaFeitas);
+            setMelhorNotaAnterior(dadosS.nota || 0);
 
-          if (jaFeitas >= limite) {
-            setModoRevisao(true);
+            if (jaFeitas >= limite) {
+              setModoRevisao(true);
+            } else {
+              setModoRevisao(false);
+            }
           } else {
+            setTentativasUsadas(0);
+            setMelhorNotaAnterior(0);
             setModoRevisao(false);
           }
-        } else {
-          setTentativasUsadas(0);
-          setModoRevisao(false);
+        } catch (error) {
+          console.error("Erro ao carregar:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Erro ao carregar:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        // Aguardando restauro da sessão do Firebase
+        console.log("Aguardando carregamento da autenticação...");
       }
-    };
+    });
 
-    inicializarDados();
+    // Função de limpeza (cleanup) do event listener
+    return () => unsubscribe();
   }, [id, navigate]);
 
   const selecionarOpcao = (letra) => {
@@ -118,16 +128,18 @@ export default function QuizPlayer() {
         const scoreRef = doc(db, "pontuacoes", scoreId);
         
         const novaContagem = tentativasUsadas + 1;
+        
+        // Calcula a nova melhor nota matemática
         const notaFinal = Math.max(acertos, melhorNotaAnterior);
 
         await setDoc(scoreRef, {
           uid: auth.currentUser.uid,
           email: auth.currentUser.email,
-          nome: auth.currentUser.displayName || "Usuário",
+          nome: auth.currentUser.displayName || "Utilizador",
           desafioId: id,
           desafio: desafio.titulo || "Desafio",
           categoria: desafio.area || "Geral",
-          nota: notaFinal,
+          nota: notaFinal, // Atualiza a melhor nota na BD
           ultimaNota: acertos,
           total: desafio.questoes.length,
           tentativas: novaContagem,
@@ -135,6 +147,7 @@ export default function QuizPlayer() {
         }, { merge: true });
         
         setTentativasUsadas(novaContagem);
+        setMelhorNotaAnterior(notaFinal); // Atualiza a melhor nota visível na interface
         setMostrarResultado(true); 
       } catch (error) {
         console.error("Erro ao salvar:", error);
@@ -158,19 +171,27 @@ export default function QuizPlayer() {
       <div className="quiz-bg">
         <div className="quiz-container resultado-container">
           <h1>Desafio Finalizado!</h1>
-          <div className="score-circle">{notaAtual} / {desafio.questoes.length}</div>
-          <p>Você completou {tentativasUsadas} de {limite} tentativas.</p>
           
-          {/* SEÇÃO DE FEEDBACK DAS RESPOSTAS */}
+          {/* Círculo exibe a melhor nota */}
+          <div className="score-circle">{melhorNotaAnterior} / {desafio.questoes.length}</div>
+          
+          <div style={{ margin: '15px 0', fontSize: '16px', color: '#555' }}>
+            <p>Nota desta tentativa: <strong>{notaAtual}</strong></p>
+            <p style={{ color: '#10B981', fontWeight: 'bold' }}>A tua melhor nota registada: {melhorNotaAnterior}</p>
+          </div>
+
+          <p>Completaste {tentativasUsadas} de {limite} tentativas.</p>
+          
+          {/* SECÇÃO DE FEEDBACK DAS RESPOSTAS */}
           <div style={{ marginTop: '30px', maxHeight: '400px', overflowY: 'auto' }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>Suas Respostas:</h3>
+            <h3 style={{ marginBottom: '15px', color: '#333' }}>As tuas Respostas:</h3>
             {desafio.questoes.map((questao, index) => {
               const respostaAluno = respostasUsuario[index];
               const estaCorreta = respostaAluno === questao.alternativaCorreta;
               const textoResposta = questao.alternativas?.[respostaAluno]?.texto || "Não respondida";
               const textoCorreta = questao.alternativas?.[questao.alternativaCorreta]?.texto;
 
-              // Só revelar o gabarito (resposta correta) quando as tentativas estiverem esgotadas
+              // Só revelar o gabarito quando as tentativas esgotarem
               if (!esgotouTentativas) {
                 return (
                   <div 
@@ -192,7 +213,7 @@ export default function QuizPlayer() {
                     </p>
 
                     <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}>
-                      <strong>Sua resposta:</strong> <span style={{ color: '#374151' }}>
+                      <strong>A tua resposta:</strong> <span style={{ color: '#374151' }}>
                         {respostaAluno ? `${respostaAluno.toUpperCase()}) ${textoResposta}` : 'Não respondida'}
                       </span>
                     </p>
@@ -200,7 +221,7 @@ export default function QuizPlayer() {
                 );
               }
 
-              // Se esgotou as tentativas, mostra gabarito (com destaque correto/errado)
+              // Gabarito com destaque quando as tentativas esgotaram
               return (
                 <div 
                   key={index} 
@@ -218,7 +239,7 @@ export default function QuizPlayer() {
                     </span>
                     <strong style={{ color: '#333' }}>Questão {index + 1}:</strong>
                     <span style={{ fontSize: '14px', color: estaCorreta ? '#10B981' : '#EF4444' }}>
-                      {estaCorreta ? 'Acertou!' : 'Errou'}
+                      {estaCorreta ? 'Acertaste!' : 'Erraste'}
                     </span>
                   </div>
                   
@@ -227,7 +248,7 @@ export default function QuizPlayer() {
                   </p>
                   
                   <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}>
-                    <strong>Sua resposta:</strong> <span style={{ color: estaCorreta ? '#10B981' : '#EF4444' }}>
+                    <strong>A tua resposta:</strong> <span style={{ color: estaCorreta ? '#10B981' : '#EF4444' }}>
                       {respostaAluno?.toUpperCase()}) {textoResposta}
                     </span>
                   </p>
@@ -245,7 +266,6 @@ export default function QuizPlayer() {
           <div className="resultado-actions" style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
               
               {esgotouTentativas ? (
-                // APARECE APENAS APÓS A SEGUNDA TENTATIVA
                 <button 
                   className="btn-restart" 
                   style={{ backgroundColor: '#F59E0B', color: 'white', padding: '12px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }} 
@@ -254,7 +274,6 @@ export default function QuizPlayer() {
                   Ver Gabarito e Justificativas
                 </button>
               ) : (
-                // APARECE ENQUANTO NÃO ESGOTAR AS TENTATIVAS
                 <button 
                   className="btn-restart" 
                   style={{ backgroundColor: '#2d72d9', color: 'white', padding: '12px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }} 
@@ -283,32 +302,59 @@ export default function QuizPlayer() {
 
         <h2 className="pergunta-texto">{questaoAtual.perguntaTexto}</h2>
 
-        {modoRevisao ? (
+        {/* Renderiza as alternativas */}
+        <div className="alternativas-grid">
+          {['a', 'b', 'c', 'd'].map((letra) => {
+            const opcao = questaoAtual.alternativas?.[letra];
+            if (!opcao?.texto) return null;
+
+            let classeFeedback = '';
+            
+            if (modoRevisao) {
+              const isCorreta = questaoAtual.alternativaCorreta === letra;
+              const isSelecionada = respostasUsuario[indiceAtual] === letra;
+
+              if (isCorreta) {
+                classeFeedback = 'opcao-correta'; // Verde
+              } else if (isSelecionada && !isCorreta) {
+                classeFeedback = 'opcao-errada'; // Vermelho
+              }
+            } else {
+              if (respostasUsuario[indiceAtual] === letra) {
+                classeFeedback = 'selecionada';
+              }
+            }
+
+            return (
+              <div 
+                key={letra} 
+                className={`alternativa-card ${classeFeedback}`} 
+                onClick={() => selecionarOpcao(letra)}
+                style={{ cursor: modoRevisao ? 'default' : 'pointer' }}
+              >
+                <div className="letra-bolinha">{letra.toUpperCase()}</div>
+                <div className="texto-opcao">{opcao.texto}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mensagem de alerta se errar a questão na revisão */}
+        {modoRevisao && respostasUsuario[indiceAtual] !== questaoAtual.alternativaCorreta && (
+           <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', borderRadius: '4px' }}>
+             <p style={{ color: '#B91C1C', margin: 0, fontWeight: 'bold' }}>
+               Resposta Incorreta! A alternativa correta era a letra {questaoAtual.alternativaCorreta?.toUpperCase()}.
+             </p>
+           </div>
+        )}
+
+        {/* Caixa de Justificativa */}
+        {modoRevisao && (
           <div className="caixa-justificativa" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '8px' }}>
             <h3 style={{ color: '#92400E' }}>💡 Justificativa:</h3>
             <p style={{ color: '#4B5563', whiteSpace: 'pre-wrap' }}>
               {questaoAtual.respostaEsperada || "Nenhum comentário disponível."}
             </p>
-            <p style={{ marginTop: '10px', fontWeight: 'bold', color: '#166534' }}>
-              Resposta correta: {questaoAtual.alternativaCorreta?.toUpperCase()}
-            </p>
-          </div>
-        ) : (
-          <div className="alternativas-grid">
-            {['a', 'b', 'c', 'd'].map((letra) => {
-              const opcao = questaoAtual.alternativas?.[letra];
-              if (!opcao?.texto) return null;
-              return (
-                <div 
-                  key={letra} 
-                  className={`alternativa-card ${respostasUsuario[indiceAtual] === letra ? 'selecionada' : ''}`} 
-                  onClick={() => selecionarOpcao(letra)}
-                >
-                  <div className="letra-bolinha">{letra.toUpperCase()}</div>
-                  <div className="texto-opcao">{opcao.texto}</div>
-                </div>
-              );
-            })}
           </div>
         )}
 
@@ -320,7 +366,7 @@ export default function QuizPlayer() {
             disabled={!modoRevisao && !respostasUsuario[indiceAtual] && !salvando}
           >
             {indiceAtual === desafio.questoes.length - 1 
-              ? (modoRevisao ? "Sair da Revisão" : (salvando ? "Salvando..." : "Finalizar")) 
+              ? (modoRevisao ? "Sair da Revisão" : (salvando ? "A salvar..." : "Finalizar")) 
               : "Próxima"}
           </button>
         </div>

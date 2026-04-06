@@ -309,6 +309,32 @@
     color: #10B981;
 }
 
+/* --- Estilos para Feedback de Revisão --- */
+
+/* Alternativa Correta (Verde) */
+.alternativa-card.opcao-correta {
+  border: 2px solid #10B981 !important;
+  background-color: #F0FDF4 !important;
+}
+
+.alternativa-card.opcao-correta .letra-bolinha {
+  background-color: #10B981 !important;
+  color: white !important;
+  border-color: #10B981 !important;
+}
+
+/* Alternativa Errada (Vermelha) */
+.alternativa-card.opcao-errada {
+  border: 2px solid #EF4444 !important;
+  background-color: #FEF2F2 !important;
+}
+
+.alternativa-card.opcao-errada .letra-bolinha {
+  background-color: #EF4444 !important;
+  color: white !important;
+  border-color: #EF4444 !important;
+}
+
 .feedback-correct-answer{ 
     color: rgb(37, 99, 235);
     margin-top: 8px; }
