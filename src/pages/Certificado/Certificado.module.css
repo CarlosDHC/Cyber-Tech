@@ -10,7 +10,10 @@ background:linear-gradient(135deg,#eef2f7,#dbe3f1);
 .certificado{
 
 width:900px;
+
 height:600px;
+
+page-break-inside: avoid;
 
 padding:70px;
 
@@ -157,7 +160,7 @@ right:40px;
 }
 
 .selo img{
-width:160px;
+width:140px;
 height:auto;
 }
 
@@ -317,8 +320,9 @@ width:250px;
 
 }
 
-.assinatura p{
-   font-family: 'Courier New', Courier, monospace;
+.imagemAssinatura img{
+  width: 180px;
+  margin-bottom: -24px;
 }
 
 .linha{

@@ -1,6 +1,31 @@
 import styles from "./Certificado.module.css";
+import html2pdf from "html2pdf.js";
 
 export default function Certificado() {
+
+const baixarCertificado = () => {
+
+  const elemento = document.getElementById("certificado");
+
+  const opt = {
+    margin: 0,
+    filename: "certificado.pdf",
+    image: { type: "jpeg", quality: 1 },
+    html2canvas: {
+      scale: 3
+    },
+    jsPDF: {
+      unit: "px",
+      format: [900, 600],
+      orientation: "landscape"
+    },
+    pagebreak: {
+      mode: ["avoid-all"]
+    }
+  };
+
+  html2pdf().set(opt).from(elemento).save();
+};
 
   const usuario = "João da Silva";
   const curso = "Tecnologia";
@@ -10,7 +35,7 @@ export default function Certificado() {
   return (
     <div className={styles.container}>
 
-      <div className={styles.certificado}>
+<div id="certificado" className={styles.certificado}>
 
         <div className={styles.topo}></div>
 
@@ -43,11 +68,16 @@ export default function Certificado() {
   <div className={styles.assinatura}>
   
   <div className={styles.imagemAssinatura}>
-    <p>CyberTech</p> 
-    
-  </div>
+  <img 
+    src="/AssinaturaCertificado.png"alt="assinatura"
+  />
+</div>
+
+
 
   <div className={styles.linha}></div>
+
+  <p>CyberTech</p>
 
   <span>Diretoria Responsável</span>
 
@@ -55,9 +85,10 @@ export default function Certificado() {
 
 </div>
 
-<button className={styles.botao}>
+<button className={styles.botao} onClick={baixarCertificado}>
   Baixar Certificado
 </button>
+
 
 </div>
 );
