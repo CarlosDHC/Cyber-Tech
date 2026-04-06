@@ -3,29 +3,28 @@ import html2pdf from "html2pdf.js";
 
 export default function Certificado() {
 
-const baixarCertificado = () => {
+  const baixarCertificado = () => {
 
-  const elemento = document.getElementById("certificado");
+    const elemento = document.getElementById("certificado");
 
-  const opt = {
-    margin: 0,
-    filename: "certificado.pdf",
-    image: { type: "jpeg", quality: 1 },
-    html2canvas: {
-      scale: 3
-    },
-    jsPDF: {
-      unit: "px",
-      format: [900, 600],
-      orientation: "landscape"
-    },
-    pagebreak: {
-      mode: ["avoid-all"]
-    }
+    const opt = {
+      margin: 0,
+      filename: "certificado.pdf",
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: {
+        scale: 3,
+        scrollX: 0,
+        scrollY: -window.scrollY
+      },
+      jsPDF: {
+        unit: "px",
+        format: [900, 600],
+        orientation: "landscape"
+      }
+    };
+
+    html2pdf().set(opt).from(elemento).save();
   };
-
-  html2pdf().set(opt).from(elemento).save();
-};
 
   const usuario = "João da Silva";
   const curso = "Tecnologia";
@@ -35,7 +34,7 @@ const baixarCertificado = () => {
   return (
     <div className={styles.container}>
 
-<div id="certificado" className={styles.certificado}>
+      <div id="certificado" className={styles.certificado}>
 
         <div className={styles.topo}></div>
 
@@ -45,13 +44,13 @@ const baixarCertificado = () => {
           ESTE CERTIFICADO COMPROVA QUE
         </p>
 
-<div className={styles.logo}>
-  <img src="/LogoEniacDourada.png" alt="logo" />
-</div>
+        <div className={styles.logo}>
+          <img src="/LogoEniacDourada.png" alt="logo" />
+        </div>
 
-<div className={styles.selo}>
-  <img src="/Selo.jpg" alt="Selo" />
-</div>
+        <div className={styles.selo}>
+          <img src="/Selo.jpg" alt="Selo" />
+        </div>
 
         <h2 className={styles.nome}>{usuario}</h2>
 
@@ -65,31 +64,31 @@ const baixarCertificado = () => {
           Emitido em {data}
         </p>
 
-  <div className={styles.assinatura}>
-  
-  <div className={styles.imagemAssinatura}>
-  <img 
-    src="/AssinaturaCertificado.png"alt="assinatura"
-  />
-</div>
+        <div className={styles.assinatura}>
+
+          <div className={styles.imagemAssinatura}>
+            <img
+              src="/AssinaturaCertificado.png" alt="assinatura"
+            />
+          </div>
 
 
 
-  <div className={styles.linha}></div>
+          <div className={styles.linha}></div>
 
-  <p>CyberTech</p>
+          <p>CyberTech</p>
 
-  <span>Diretoria Responsável</span>
+          <span>Diretoria Responsável</span>
 
-</div>
+        </div>
 
-</div>
+      </div>
 
-<button className={styles.botao} onClick={baixarCertificado}>
-  Baixar Certificado
-</button>
+      <button className={styles.botao} onClick={baixarCertificado}>
+        Baixar Certificado
+      </button>
 
 
-</div>
-);
+    </div>
+  );
 }

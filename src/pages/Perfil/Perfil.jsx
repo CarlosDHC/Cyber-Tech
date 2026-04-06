@@ -64,7 +64,9 @@ export default function Perfil() {
     );
   }
 
-  //  NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE JAJAJA
+  //  NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE JAJAJA.
+
+  // Resposta para o comentário acima: Azideia desse cara.
   const formatPhone = (value) => {
     if (!value) return "";
 
@@ -169,7 +171,7 @@ export default function Perfil() {
             className={`${styles.buttonBase} ${styles.primaryButton}`}
             onClick={() => navigate(`/certificado/ID_DO_DESAFIO`)}
           >
-            Visualizar Certificado
+            Visualizar Certificados
           </button>
         </div>
 
