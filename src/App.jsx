@@ -17,6 +17,7 @@ import ChallengeList from './pages/ChallengeList/ChallengeList.jsx';
 import Forum from './pages/Forum/Forum.jsx';
 import Certificado from './pages/Certificado/Certificado.jsx';
 
+
 // Blog Pages (Categorias)
 import Tecnologia from "./pages/Blog/Tecnologia.jsx";
 import Engenharia from "./pages/Blog/Engenharia.jsx";
