@@ -4,8 +4,10 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 height:100vh;
-background:linear-gradient(135deg,#eef2f7,#dbe3f1);
+padding-bottom: 0 ;
+margin-bottom: 1px;
 }
+
 
 .certificado{
 
@@ -338,29 +340,69 @@ margin-bottom:0.2px;
 }
 
 .botao{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0px;
 
-margin-top:30px;
+  font-size: 20px;
+  padding: 12px 40px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
 
-padding:12px 25px;
+  background: linear-gradient(135deg, #1e90ff, #0066ff);
+  color: white;
+  font-weight: bold;
 
-border:none;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
 
-background:#0b3a75;
-
-color:white;
-
-font-size:16px;
-
-cursor:pointer;
-
-border-radius:6px;
-
-transition:0.3s;
-
+  position: relative;
+  overflow: hidden;
 }
 
+/* efeito ao passar mouse */
 .botao:hover{
-
-background:#082a55;
-
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
 }
+
+/* clique */
+.botao:active{
+  transform: scale(0.95);
+}
+
+/* ícone */
+.icone{
+  font-size: 24px;
+  transition: transform 0.4s ease;
+}
+
+/* animação do ícone */
+.botao:hover .icone{
+  transform: rotate(-20deg) scale(1.2);
+}
+
+/* brilho animado */
+.botao::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.6),
+    transparent
+  );
+  transition: all 0.6s;
+}
+
+.botao:hover::before{
+  left: 100%;
+}
+
+

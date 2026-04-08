@@ -1,21 +1,70 @@
 import styles from "./Certificado.module.css";
 import html2pdf from "html2pdf.js";
 
-// Adicionamos { nomeUsuario, nomeCurso, cargaHoraria } como props
-export default function Certificado({ nomeUsuario, nomeCurso, cargaHoraria }) {
+import { useEffect, useState } from "react";
+import { auth, db } from "../../../FirebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+
+export default function Certificado({ nomeCurso, cargaHoraria }) {
+
+  const [nomeUsuario, setNomeUsuario] = useState("");
+
+  const curso = nomeCurso || "Tecnologia";
+  const horas = cargaHoraria || "10 horas";
+
+  useEffect(() => {
+
+    const buscarNome = async () => {
+
+      const user = auth.currentUser;
+
+      if (!user) return;
+
+      try {
+
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+
+          const dados = docSnap.data();
+
+          const nome =
+            dados.apelido ||
+            dados.name ||
+            "Estudante";
+
+          setNomeUsuario(nome);
+
+        }
+
+      } catch (erro) {
+        console.log("Erro ao buscar nome:", erro);
+      }
+
+    };
+
+    buscarNome();
+
+  }, []);
+
+  const usuario = nomeUsuario || "Estudante";
 
   const baixarCertificado = () => {
+
     const elemento = document.getElementById("certificado");
+
+    if (!elemento) return;
 
     const opt = {
       margin: 0,
-      filename: `Certificado_${nomeUsuario}.pdf`, // Nome do arquivo personalizado
+      filename: `Certificado_${usuario}.pdf`,
       image: { type: "jpeg", quality: 1 },
       html2canvas: {
         scale: 3,
         scrollX: 0,
         scrollY: -window.scrollY,
-        useCORS: true // Importante para carregar imagens externas/Firebase
+        useCORS: true
       },
       jsPDF: {
         unit: "px",
@@ -27,12 +76,13 @@ export default function Certificado({ nomeUsuario, nomeCurso, cargaHoraria }) {
     html2pdf().set(opt).from(elemento).save();
   };
 
-  // Pegamos a data atual automaticamente
   const dataHoje = new Date().toLocaleDateString("pt-BR");
 
   return (
     <div className={styles.container}>
+
       <div id="certificado" className={styles.certificado}>
+
         <div className={styles.topo}></div>
 
         <h1 className={styles.titulo}>CERTIFICADO</h1>
@@ -49,13 +99,12 @@ export default function Certificado({ nomeUsuario, nomeCurso, cargaHoraria }) {
           <img src="/Selo.jpg" alt="Selo" />
         </div>
 
-        {/* USANDO AS PROPS AQUI */}
-        <h2 className={styles.nome}>{nomeUsuario || "Estudante"}</h2>
+        <h2 className={styles.nome}>{usuario}</h2>
 
         <p className={styles.texto}>
-          Concluiu com êxito o curso <strong>{nomeCurso || "Tecnologia"}</strong>,
-          com carga horária de <strong>{cargaHoraria || "2 horas"}</strong>,
-          demonrando dedicação e desempenho exemplares.
+          Concluiu com êxito o curso de <strong>{curso}</strong>,
+          com carga horária de <strong>{horas}</strong>,
+          demonstrando dedicação e desempenho exemplares.
         </p>
 
         <p className={styles.data}>
@@ -66,15 +115,20 @@ export default function Certificado({ nomeUsuario, nomeCurso, cargaHoraria }) {
           <div className={styles.imagemAssinatura}>
             <img src="/AssinaturaCertificado.png" alt="assinatura" />
           </div>
+
           <div className={styles.linha}></div>
+
           <p>CyberTech</p>
           <span>Diretoria Responsável</span>
         </div>
+
       </div>
 
       <button className={styles.botao} onClick={baixarCertificado}>
-        Baixar Certificado
-      </button>
+  <span className={styles.icone}>🎓</span>
+  Baixar Certificado
+</button>
+
     </div>
   );
 }

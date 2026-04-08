@@ -6,6 +6,45 @@
   --text-color: #222;
 }
 
+.botao{
+  font-size: 22px;
+  padding: 12px 45px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  background: linear-gradient(135deg, #d4af37, #f6e27a);
+  color: #2b2b2b;
+  font-weight: bold;
+  letter-spacing: 1px;
+
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+
+.botao:hover{
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+}
+
+/* brilho passando no botão */
+.botao::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: rgba(255,255,255,0.4);
+  transform: skewX(-25deg);
+  transition: 0.7s;
+}
+
+.botao:hover::before{
+  left: 130%;
+}
 
 .home {
   color: var(--text-main);

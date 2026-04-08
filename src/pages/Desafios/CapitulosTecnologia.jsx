@@ -5,24 +5,6 @@ import styles from "../Home/Home.module.css";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../../FirebaseConfig";
 
-function concluirDesafio(idDesafio) {
-
-  const desafios =
-    JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
-
-  if (!desafios.includes(idDesafio)) {
-
-    desafios.push(idDesafio);
-
-    localStorage.setItem(
-      "desafiosConcluidos",
-      JSON.stringify(desafios)
-    );
-
-  }
-
-}
-
 function CapitulosTecnologia() {
 
   const [desafios, setDesafios] = useState([]);
@@ -31,6 +13,25 @@ function CapitulosTecnologia() {
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
 
   const AREA_ATUAL = "Tecnologia";
+
+  // FUNÇÃO PARA SALVAR DESAFIO CONCLUÍDO
+  function concluirDesafio(idDesafio) {
+
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    if (!desafiosConcluidos.includes(idDesafio)) {
+
+      desafiosConcluidos.push(idDesafio);
+
+      localStorage.setItem(
+        "desafiosConcluidos",
+        JSON.stringify(desafiosConcluidos)
+      );
+
+    }
+
+  }
 
   useEffect(() => {
 
@@ -55,22 +56,6 @@ function CapitulosTecnologia() {
 
         setDesafios(listaDesafios);
 
-        const desafiosConcluidos =
-          JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
-
-        const todosConcluidos = listaDesafios.every((desafio) =>
-          desafiosConcluidos.includes(desafio.id)
-        );
-
-        if (todosConcluidos) {
-          setCertificadoLiberado(true);
-          setMostrarAnimacao(true);
-
-          setTimeout(() => {
-            setMostrarAnimacao(false);
-          }, 4000);
-        }
-
       } catch (error) {
         console.error("Erro ao buscar desafios:", error);
       } finally {
@@ -83,69 +68,61 @@ function CapitulosTecnologia() {
 
   }, []);
 
+  // Verifica se todos desafios foram concluídos
+  useEffect(() => {
+
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    const todosConcluidos = desafios.every((desafio) =>
+      desafiosConcluidos.includes(desafio.id)
+    );
+
+    if (todosConcluidos && desafios.length > 0) {
+      setCertificadoLiberado(true);
+      setMostrarAnimacao(true);
+
+      setTimeout(() => {
+        setMostrarAnimacao(false);
+      }, 4000);
+    }
+
+  }, [desafios]);
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
 
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
 
-      <p className={styles.pageSubtitle}>
-        Hora de praticar! Treine a lógica de programação com nossos desafios.
-      </p>
-
       {loading ? (
-
-        <p style={{ textAlign: "center", marginTop: "20px" }}>
-          Carregando desafios...
-        </p>
-
+        <p style={{ textAlign: "center" }}>Carregando desafios...</p>
       ) : (
 
         <div className={styles.challengeCardsList}>
 
-          {desafios.length > 0 ? (
+          {desafios.map((desafio) => (
 
-            desafios.map((desafio) => (
+            <Link
+              to={`/quiz/${desafio.id}`}
+              key={desafio.id}
+              className={styles.challengeCard}
+              onClick={() => concluirDesafio(desafio.id)}
+            >
 
-              <Link
-                to={`/quiz/${desafio.id}`}
-                key={desafio.id}
-                className={styles.challengeCard}
-              >
+              <img
+                src={desafio.imagemCapa || "https://placehold.co/600x400"}
+                alt={desafio.titulo}
+              />
 
-                <img
-                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Quiz"}
-                  alt={desafio.titulo}
-                  onError={(e) => {
-                    e.target.src = "https://placehold.co/600x400?text=Sem+Imagem";
-                  }}
-                  style={{ objectFit: "cover" }}
-                />
+              <p>{desafio.titulo}</p>
 
-                <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
-                  {desafio.titulo}
-                </p>
+              <span>
+                {desafio.qtdQuestoes} Questões
+              </span>
 
-                <div style={{ fontSize: "0.9rem", color: "#555", marginBottom: "8px" }}>
-                  <span>{desafio.qtdQuestoes || 0} Questões</span>
-                  <span> • </span>
-                  <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
-                </div>
+            </Link>
 
-                <span style={{ fontSize: "0.8rem", color: "#666", fontStyle: "italic" }}>
-                  {desafio.subcategoria}
-                </span>
-
-              </Link>
-
-            ))
-
-          ) : (
-
-            <p style={{ gridColumn: "1/-1", textAlign: "center" }}>
-              Nenhum desafio encontrado para esta área no momento.
-            </p>
-
-          )}
+          ))}
 
         </div>
 
@@ -158,10 +135,10 @@ function CapitulosTecnologia() {
       )}
 
       {certificadoLiberado && (
-        <div style={{ textAlign: "center", marginTop: "40px" }}>
-          <Link to="/certificado">
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
+          <Link to="/certificado/Certificado.jsx">
             <button className={styles.botao}>
-              🎓 Baixar Certificado
+              🎓 Certificado desbloqueado!
             </button>
           </Link>
         </div>
@@ -169,7 +146,6 @@ function CapitulosTecnologia() {
 
     </div>
   );
-
 }
 
 export default CapitulosTecnologia;
