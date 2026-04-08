@@ -12,38 +12,37 @@ import {
   serverTimestamp 
 } from "firebase/firestore";
 
-// 🔥 IMPORTAÇÃO DA IA
+// IMPORTAÇÃO DA IA
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// 🧠 FUNÇÃO AUXILIAR PARA CHAMAR A IA COM FEEDBACK DETALHADO
-const avaliarRespostaComIA = async (pergunta, esperada, respostaAluno) => {
+// FUNÇÃO AUXILIAR DA IA (Focada em Múltipla Escolha)
+const avaliarRespostaComIA = async (pergunta, textoCorreta, textoEscolhida, acertou) => {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
     console.error("Falta a VITE_GEMINI_API_KEY no .env");
-    return { correta: false, feedback: "A API da IA não está configurada no sistema." };
+    return { feedback: "A API da IA não está configurada no sistema." };
   }
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // ou "gemini-2.0-flash"
     const prompt = `
-      Atue como um professor empático e especialista avaliando a resposta dissertativa de um aluno.
+      Atue como um professor particular empático e didático.
       
-      Pergunta feita: "${pergunta}"
-      Gabarito esperado (conceito correto): "${esperada}"
-      Resposta do aluno: "${respostaAluno}"
+      Pergunta do Quiz: "${pergunta}"
+      Gabarito (Resposta Correta): "${textoCorreta}"
+      O que o aluno respondeu: "${textoEscolhida}"
 
-      Analise a resposta do aluno considerando o conceito do gabarito. 
+      O aluno ${acertou ? "ACERTOU" : "ERROU"} a questão.
       
-      Regras obrigatórias para o feedback:
-      1. Se o aluno ACERTOU (mesmo usando outras palavras, desde que a essência esteja correta): Dê os parabéns, confirme que ele acertou e explique brevemente o porquê de estar correto, reforçando o aprendizado.
-      2. Se o aluno ERROU ou respondeu algo INCOMPLETO: Explique de forma didática o que está errado ou o que faltou, justifique o motivo e diga explicitamente qual seria a resposta correta de acordo com o gabarito.
+      Sua tarefa: 
+      Escreva uma justificativa de no máximo 3 parágrafos. 
+      Se o aluno acertou, parabenize e reforce por que a resposta está correta.
+      Se o aluno errou (ou deixou em branco), explique de forma amigável por que a alternativa dele está incorreta e explique o conceito por trás do gabarito correto.
 
       Retorne APENAS um objeto JSON válido (sem formatação markdown como \`\`\`json), com o seguinte formato exato:
       {
-        "correta": true ou false,
-        "feedback": "O seu texto de feedback aqui, seguindo as regras acima."
+        "feedback": "O seu texto de justificativa aqui."
       }
     `;
 
@@ -52,7 +51,7 @@ const avaliarRespostaComIA = async (pergunta, esperada, respostaAluno) => {
     return JSON.parse(textoLimpo);
   } catch (error) {
     console.error("Erro na avaliação da IA:", error);
-    return { correta: false, feedback: "Houve uma instabilidade ao conectar com a inteligência artificial para corrigir a sua resposta. Consulte o professor." };
+    return { feedback: "Houve uma instabilidade ao conectar com a inteligência artificial para gerar a justificativa desta questão." };
   }
 };
 
@@ -161,23 +160,29 @@ export default function QuizPlayer() {
     let acertos = 0;
     let novosFeedbacksIA = {}; 
     
-    // AVALIAÇÃO INTELIGENTE
+    // AVALIAÇÃO INTELIGENTE (Adaptada para Múltipla Escolha)
     for (let index = 0; index < desafio.questoes.length; index++) {
       const q = desafio.questoes[index];
-      const respostaAluno = respostasUsuario[index];
+      const respostaLetra = respostasUsuario[index]; // Ex: 'a', 'b', 'c', 'd'
+      
+      const estaCorreta = respostaLetra === q.alternativaCorreta;
+      if (estaCorreta) acertos++;
 
-      // Verificação case-insensitive
-      if (q.tipo && q.tipo.toLowerCase() === 'dissertativa') {
-        if (respostaAluno && respostaAluno.trim().length > 0) {
-          const analise = await avaliarRespostaComIA(q.perguntaTexto, q.respostaEsperada, respostaAluno);
-          if (analise.correta) acertos++;
-          novosFeedbacksIA[index] = analise.feedback;
-        } else {
-          novosFeedbacksIA[index] = "Nenhuma resposta foi enviada pelo aluno. Aconselhamos que tente formular uma resposta teórica da próxima vez.";
-        }
-      } else {
-        if (respostaAluno === q.alternativaCorreta) acertos++;
-      }
+      // Extrair os textos reais das alternativas para a IA conseguir justificar o contexto
+      const textoCorreta = q.alternativas?.[q.alternativaCorreta]?.texto || "Sem texto na alternativa correta.";
+      const textoEscolhida = respostaLetra 
+        ? q.alternativas?.[respostaLetra]?.texto 
+        : "O aluno não selecionou nenhuma alternativa (deixou em branco).";
+
+      // Chama a IA para gerar a justificativa
+      const analise = await avaliarRespostaComIA(
+        q.perguntaTexto, 
+        textoCorreta, 
+        textoEscolhida, 
+        estaCorreta
+      );
+      
+      novosFeedbacksIA[index] = analise.feedback;
     }
 
     setNotaAtual(acertos);
@@ -253,7 +258,7 @@ export default function QuizPlayer() {
       setMostrarResultado(true); 
 
     } catch (error) {
-      console.error("Erro fatal ao salvar o progresso:", error);
+      console.error("Erro fatal ao guardar o progresso:", error);
       alert("Houve um erro ao guardar o teu progresso.");
     } finally {
       setSalvando(false);
@@ -283,57 +288,44 @@ export default function QuizPlayer() {
 
           <p>Completaste {tentativasUsadas} de {limite} tentativas.</p>
           
-          <div style={{ marginTop: '30px', maxHeight: '400px', overflowY: 'auto' }}>
+          <div style={{ marginTop: '30px', maxHeight: '500px', overflowY: 'auto', paddingRight: '10px' }}>
             <h3 style={{ marginBottom: '15px', color: '#333' }}>Resumo da Tentativa:</h3>
             {desafio.questoes.map((questao, index) => {
               const respostaAluno = respostasUsuario[index];
               const respondeuAlgo = respostaAluno !== undefined;
-              const feedbackIA = feedbacksIA[index];
+              const feedbackDaIA = feedbacksIA[index];
 
-              // 🔥 SOLUÇÃO: A dissertativa mostra SEMPRE o feedback da IA, independentemente de ter esgotado as tentativas!
-              if (questao.tipo && questao.tipo.toLowerCase() === 'dissertativa') {
-                return (
-                  <div key={index} style={{ marginBottom: '15px', padding: '15px', borderRadius: '8px', border: '1px solid #0EA5E9', backgroundColor: '#F0F9FF' }}>
-                    <div style={{ marginBottom: '8px' }}><strong style={{ color: '#0369A1' }}>Questão {index + 1} (Avaliação da IA):</strong></div>
-                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong>Pergunta:</strong> {questao.perguntaTexto}</p>
-                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}><strong>A tua resposta:</strong> <span style={{ color: '#374151' }}>{respostaAluno || "Em branco"}</span></p>
-                    
-                    {/* AQUI ESTÁ A CORREÇÃO: Removi a limitação 'esgotouTentativas' */}
-                    {feedbackIA && (
-                      <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#E0F2FE', borderRadius: '6px' }}>
-                        <p style={{ margin: 0, fontSize: '14px', color: '#0284C7' }}><strong>🤖 Professor IA diz:</strong> {feedbackIA}</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              // Múltipla escolha clássica (Continua a esconder o gabarito até esgotar as tentativas)
               const estaCorreta = respostaAluno === questao.alternativaCorreta;
               const textoResposta = questao.alternativas?.[respostaAluno]?.texto || "Não respondida";
               const textoCorreta = questao.alternativas?.[questao.alternativaCorreta]?.texto;
 
-              if (!esgotouTentativas) {
-                return (
-                  <div key={index} style={{ marginBottom: '15px', padding: '15px', borderRadius: '8px', border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF' }}>
-                    <div style={{ marginBottom: '8px' }}><strong style={{ color: '#333' }}>Questão {index + 1}:</strong></div>
-                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong>Pergunta:</strong> {questao.perguntaTexto}</p>
-                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}><strong>A tua resposta:</strong> <span style={{ color: '#374151' }}>{respostaAluno ? `${respostaAluno.toUpperCase()}) ${textoResposta}` : 'Não respondida'}</span></p>
-                  </div>
-                );
-              }
-
+              // Renderização do resumo com o feedback da IA incluído em cada questão
               return (
-                <div key={index} style={{ marginBottom: '15px', padding: '15px', borderRadius: '8px', border: (respondeuAlgo && estaCorreta) ? '2px solid #10B981' : '2px solid #EF4444', backgroundColor: (respondeuAlgo && estaCorreta) ? '#F0FDF4' : '#FEF2F2' }}>
+                <div key={index} style={{ marginBottom: '20px', padding: '15px', borderRadius: '8px', border: (respondeuAlgo && estaCorreta) ? '2px solid #10B981' : '2px solid #EF4444', backgroundColor: (respondeuAlgo && estaCorreta) ? '#F0FDF4' : '#FEF2F2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                     <span style={{ fontSize: '18px' }}>{estaCorreta ? '✓' : '✗'}</span>
                     <strong style={{ color: '#333' }}>Questão {index + 1}:</strong>
                     <span style={{ fontSize: '14px', color: estaCorreta ? '#10B981' : '#EF4444' }}>{estaCorreta ? 'Acertaste!' : 'Erraste'}</span>
                   </div>
                   <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong>Pergunta:</strong> {questao.perguntaTexto}</p>
-                  <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}><strong>A tua resposta:</strong> <span style={{ color: estaCorreta ? '#10B981' : '#EF4444' }}>{respostaAluno ? `${respostaAluno.toUpperCase()}) ${textoResposta}` : 'Em branco'}</span></p>
+                  
+                  <p style={{ margin: '8px 0', fontSize: '14px', color: '#333' }}>
+                    <strong>A tua resposta:</strong> <span style={{ color: estaCorreta ? '#10B981' : '#EF4444' }}>{respostaAluno ? `${respostaAluno.toUpperCase()}) ${textoResposta}` : 'Em branco'}</span>
+                  </p>
+                  
                   {!estaCorreta && (
-                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#10B981' }}><strong>Gabarito Correto:</strong> {questao.alternativaCorreta?.toUpperCase()}) {textoCorreta}</p>
+                    <p style={{ margin: '8px 0', fontSize: '14px', color: '#10B981' }}>
+                      <strong>Gabarito Correto:</strong> {questao.alternativaCorreta?.toUpperCase()}) {textoCorreta}
+                    </p>
+                  )}
+
+                  {/* 🔥 CAIXA COM A EXPLICAÇÃO DA IA */}
+                  {feedbackDaIA && (
+                    <div style={{ marginTop: '15px', padding: '12px', backgroundColor: '#E0F2FE', borderRadius: '6px', borderLeft: '4px solid #0EA5E9' }}>
+                      <p style={{ margin: 0, fontSize: '14px', color: '#0369A1' }}>
+                        <strong>🤖 Explicação do Professor IA:</strong> {feedbackDaIA}
+                      </p>
+                    </div>
                   )}
                 </div>
               );
@@ -369,77 +361,68 @@ export default function QuizPlayer() {
 
         <h2 className="pergunta-texto">{questaoAtual.perguntaTexto}</h2>
 
-        {questaoAtual.tipo && questaoAtual.tipo.toLowerCase() === 'dissertativa' ? (
-          <div className="area-dissertativa">
-            <textarea
-              value={respostasUsuario[indiceAtual] || ''}
-              onChange={(e) => lidarComResposta(e.target.value)}
-              disabled={modoRevisao}
-              placeholder={modoRevisao ? "A tua resposta enviada:" : "Desenvolve a tua resposta aqui..."}
-              style={{
-                width: '100%', minHeight: '120px', padding: '15px', borderRadius: '8px', 
-                border: '2px solid #ccc', fontSize: '16px', outline: 'none', 
-                fontFamily: 'inherit', resize: 'vertical'
-              }}
-            />
-            {modoRevisao && feedbacksIA[indiceAtual] && (
-              <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#E0F2FE', borderLeft: '4px solid #0EA5E9', borderRadius: '4px' }}>
-                 <p style={{ color: '#0369A1', margin: 0, fontWeight: 'bold' }}>🤖 Professor IA diz:</p>
-                 <p style={{ color: '#0284C7', margin: '5px 0 0 0' }}>{feedbacksIA[indiceAtual]}</p>
+        <div className="alternativas-grid">
+          {['a', 'b', 'c', 'd'].map((letra) => {
+            const opcao = questaoAtual.alternativas?.[letra];
+            if (!opcao?.texto) return null;
+
+            let classeFeedback = '';
+            
+            if (modoRevisao) {
+              const isCorreta = questaoAtual.alternativaCorreta === letra;
+              const isSelecionada = respostasUsuario[indiceAtual] === letra;
+              if (isCorreta) classeFeedback = 'opcao-correta';
+              else if (isSelecionada && !isCorreta) classeFeedback = 'opcao-errada';
+            } else {
+              if (respostasUsuario[indiceAtual] === letra) classeFeedback = 'selecionada';
+            }
+
+            return (
+              <div key={letra} className={`alternativa-card ${classeFeedback}`} onClick={() => lidarComResposta(letra)} style={{ cursor: modoRevisao ? 'default' : 'pointer' }}>
+                <div className="letra-bolinha">{letra.toUpperCase()}</div>
+                <div className="texto-opcao">{opcao.texto}</div>
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="alternativas-grid">
-            {['a', 'b', 'c', 'd'].map((letra) => {
-              const opcao = questaoAtual.alternativas?.[letra];
-              if (!opcao?.texto) return null;
+            );
+          })}
+        </div>
 
-              let classeFeedback = '';
-              
-              if (modoRevisao) {
-                const isCorreta = questaoAtual.alternativaCorreta === letra;
-                const isSelecionada = respostasUsuario[indiceAtual] === letra;
-                if (isCorreta) classeFeedback = 'opcao-correta';
-                else if (isSelecionada && !isCorreta) classeFeedback = 'opcao-errada';
-              } else {
-                if (respostasUsuario[indiceAtual] === letra) classeFeedback = 'selecionada';
-              }
-
-              return (
-                <div key={letra} className={`alternativa-card ${classeFeedback}`} onClick={() => lidarComResposta(letra)} style={{ cursor: modoRevisao ? 'default' : 'pointer' }}>
-                  <div className="letra-bolinha">{letra.toUpperCase()}</div>
-                  <div className="texto-opcao">{opcao.texto}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {modoRevisao && (!questaoAtual.tipo || questaoAtual.tipo.toLowerCase() !== 'dissertativa') && respostasUsuario[indiceAtual] && respostasUsuario[indiceAtual] !== questaoAtual.alternativaCorreta && (
+        {/* FEEDBACK VISUAL RÁPIDO - MODO REVISÃO */}
+        {modoRevisao && respostasUsuario[indiceAtual] && respostasUsuario[indiceAtual] !== questaoAtual.alternativaCorreta && (
            <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', borderRadius: '4px' }}>
-             <p style={{ color: '#B91C1C', margin: 0, fontWeight: 'bold' }}>Resposta Incorreta selecionada! <br></br>A alternativa correta é a letra {questaoAtual.alternativaCorreta?.toUpperCase()}.</p>
+             <p style={{ color: '#B91C1C', margin: 0, fontWeight: 'bold' }}>Resposta Incorreta selecionada! <br />A alternativa correta é a letra {questaoAtual.alternativaCorreta?.toUpperCase()}.</p>
            </div>
         )}
 
-        {modoRevisao && (!questaoAtual.tipo || questaoAtual.tipo.toLowerCase() !== 'dissertativa') && !respostasUsuario[indiceAtual] && (
+        {modoRevisao && !respostasUsuario[indiceAtual] && (
            <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#F0FDF4', borderLeft: '4px solid #10B981', borderRadius: '4px' }}>
              <p style={{ color: '#047857', margin: 0, fontWeight: 'bold' }}>Gabarito: A alternativa correta é a letra {questaoAtual.alternativaCorreta?.toUpperCase()}.</p>
            </div>
         )}
 
-        {modoRevisao && (!questaoAtual.tipo || questaoAtual.tipo.toLowerCase() !== 'dissertativa') && (
-          <div className="caixa-justificativa" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '8px' }}>
-            <h3 style={{ color: '#92400E' }}>💡 Justificativa:</h3>
-            <p style={{ color: '#4B5563', whiteSpace: 'pre-wrap' }}>{questaoAtual.respostaEsperada || "Nenhum comentário disponível."}</p>
+        {/* 🔥 CAIXA DA IA NO MODO REVISÃO */}
+        {modoRevisao && feedbacksIA[indiceAtual] && (
+          <div className="caixa-justificativa-ia" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderLeft: '6px solid #0EA5E9', borderRadius: '8px' }}>
+            <h3 style={{ color: '#0369A1', marginTop: 0, marginBottom: '10px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🤖</span> Justificativa do Professor IA:
+            </h3>
+            <p style={{ color: '#0284C7', whiteSpace: 'pre-wrap', margin: 0, lineHeight: '1.6', fontSize: '15px' }}>
+              {feedbacksIA[indiceAtual]}
+            </p>
           </div>
         )}
 
         <div className="quiz-footer" style={{ marginTop: '30px', display: 'flex', justifyContent: 'space-between' }}>
           <button className="btn-voltar" onClick={voltarQuestao} disabled={indiceAtual === 0}>Anterior</button>
           
-          <button className="btn-proximo" onClick={proximaQuestao} disabled={!modoRevisao && !respostasUsuario[indiceAtual] && !salvando}>
-            {indiceAtual === desafio.questoes.length - 1 ? (modoRevisao ? "Sair da Revisão" : (salvando ? "A IA está a avaliar..." : "Finalizar")) : "Próxima"}
+          <button 
+            className="btn-proximo" 
+            onClick={proximaQuestao} 
+            disabled={!modoRevisao && !respostasUsuario[indiceAtual] && !salvando}
+            style={salvando ? { opacity: 0.7, cursor: 'not-allowed' } : {}}
+          >
+            {indiceAtual === desafio.questoes.length - 1 
+              ? (modoRevisao ? "Sair da Revisão" : (salvando ? "A IA está a avaliar..." : "Finalizar")) 
+              : "Próxima"}
           </button>
         </div>
       </div>
