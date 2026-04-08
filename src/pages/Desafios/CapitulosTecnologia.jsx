@@ -14,6 +14,25 @@ function CapitulosTecnologia() {
 
   const AREA_ATUAL = "Tecnologia";
 
+  // FUNÇÃO PARA SALVAR DESAFIO CONCLUÍDO
+  function concluirDesafio(idDesafio) {
+
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    if (!desafiosConcluidos.includes(idDesafio)) {
+
+      desafiosConcluidos.push(idDesafio);
+
+      localStorage.setItem(
+        "desafiosConcluidos",
+        JSON.stringify(desafiosConcluidos)
+      );
+
+    }
+
+  }
+
   useEffect(() => {
 
     const fetchDesafios = async () => {
@@ -87,6 +106,7 @@ function CapitulosTecnologia() {
               to={`/quiz/${desafio.id}`}
               key={desafio.id}
               className={styles.challengeCard}
+              onClick={() => concluirDesafio(desafio.id)}
             >
 
               <img
@@ -115,10 +135,10 @@ function CapitulosTecnologia() {
       )}
 
       {certificadoLiberado && (
-        <div style={{ textAlign: "center", marginTop: "40px" }}>
-          <Link to="/certificado">
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
+          <Link to="/certificado/Certificado.jsx">
             <button className={styles.botao}>
-              🎓 Baixar Certificado
+              🎓 Certificado desbloqueado!
             </button>
           </Link>
         </div>
