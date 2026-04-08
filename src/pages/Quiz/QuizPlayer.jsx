@@ -31,17 +31,14 @@ export default function QuizPlayer() {
   const [notaAtual, setNotaAtual] = useState(0);
   const [salvando, setSalvando] = useState(false);
 
-  // Efeito reescrito para aguardar o Firebase carregar a conta do utilizador
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!id) return;
       
-      // Se o utilizador estiver autenticado e a sessão carregada
       if (user) {
         try {
           setLoading(true);
 
-          // Busca o Desafio
           const docRef = doc(db, "desafios", id);
           const docSnap = await getDoc(docRef);
 
@@ -53,18 +50,19 @@ export default function QuizPlayer() {
           const dadosD = docSnap.data();
           setDesafio(dadosD);
 
-          // Busca a Pontuação ANTERIOR no banco usando o UID do 'user' carregado
           const scoreId = `${user.uid}_${id}`;
           const scoreRef = doc(db, "pontuacoes", scoreId);
           const scoreSnap = await getDoc(scoreRef);
 
           if (scoreSnap.exists()) {
             const dadosS = scoreSnap.data();
-            const jaFeitas = dadosS.tentativas || 0;
-            const limite = dadosD.tentativasPermitidas || 2;
+            
+            // Força a coversão para garantir que lidamos sempre com números
+            const jaFeitas = parseInt(dadosS.tentativas) || 0;
+            const limite = parseInt(dadosD.tentativasPermitidas) || 2;
 
             setTentativasUsadas(jaFeitas);
-            setMelhorNotaAnterior(dadosS.nota || 0);
+            setMelhorNotaAnterior(parseInt(dadosS.nota) || 0);
 
             if (jaFeitas >= limite) {
               setModoRevisao(true);
@@ -82,12 +80,10 @@ export default function QuizPlayer() {
           setLoading(false);
         }
       } else {
-        // Aguardando restauro da sessão do Firebase
-        console.log("Aguardando carregamento da autenticação...");
+        console.log("A aguardar o carregamento da autenticação...");
       }
     });
 
-    // Função de limpeza (cleanup) do event listener
     return () => unsubscribe();
   }, [id, navigate]);
 
@@ -116,6 +112,7 @@ export default function QuizPlayer() {
     setSalvando(true);
     let acertos = 0;
     
+    // Calcula quantos acertos o utilizador teve agora
     desafio.questoes.forEach((q, index) => {
       if (respostasUsuario[index] === q.alternativaCorreta) acertos++;
     });
@@ -127,11 +124,27 @@ export default function QuizPlayer() {
         const scoreId = `${auth.currentUser.uid}_${id}`;
         const scoreRef = doc(db, "pontuacoes", scoreId);
         
-        const novaContagem = tentativasUsadas + 1;
-        
-        // Calcula a nova melhor nota matemática
-        const notaFinal = Math.max(acertos, melhorNotaAnterior);
+        // 1. Consulta o banco AGORA, imediatamente antes de salvar
+        const scoreSnap = await getDoc(scoreRef);
+        let notaHistoricaNoBanco = 0;
+        let tentativasHistoricasNoBanco = 0;
 
+        if (scoreSnap.exists()) {
+            const dadosBanco = scoreSnap.data();
+            // 🔥 FORÇA O VALOR A SER UM NÚMERO (Resolve o problema das notas antigas salvas como texto)
+            notaHistoricaNoBanco = parseInt(dadosBanco.nota) || 0;
+            tentativasHistoricasNoBanco = parseInt(dadosBanco.tentativas) || 0;
+        }
+        
+        const novaContagem = tentativasHistoricasNoBanco + 1;
+        
+        // 2. LÓGICA BLINDADA: A nota final só será a histórica se ela for MAIOR que a de agora
+        let notaFinal = acertos; // Por defeito, é a nota de agora
+        if (notaHistoricaNoBanco > acertos) {
+            notaFinal = notaHistoricaNoBanco; // Se a antiga for maior, a antiga vence
+        }
+
+        // 3. Salva a decisão no banco
         await setDoc(scoreRef, {
           uid: auth.currentUser.uid,
           email: auth.currentUser.email,
@@ -139,32 +152,32 @@ export default function QuizPlayer() {
           desafioId: id,
           desafio: desafio.titulo || "Desafio",
           categoria: desafio.area || "Geral",
-          nota: notaFinal, // Atualiza a melhor nota na BD
-          ultimaNota: acertos,
+          nota: notaFinal, // 🔥 SALVA SEMPRE A MAIOR NOTA
+          ultimaNota: acertos, // Salva a nota desta tentativa atual separada
           total: desafio.questoes.length,
           tentativas: novaContagem,
           data: serverTimestamp()
         }, { merge: true });
         
         setTentativasUsadas(novaContagem);
-        setMelhorNotaAnterior(notaFinal); // Atualiza a melhor nota visível na interface
+        setMelhorNotaAnterior(notaFinal); 
         setMostrarResultado(true); 
       } catch (error) {
         console.error("Erro ao salvar:", error);
-        alert("Erro ao salvar progresso.");
+        alert("Erro ao guardar o teu progresso.");
       } finally {
         setSalvando(false);
       }
     }
   };
 
-  if (loading) return <div className="quiz-loading">Carregando dados...</div>;
+  if (loading) return <div className="quiz-loading">A carregar os dados...</div>;
   if (!desafio) return <div className="quiz-error">Desafio não carregado.</div>;
 
   const questaoAtual = desafio.questoes[indiceAtual];
 
   if (mostrarResultado) {
-    const limite = desafio.tentativasPermitidas || 2;
+    const limite = parseInt(desafio.tentativasPermitidas) || 2;
     const esgotouTentativas = tentativasUsadas >= limite;
 
     return (
@@ -366,7 +379,7 @@ export default function QuizPlayer() {
             disabled={!modoRevisao && !respostasUsuario[indiceAtual] && !salvando}
           >
             {indiceAtual === desafio.questoes.length - 1 
-              ? (modoRevisao ? "Sair da Revisão" : (salvando ? "A salvar..." : "Finalizar")) 
+              ? (modoRevisao ? "Sair da Revisão" : (salvando ? "A guardar..." : "Finalizar")) 
               : "Próxima"}
           </button>
         </div>
