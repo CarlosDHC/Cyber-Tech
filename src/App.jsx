@@ -16,7 +16,8 @@ import Blog from './pages/Blog/Blog.jsx';
 import ChallengeList from './pages/ChallengeList/ChallengeList.jsx';
 import Forum from './pages/Forum/Forum.jsx';
 import Certificado from './pages/Certificado/Certificado.jsx';
-
+import CertificadoRH from './pages/Certificado/CertificadoRH.jsx';
+import CertificadoMAR from './pages/Certificado/CertificadoMAR.jsx';
 
 // Blog Pages (Categorias)
 import Tecnologia from "./pages/Blog/Tecnologia.jsx";
@@ -114,6 +115,22 @@ function App() {
                   <Certificado />
                 </AnimatedPage>
               </ProtectedRoute>
+            } />
+
+            <Route path="/certificado/CertificadoRH.jsx" element={
+              <ProtectedRoute>
+              <AnimatedPage>
+              <CertificadoRH />
+               </AnimatedPage>
+               </ProtectedRoute>
+            } />
+
+            <Route path="/certificado/CertificadoMAR.jsx" element={
+              <ProtectedRoute>
+              <AnimatedPage>
+              <CertificadoMAR />
+               </AnimatedPage>
+               </ProtectedRoute>
             } />
 
             {/* ROTA DE JOGO (QUIZ) */}
