@@ -10,13 +10,31 @@ function CapitulosMarketing() {
   const [desafios, setDesafios] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [certificadoLiberado, setCertificadoLiberado] = useState(false);
+  const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
+
   // Define a área desta página como Marketing
   const AREA_ATUAL = "Marketing"; 
+
+  // FUNÇÃO PARA SALVAR DESAFIO CONCLUÍDO
+  function concluirDesafio(idDesafio) {
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    if (!desafiosConcluidos.includes(idDesafio)) {
+      desafiosConcluidos.push(idDesafio);
+      localStorage.setItem(
+        "desafiosConcluidos",
+        JSON.stringify(desafiosConcluidos)
+      );
+    }
+  }
 
   useEffect(() => {
     const fetchDesafios = async () => {
       try {
         setLoading(true);
+
         // Busca desafios da coleção 'desafios' filtrados pela área Marketing
         const q = query(
           collection(db, "desafios"),
@@ -38,8 +56,27 @@ function CapitulosMarketing() {
       }
     };
 
-      fetchDesafios();
+    fetchDesafios();
   }, []);
+
+  // Verifica se todos os desafios foram concluídos
+  useEffect(() => {
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    const todosConcluidos = desafios.every((desafio) =>
+      desafiosConcluidos.includes(desafio.id)
+    );
+
+    if (todosConcluidos && desafios.length > 0) {
+      setCertificadoLiberado(true);
+      setMostrarAnimacao(true);
+
+      setTimeout(() => {
+        setMostrarAnimacao(false);
+      }, 4000);
+    }
+  }, [desafios]);
 
   return (
     <div className={`container ${styles.challengeListContainer}`}>
@@ -54,7 +91,12 @@ function CapitulosMarketing() {
         <div className={styles.challengeCardsList}>
           {desafios.length > 0 ? (
             desafios.map((desafio) => (
-              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
+              <Link
+                to={`/quiz/${desafio.id}`}
+                key={desafio.id}
+                className={styles.challengeCard}
+                onClick={() => concluirDesafio(desafio.id)}
+              >
                 <img
                   src={desafio.imagemCapa || "https://placehold.co/600x400?text=Marketing"}
                   alt={desafio.titulo}
@@ -62,15 +104,11 @@ function CapitulosMarketing() {
                   style={{ objectFit: 'cover' }}
                 />
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
-                
-                {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS PADRONIZADAS --- */}
                 <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
                   <span>{desafio.qtdQuestoes || 0} Questões</span>
                   <span> • </span>
                   <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
                 </div>
-                {/* ------------------------------------------------- */}
-
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}
                 </span>
@@ -81,6 +119,22 @@ function CapitulosMarketing() {
               Nenhum desafio encontrado para a área de Marketing no momento.
             </p>
           )}
+        </div>
+      )}
+
+      {mostrarAnimacao && (
+        <div className={styles.animacaoConquista}>
+          🎉 Parabéns! Você concluiu todos os desafios!
+        </div>
+      )}
+
+      {certificadoLiberado && (
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
+          <Link to="/Certificado/CertificadoMAR.jsx">
+            <button className={styles.botao}>
+              🎓 Certificado desbloqueado!
+            </button>
+          </Link>
         </div>
       )}
     </div>

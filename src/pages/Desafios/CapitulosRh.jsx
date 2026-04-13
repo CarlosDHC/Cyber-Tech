@@ -10,8 +10,30 @@ function CapitulosRh() {
   const [desafios, setDesafios] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [certificadoLiberado, setCertificadoLiberado] = useState(false);
+  const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
+
   // Define a área desta página como RH (Recursos Humanos)
   const AREA_ATUAL = "RH"; 
+
+  // FUNÇÃO PARA SALVAR DESAFIO CONCLUÍDO
+  function concluirDesafio(idDesafio) {
+
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    if (!desafiosConcluidos.includes(idDesafio)) {
+
+      desafiosConcluidos.push(idDesafio);
+
+      localStorage.setItem(
+        "desafiosConcluidos",
+        JSON.stringify(desafiosConcluidos)
+      );
+
+    }
+
+  }
 
   useEffect(() => {
     const fetchDesafios = async () => {
@@ -41,6 +63,27 @@ function CapitulosRh() {
     fetchDesafios();
   }, []);
 
+  // Verifica se todos desafios foram concluídos
+  useEffect(() => {
+
+    const desafiosConcluidos =
+      JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+    const todosConcluidos = desafios.every((desafio) =>
+      desafiosConcluidos.includes(desafio.id)
+    );
+
+    if (todosConcluidos && desafios.length > 0) {
+      setCertificadoLiberado(true);
+      setMostrarAnimacao(true);
+
+      setTimeout(() => {
+        setMostrarAnimacao(false);
+      }, 4000);
+    }
+
+  }, [desafios]);
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
@@ -54,7 +97,12 @@ function CapitulosRh() {
         <div className={styles.challengeCardsList}>
           {desafios.length > 0 ? (
             desafios.map((desafio) => (
-              <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
+              <Link 
+                to={`/quiz/${desafio.id}`} 
+                key={desafio.id} 
+                className={styles.challengeCard}
+                onClick={() => concluirDesafio(desafio.id)}
+              >
                 <img
                   src={desafio.imagemCapa || "https://placehold.co/600x400?text=RH"}
                   alt={desafio.titulo}
@@ -63,13 +111,11 @@ function CapitulosRh() {
                 />
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
                 
-                {/* --- EXIBIÇÃO PADRONIZADA: QUESTÕES E TENTATIVAS --- */}
                 <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
                   <span>{desafio.qtdQuestoes || 0} Questões</span>
                   <span> • </span>
                   <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
                 </div>
-                {/* ------------------------------------------------- */}
 
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}
@@ -83,6 +129,23 @@ function CapitulosRh() {
           )}
         </div>
       )}
+
+      {mostrarAnimacao && (
+        <div className={styles.animacaoConquista}>
+          🎉 Parabéns! Você concluiu todos os desafios!
+        </div>
+      )}
+
+      {certificadoLiberado && (
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
+          <Link to="/Certificado/CertificadoRH.jsx">
+            <button className={styles.botao}>
+              🎓 Certificado desbloqueado!
+            </button>
+          </Link>
+        </div>
+      )}
+
     </div>
   );
 }
