@@ -4,8 +4,8 @@ import styles from "./Cadastro.module.css";
 
 import { auth, db } from "../../../FirebaseConfig.js";
 
-// Importação necessária do updateProfile para vincular o nome ao Auth do Firebase
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+// Adicionado o sendEmailVerification
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 
 const Cadastro = () => {
@@ -65,9 +65,13 @@ const Cadastro = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // 2. Atualiza o perfil com o nome
       await updateProfile(user, {
         displayName: nome
       });
+
+      // NOVO: Enviar o e-mail de verificação para o utilizador
+      await sendEmailVerification(user);
 
       // 3. Salva os dados detalhados no Firestore
       await setDoc(doc(db, "users", user.uid), {
@@ -83,6 +87,8 @@ const Cadastro = () => {
       console.log("Usuário cadastrado com sucesso:", user.uid);
       setLoading(false);
 
+      // Alerta o utilizador para ir ao e-mail
+      alert("Cadastro realizado com sucesso! Foi enviado um e-mail de verificação. Por favor, verifique a sua caixa de entrada ou spam antes de iniciar sessão.");
       navigate("/login");
 
     } catch (err) {
@@ -95,7 +101,7 @@ const Cadastro = () => {
       } else if (err.code === "auth/weak-password") {
         setError("A senha é muito fraca. Escolha uma mais forte.");
       } else if (err.code === "auth/network-request-failed") {
-        setError("Falha de conexão. Verifique sua internet.");
+        setError("Falha de conexão. Verifique a sua internet.");
       } else {
         setError("Ocorreu um erro ao tentar cadastrar.");
       }
@@ -153,7 +159,6 @@ const Cadastro = () => {
 
             <div className={styles.formGroup}>
               <label htmlFor="telefone">Telefone</label>
-              {/* O onChange usa formatPhone, e o maxLength foi para 15 */}
               <input
                 type="tel"
                 id="telefone"

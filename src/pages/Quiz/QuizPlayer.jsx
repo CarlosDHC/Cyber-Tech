@@ -403,7 +403,7 @@ export default function QuizPlayer() {
         {modoRevisao && feedbacksIA[indiceAtual] && (
           <div className="caixa-justificativa-ia" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderLeft: '6px solid #0EA5E9', borderRadius: '8px' }}>
             <h3 style={{ color: '#0369A1', marginTop: 0, marginBottom: '10px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🤖</span> Justificativa do Professor IA:
+              <span>XD</span> Justificativa do Professor IA:
             </h3>
             <p style={{ color: '#0284C7', whiteSpace: 'pre-wrap', margin: 0, lineHeight: '1.6', fontSize: '15px' }}>
               {feedbacksIA[indiceAtual]}

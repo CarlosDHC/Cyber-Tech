@@ -4,7 +4,8 @@ import styles from "./Login.module.css";
 
 // Caminho corrigido — o FirebaseConfig está fora da pasta src
 import { auth } from "../../../FirebaseConfig.js";
-import { signInWithEmailAndPassword } from "firebase/auth";
+// Adicionado o signOut
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +22,21 @@ const Login = () => {
     const cleanEmail = email.trim();
 
     try {
-      await signInWithEmailAndPassword(auth, cleanEmail, password);
+      const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
+      const user = userCredential.user;
+
+      // NOVO: Verifica se o e-mail foi validado
+      if (!user.emailVerified) {
+        // Desloga o usuário imediatamente
+        await signOut(auth);
+        
+        // Exibe um erro
+        setError("Por favor, verifique o seu e-mail antes de iniciar sessão. Verifique a sua caixa de entrada ou spam.");
+        setLoading(false);
+        return;
+      }
+
+      // Se estiver verificado, vai para a Home
       navigate("/");
     } catch (err) {
       console.error("Erro detalhado no login:", err);
@@ -39,7 +54,11 @@ const Login = () => {
         setError("Ocorreu um erro ao tentar iniciar sessão.");
       }
     } finally {
-      setLoading(false);
+      // O finally não deve mudar o loading para false se a verificação do email falhar e dermos return
+      // Por isso, fazemos a verificação se ainda estivermos no fluxo
+      if(error === null && auth.currentUser && auth.currentUser.emailVerified) {
+        setLoading(false);
+      }
     }
   };
 
