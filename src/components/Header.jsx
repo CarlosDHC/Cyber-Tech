@@ -53,7 +53,6 @@ export default function Header() {
       navigate("/login"); 
       setMenuOpen(false); 
     } else {
-      
       handleNavClick(path);
     }
   };
@@ -72,7 +71,14 @@ export default function Header() {
             setUserName(data.name || ""); 
           }
         },
-        (error) => console.error("Erro:", error)
+        (error) => {
+          // Tratamento para evitar o erro vermelho no console durante o logout
+          if (error.code === 'permission-denied') {
+            console.log("Leitura do Header interrompida (logout ou permissão negada).");
+          } else {
+            console.error("Erro no onSnapshot do Header:", error);
+          }
+        }
       );
     } else {
       setUserName("");
