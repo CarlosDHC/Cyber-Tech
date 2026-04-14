@@ -11,7 +11,7 @@ function CapitulosDireito() {
   const [loading, setLoading] = useState(true);
 
   // Define a área desta página como Direito
-  const AREA_ATUAL = "Direito"; 
+  const AREA_ATUAL = "Direito";
 
   useEffect(() => {
     const fetchDesafios = async () => {
@@ -62,7 +62,7 @@ function CapitulosDireito() {
                   style={{ objectFit: 'cover' }}
                 />
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
-                
+
                 <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
                   <span>{desafio.qtdQuestoes || 0} Questões</span>
                   <span> • </span>
