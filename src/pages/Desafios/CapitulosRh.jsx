@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css"; // Reutilizando seus estilos do projeto
+import styles from "../Home/Home.module.css";
 
-// Firebase Imports
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "../../../FirebaseConfig";
 
 function CapitulosRh() {
+
   const [desafios, setDesafios] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [certificadoLiberado, setCertificadoLiberado] = useState(false);
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
 
-  // Define a área desta página como RH (Recursos Humanos)
-  const AREA_ATUAL = "RH"; 
+  const AREA_ATUAL = "RH";
 
-  // FUNÇÃO PARA SALVAR DESAFIO CONCLUÍDO
   function concluirDesafio(idDesafio) {
 
     const desafiosConcluidos =
@@ -36,10 +34,13 @@ function CapitulosRh() {
   }
 
   useEffect(() => {
+
     const fetchDesafios = async () => {
+
       try {
+
         setLoading(true);
-        // Busca os desafios da coleção 'desafios' filtrados pela área RH
+
         const q = query(
           collection(db, "desafios"),
           where("area", "==", AREA_ATUAL),
@@ -47,23 +48,26 @@ function CapitulosRh() {
         );
 
         const querySnapshot = await getDocs(q);
+
         const listaDesafios = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
 
         setDesafios(listaDesafios);
+
       } catch (error) {
         console.error("Erro ao buscar desafios de RH:", error);
       } finally {
         setLoading(false);
       }
+
     };
 
     fetchDesafios();
+
   }, []);
 
-  // Verifica se todos desafios foram concluídos
   useEffect(() => {
 
     const desafiosConcluidos =
@@ -84,33 +88,85 @@ function CapitulosRh() {
 
   }, [desafios]);
 
+  // CALCULAR PROGRESSO
+  const desafiosConcluidos =
+    JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+  const concluidosNaArea = desafios.filter(d =>
+    desafiosConcluidos.includes(d.id)
+  ).length;
+
+  const progresso = desafios.length
+    ? (concluidosNaArea / desafios.length) * 100
+    : 0;
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
+
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
+
       <p className={styles.pageSubtitle}>
         Desenvolva competências em gestão de pessoas com nossos simulados.
       </p>
 
+      {/* BARRA DE PROGRESSO */}
+
+      <div
+        style={{
+          width: "100%",
+          height: "12px",
+          background: "#ddd",
+          borderRadius: "10px",
+          marginBottom: "10px"
+        }}
+      >
+        <div
+          style={{
+            width: `${progresso}%`,
+            height: "100%",
+            background: "linear-gradient(135deg,#4CAF50,#2E7D32)",
+            borderRadius: "10px",
+            transition: "0.5s"
+          }}
+        />
+      </div>
+
+      <p style={{ textAlign: "center", marginBottom: "25px" }}>
+        {concluidosNaArea} de {desafios.length} desafios concluídos
+      </p>
+
       {loading ? (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>
+          Carregando desafios...
+        </p>
       ) : (
+
         <div className={styles.challengeCardsList}>
+
           {desafios.length > 0 ? (
+
             desafios.map((desafio) => (
+
               <Link 
                 to={`/quiz/${desafio.id}`} 
                 key={desafio.id} 
                 className={styles.challengeCard}
                 onClick={() => concluirDesafio(desafio.id)}
               >
+
                 <img
                   src={desafio.imagemCapa || "https://placehold.co/600x400?text=RH"}
                   alt={desafio.titulo}
-                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
+                  onError={(e) => { 
+                    e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; 
+                  }}
                   style={{ objectFit: 'cover' }}
                 />
-                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
-                
+
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                  {desafio.titulo}
+                </p>
+
                 <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
                   <span>{desafio.qtdQuestoes || 0} Questões</span>
                   <span> • </span>
@@ -120,14 +176,21 @@ function CapitulosRh() {
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}
                 </span>
+
               </Link>
+
             ))
+
           ) : (
+
             <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
               Nenhum desafio encontrado para a área de RH no momento.
             </p>
+
           )}
+
         </div>
+
       )}
 
       {mostrarAnimacao && (
@@ -138,7 +201,7 @@ function CapitulosRh() {
 
       {certificadoLiberado && (
         <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
-          <Link to="/Certificado/CertificadoRH.jsx">
+          <Link to="/Certificado/CertificadoRH">
             <button className={styles.botao}>
               🎓 Certificado desbloqueado!
             </button>

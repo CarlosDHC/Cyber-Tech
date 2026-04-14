@@ -17,7 +17,7 @@ function CapitulosDireito() {
     const fetchDesafios = async () => {
       try {
         setLoading(true);
-        // Busca desafios da coleção 'desafios' filtrados pela área Direito
+
         const q = query(
           collection(db, "desafios"),
           where("area", "==", AREA_ATUAL),

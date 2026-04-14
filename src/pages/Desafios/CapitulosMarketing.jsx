@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../Home/Home.module.css"; // Reutilizando estilos existentes
+import styles from "../Home/Home.module.css";
 
 // Firebase Imports
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
@@ -13,16 +13,17 @@ function CapitulosMarketing() {
   const [certificadoLiberado, setCertificadoLiberado] = useState(false);
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
 
-  // Define a área desta página como Marketing
-  const AREA_ATUAL = "Marketing"; 
+  const [progresso, setProgresso] = useState(0); // NOVO
 
-  // FUNÇÃO PARA SALVAR DESAFIO CONCLUÍDO
+  const AREA_ATUAL = "Marketing";
+
   function concluirDesafio(idDesafio) {
     const desafiosConcluidos =
       JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
 
     if (!desafiosConcluidos.includes(idDesafio)) {
       desafiosConcluidos.push(idDesafio);
+
       localStorage.setItem(
         "desafiosConcluidos",
         JSON.stringify(desafiosConcluidos)
@@ -35,7 +36,6 @@ function CapitulosMarketing() {
       try {
         setLoading(true);
 
-        // Busca desafios da coleção 'desafios' filtrados pela área Marketing
         const q = query(
           collection(db, "desafios"),
           where("area", "==", AREA_ATUAL),
@@ -43,6 +43,7 @@ function CapitulosMarketing() {
         );
 
         const querySnapshot = await getDocs(q);
+
         const listaDesafios = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -59,16 +60,23 @@ function CapitulosMarketing() {
     fetchDesafios();
   }, []);
 
-  // Verifica se todos os desafios foram concluídos
+  // VERIFICA PROGRESSO
   useEffect(() => {
     const desafiosConcluidos =
       JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
 
-    const todosConcluidos = desafios.every((desafio) =>
+    const concluidos = desafios.filter((desafio) =>
       desafiosConcluidos.includes(desafio.id)
-    );
+    ).length;
 
-    if (todosConcluidos && desafios.length > 0) {
+    const porcentagem =
+      desafios.length > 0 ? Math.round((concluidos / desafios.length) * 100) : 0;
+
+    setProgresso(porcentagem);
+
+    const todosConcluidos = concluidos === desafios.length && desafios.length > 0;
+
+    if (todosConcluidos) {
       setCertificadoLiberado(true);
       setMostrarAnimacao(true);
 
@@ -76,14 +84,47 @@ function CapitulosMarketing() {
         setMostrarAnimacao(false);
       }, 4000);
     }
+
   }, [desafios]);
 
   return (
     <div className={`container ${styles.challengeListContainer}`}>
+
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
+
       <p className={styles.pageSubtitle}>
         Domine estratégias, métricas e criatividade com nossos desafios práticos.
       </p>
+
+      {/* BARRA DE PROGRESSO */}
+      <div style={{ width: "100%", marginBottom: "30px" }}>
+
+        <div
+          style={{
+            width: "100%",
+            height: "20px",
+            background: "#ddd",
+            borderRadius: "10px",
+            overflow: "hidden"
+          }}
+        >
+
+          <div
+            style={{
+              width: `${progresso}%`,
+              height: "100%",
+              background: "#4CAF50",
+              transition: "width 0.5s ease"
+            }}
+          />
+
+        </div>
+
+        <p style={{ textAlign: "center", marginTop: "8px", fontWeight: "bold" }}>
+          Progresso: {progresso}%
+        </p>
+
+      </div>
 
       {loading ? (
         <p style={{ textAlign: 'center', marginTop: '20px' }}>Carregando desafios...</p>
@@ -97,21 +138,28 @@ function CapitulosMarketing() {
                 className={styles.challengeCard}
                 onClick={() => concluirDesafio(desafio.id)}
               >
+
                 <img
                   src={desafio.imagemCapa || "https://placehold.co/600x400?text=Marketing"}
                   alt={desafio.titulo}
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
                 />
-                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
+
+                <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                  {desafio.titulo}
+                </p>
+
                 <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
                   <span>{desafio.qtdQuestoes || 0} Questões</span>
                   <span> • </span>
                   <span>{desafio.tentativasPermitidas || 0} Tentativas</span>
                 </div>
+
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}
                 </span>
+
               </Link>
             ))
           ) : (
@@ -137,6 +185,7 @@ function CapitulosMarketing() {
           </Link>
         </div>
       )}
+
     </div>
   );
 }

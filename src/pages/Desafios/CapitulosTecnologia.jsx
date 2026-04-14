@@ -68,7 +68,7 @@ function CapitulosTecnologia() {
 
   }, []);
 
-  // Verifica se todos desafios foram concluídos
+  // verificar se concluiu todos
   useEffect(() => {
 
     const desafiosConcluidos =
@@ -89,10 +89,48 @@ function CapitulosTecnologia() {
 
   }, [desafios]);
 
+  // CALCULAR PROGRESSO
+  const desafiosConcluidos =
+    JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
+
+  const concluidosNaArea = desafios.filter(d =>
+    desafiosConcluidos.includes(d.id)
+  ).length;
+
+  const progresso = desafios.length
+    ? (concluidosNaArea / desafios.length) * 100
+    : 0;
+
   return (
     <div className={`container ${styles.challengeListContainer}`}>
 
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
+
+      {/* BARRA DE PROGRESSO */}
+
+      <div
+        style={{
+          width: "100%",
+          height: "12px",
+          background: "#ddd",
+          borderRadius: "10px",
+          marginBottom: "10px"
+        }}
+      >
+        <div
+          style={{
+            width: `${progresso}%`,
+            height: "100%",
+            background: "linear-gradient(135deg,#4CAF50,#2E7D32)",
+            borderRadius: "10px",
+            transition: "0.5s"
+          }}
+        />
+      </div>
+
+      <p style={{ textAlign: "center", marginBottom: "25px" }}>
+        {concluidosNaArea} de {desafios.length} desafios concluídos
+      </p>
 
       {loading ? (
         <p style={{ textAlign: "center" }}>Carregando desafios...</p>
