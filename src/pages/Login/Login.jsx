@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
-// Caminho corrigido — o FirebaseConfig está fora da pasta src
 import { auth } from "../../../FirebaseConfig.js";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 
@@ -24,7 +23,6 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
       const user = userCredential.user;
 
-      // ⚠️ ATENÇÃO: Verificação de E-mail
       // Só descomente o bloco abaixo se a sua tela de Cadastro estiver configurada 
       // para disparar o e-mail de verificação real para o usuário.
       /*

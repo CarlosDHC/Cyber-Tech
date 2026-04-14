@@ -13,6 +13,13 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Regras para Desafios (Usuários logados podem ler)
+    match /desafios/{desafioId} {
+      allow read: if request.auth != null;
+      // Se apenas o Admin puder criar/editar desafios, você pode restringir o write depois
+      allow write: if request.auth != null; 
+    }
+
     // Regras para Pontuações (Notas)
     match /pontuacoes/{document=**} {
       // Admin lê tudo para o gráfico, Aluno cria nota ao terminar desafio
@@ -27,6 +34,16 @@ service cloud.firestore {
     // Regras para Admins
     match /admins/{userId} {
       allow read: if request.auth != null;
+    }
+
+    // Regras para o Fórum (Posts e Comentários)
+    match /forum_posts/{postId} {
+      // Permite que usuários logados leiam e criem posts
+      allow read, create: if request.auth != null;
+      
+      // Permite que o Admin (ou o autor do post) possa excluir ou atualizar
+      // Nota: Para segurança total, você pode validar se o UID é de um admin
+      allow update, delete: if request.auth != null;
     }
 
     // Regras para o Fórum/Chat

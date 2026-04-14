@@ -319,7 +319,7 @@ export default function QuizPlayer() {
                     </p>
                   )}
 
-                  {/* 🔥 CAIXA COM A EXPLICAÇÃO DA IA */}
+                  {/* CAIXA COM A EXPLICAÇÃO DA IA */}
                   {feedbackDaIA && (
                     <div style={{ marginTop: '15px', padding: '12px', backgroundColor: '#E0F2FE', borderRadius: '6px', borderLeft: '4px solid #0EA5E9' }}>
                       <p style={{ margin: 0, fontSize: '14px', color: '#0369A1' }}>
@@ -399,7 +399,7 @@ export default function QuizPlayer() {
            </div>
         )}
 
-        {/* 🔥 CAIXA DA IA NO MODO REVISÃO */}
+        {/*CAIXA DA IA NO MODO REVISÃO */}
         {modoRevisao && feedbacksIA[indiceAtual] && (
           <div className="caixa-justificativa-ia" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderLeft: '6px solid #0EA5E9', borderRadius: '8px' }}>
             <h3 style={{ color: '#0369A1', marginTop: 0, marginBottom: '10px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
