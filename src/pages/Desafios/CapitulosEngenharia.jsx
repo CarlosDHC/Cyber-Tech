@@ -55,14 +55,14 @@ function CapitulosEngenharia() {
           {desafios.length > 0 ? (
             desafios.map((desafio) => (
               <Link to={`/quiz/${desafio.id}`} key={desafio.id} className={styles.challengeCard}>
-                <img
+                    <img
                   src={desafio.imagemCapa || "https://placehold.co/600x400?text=Engenharia"}
-                  alt={desafio.titulo}
+                      alt={desafio.titulo}
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
-                />
+                    />
                 <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{desafio.titulo}</p>
-                
+
                 {/* --- ADIÇÃO: QUESTÕES E TENTATIVAS PADRONIZADAS --- */}
                 <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '8px' }}>
                   <span>{desafio.qtdQuestoes || 0} Questões</span>
@@ -73,8 +73,8 @@ function CapitulosEngenharia() {
 
                 <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>
                   {desafio.subcategoria}
-                </span>
-              </Link>
+                      </span>
+                  </Link>
             ))
           ) : (
             <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
