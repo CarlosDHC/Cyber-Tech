@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 
 // --- 1. MODERAÇÃO: Filtro Local de Palavrões ---
-const palavrasProibidas = ["merda", "idiota", "imbecil", "palavrao1"]; // Adicione suas palavras aqui
+const palavrasProibidas = ["merda", "idiota", "imbecil", "porra","caralho"]; // Adicione suas palavras aqui
 
 const aplicarFiltroDePalavroes = (texto) => {
   let textoFiltrado = texto;
