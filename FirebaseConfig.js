@@ -7,13 +7,13 @@ import { getStorage } from "firebase/storage"; // Import do Storage
 
 // ✅ Configurações do Firebase via variáveis de ambiente (.env)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyBQ1i_DyfGcVmMwIZex_L3JBc_dGfF31VE",
+  authDomain: "cybertech-ce995.firebaseapp.com",
+  projectId: "cybertech-ce995",
+  storageBucket: "cybertech-ce995.firebasestorage.app",
+  messagingSenderId: "116364534281",
+  appId: "1:116364534281:web:ce3588b5a3804f393a0ed8",
+  measurementId: "G-52HPWZWSP0"
 };
 
 // ✅ 1. Inicializa o Firebase (Obrigatório ser a primeira inicialização)
