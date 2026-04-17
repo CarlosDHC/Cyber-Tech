@@ -16,6 +16,19 @@ import {
   arrayRemove 
 } from "firebase/firestore";
 
+// --- 1. MODERAÇÃO: Filtro Local de Palavrões ---
+const palavrasProibidas = ["merda", "idiota", "imbecil", "porra","caralho"]; // Adicione suas palavras aqui
+
+const aplicarFiltroDePalavroes = (texto) => {
+  let textoFiltrado = texto;
+  palavrasProibidas.forEach(palavra => {
+    const regex = new RegExp(`\\b${palavra}\\b`, 'gi'); 
+    textoFiltrado = textoFiltrado.replace(regex, '*'.repeat(palavra.length));
+  });
+  return textoFiltrado;
+};
+// ------------------------------------------------
+
 const Forum = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,13 +53,19 @@ const Forum = () => {
   // Comentários
   const [commentInputs, setCommentInputs] = useState({}); 
 
+  // --- 2. MODERAÇÃO: ESTADOS DO MODAL DE DENÚNCIA ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postIdParaDenuncia, setPostIdParaDenuncia] = useState(null);
+  const [motivoDenuncia, setMotivoDenuncia] = useState("Conteúdo Inadequado/Ofensivo");
+  const [detalhesDenuncia, setDetalhesDenuncia] = useState("");
+  // ---------------------------------------------------
+
   // --- CONFIGURAÇÃO INTELIGENTE DE CATEGORIAS ---
   const mainCategories = [
     "Todas", "Tecnologia", "Direito", "Engenharia", 
     "Marketing", "RH", "Geral"
   ];
 
-  // Dicionário de sinônimos para o filtro inteligente (Opção 2)
   const categoryMap = {
     "Tecnologia": ["tecnologia", "python", "javascript", "react", "html/css", "lógica", "banco de dados", "mobile", "devops", "código", "programação","Framework", "web", "app"],
     "Direito": ["direito", "direito digital", "leis", "jurídico", "legislação", "advocacia", "penal", "civil"],
@@ -56,7 +75,6 @@ const Forum = () => {
     "Geral": ["geral", "dúvida", "off-topic", "discussão", "ajuda"]
   };
 
-  // Sugestões de Tags para o Input
   const tagSuggestions = [
     "Python", "JavaScript", "React", "HTML/CSS", "Lógica", 
     "Banco de Dados", "Mobile", "DevOps", "Carreira", "Gestão"
@@ -74,7 +92,6 @@ const Forum = () => {
       const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setPosts(postsData);
 
-      // Lógica de Trending
       const tagStats = {}; 
       postsData.forEach(post => {
         if (post.tags && Array.isArray(post.tags)) {
@@ -106,24 +123,16 @@ const Forum = () => {
 
   const handleCategoryClick = (category) => {
     setActiveFilter(category);
-    // Opcional: Se quiser limpar a busca ao mudar de categoria, descomente a linha abaixo
-    // setSearchQuery(""); 
   };
 
-  // --- LÓGICA DE FILTRAGEM AVANÇADA (OPÇÃO 2) ---
   const displayedPosts = posts.filter(post => {
-    // 1. Filtro Inteligente por Categoria
     let matchesCategory = false;
 
     if (activeFilter === "Todas") {
       matchesCategory = true;
     } else {
-      // Pega a lista de tags relacionadas à categoria selecionada (ou array vazio)
       const relatedTags = categoryMap[activeFilter] || [];
-      
-      // Verifica se o post tem tags
       if (post.tags && Array.isArray(post.tags)) {
-        // Verifica se ALGUMA tag do post está na lista de relacionadas OU é igual ao nome da categoria
         matchesCategory = post.tags.some(tag => {
           const lowerTag = tag.toLowerCase();
           return lowerTag === activeFilter.toLowerCase() || relatedTags.includes(lowerTag);
@@ -131,17 +140,14 @@ const Forum = () => {
       }
     }
 
-    // 2. Filtro por Busca de Texto (Mantendo lógica atual)
     const matchesSearch = searchQuery 
       ? (post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
          post.content.toLowerCase().includes(searchQuery.toLowerCase()))
       : true;
 
-    // Retorna verdadeiro apenas se AMBOS os filtros passarem
     return matchesCategory && matchesSearch;
   });
 
-  // --- Tags e Inputs ---
   const addTagLogic = () => {
     const val = tagInput.trim();
     if (val) {
@@ -171,20 +177,60 @@ const Forum = () => {
     if (!user) { alert("Faça login para publicar."); return; }
 
     setIsSubmitting(true);
+    
     try {
+      // --- 3. MODERAÇÃO: VERIFICAÇÃO COM OPENAI ---
+      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+      const textoAnalise = `${newTitle}. ${newContent}`;
+      
+      const respostaIA = await fetch("https://api.openai.com/v1/moderations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ input: textoAnalise })
+      });
+
+      const dadosIA = await respostaIA.json();
+      const contemOdio = dadosIA.results[0].flagged;
+
+      if (contemOdio) {
+        alert("Sua publicação contém termos que violam as regras do fórum (Discurso de ódio ou assédio).");
+        setIsSubmitting(false);
+        return; 
+      }
+
+      // --- 4. MODERAÇÃO: APLICAR FILTRO DE PALAVRÕES ---
+      const tituloLimpo = aplicarFiltroDePalavroes(newTitle);
+      const conteudoLimpo = aplicarFiltroDePalavroes(newContent);
+      // ------------------------------------------------
+
       const safeName = getSafeUserName(user);
       await addDoc(collection(db, "forum_posts"), {
-        title: newTitle, content: newContent, imageUrl: imageLink.trim(),
-        author: safeName, authorId: user.uid, authorInitial: safeName[0].toUpperCase(), 
-        createdAt: serverTimestamp(), tags: finalTags, likedBy: [], comments: [] 
+        title: tituloLimpo, 
+        content: conteudoLimpo, 
+        imageUrl: imageLink.trim(),
+        author: safeName, 
+        authorId: user.uid, 
+        authorInitial: safeName[0].toUpperCase(), 
+        createdAt: serverTimestamp(), 
+        tags: finalTags, 
+        likedBy: [], 
+        comments: [],
+        status: "aprovado" 
       });
+      
       setNewTitle(""); setNewContent(""); setImageLink(""); 
       setSelectedTags(["Geral"]); setTagInput(""); 
-      // Não reseta o filtro para o usuário ver o post criado se estiver na categoria certa
-      // setActiveFilter("Todas"); 
       setSearchQuery("");
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) { console.error(error); } finally { setIsSubmitting(false); }
+    } catch (error) { 
+      console.error(error); 
+      alert("Erro ao publicar. Verifique sua conexão ou configurações.");
+    } finally { 
+      setIsSubmitting(false); 
+    }
   };
 
   const handleLike = async (postId, likedByArray = []) => {
@@ -204,17 +250,65 @@ const Forum = () => {
     if (!text?.trim()) return;
     const user = auth.currentUser;
     if (!user) return alert("Faça login.");
+
+    // --- 5. MODERAÇÃO: Filtra palavrões nos comentários ---
+    const comentarioLimpo = aplicarFiltroDePalavroes(text);
+
     try {
       const safeName = getSafeUserName(user);
       const postRef = doc(db, "forum_posts", postId);
       await updateDoc(postRef, {
         comments: arrayUnion({
-          id: Date.now(), text: text, author: safeName, authorId: user.uid, createdAt: new Date().toISOString()
+          id: Date.now(), 
+          text: comentarioLimpo, 
+          author: safeName, 
+          authorId: user.uid, 
+          createdAt: new Date().toISOString()
         })
       });
       setCommentInputs(prev => ({ ...prev, [postId]: "" }));
     } catch (error) { console.error(error); }
   };
+
+  // --- 6. MODERAÇÃO: LÓGICA DO SISTEMA DE DENÚNCIAS ---
+  const abrirModalDenuncia = (postId) => {
+    setPostIdParaDenuncia(postId);
+    setIsModalOpen(true);
+  };
+
+  const abrirModalDenunciaGeral = () => {
+    setPostIdParaDenuncia(null); 
+    setIsModalOpen(true);
+  };
+
+  const fecharModal = () => {
+    setIsModalOpen(false);
+    setPostIdParaDenuncia(null);
+    setDetalhesDenuncia("");
+  };
+
+  const handleEnviarDenuncia = async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+
+    try {
+      await addDoc(collection(db, "denuncias"), {
+        tipo: postIdParaDenuncia ? "Denúncia de Post" : "Denúncia Geral", 
+        postId: postIdParaDenuncia || "N/A", 
+        motivo: motivoDenuncia,
+        detalhes: detalhesDenuncia,
+        denuncianteId: user ? user.uid : "Anônimo", 
+        status: "pendente",
+        data: serverTimestamp() 
+      });
+      alert("Denúncia enviada com sucesso! Nossa equipe analisará em breve.");
+      fecharModal();
+    } catch (error) {
+      console.error("Erro ao enviar denúncia:", error);
+      alert("Erro ao enviar denúncia. Tente novamente.");
+    }
+  };
+  // --------------------------------------
 
   const formatTime = (timestamp) => {
     if (!timestamp) return "...";
@@ -231,7 +325,6 @@ const Forum = () => {
             <h1 className={styles.pageTitle}>Fórum de Discussões</h1>
             <p className={styles.pageSubtitle}>Conecte-se com especialistas e tire suas dúvidas.</p>
             
-            {/* BARRA DE PESQUISA */}
             <div className={styles.searchBar}>
               <div className={styles.searchIcon}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -247,7 +340,6 @@ const Forum = () => {
               />
             </div>
 
-            {/* FILTRO POR ÁREAS (Smart Filter) */}
             <div className={styles.categoryFilterContainer}>
               {mainCategories.map((cat) => (
                 <button 
@@ -320,7 +412,9 @@ const Forum = () => {
                   disabled={isSubmitting} 
                   className={styles.cleanTextarea} 
                 />
-                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>Publicar</button>
+                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                  {isSubmitting ? 'Analisando...' : 'Publicar'}
+                </button>
               </form>
             )}
           </div>
@@ -382,6 +476,16 @@ const Forum = () => {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                     {post.comments?.length || 0} Comentários
                   </button>
+                  
+                  {/* Botão de Denunciar Post */}
+                  <button 
+                    className={styles.actionBtn} 
+                    style={{marginLeft: 'auto', color: '#ef4444'}} 
+                    onClick={() => abrirModalDenuncia(post.id)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                    Denunciar
+                  </button>
                 </div>
 
                 <div className={styles.commentsSection}>
@@ -407,8 +511,6 @@ const Forum = () => {
               </div>
             );
           })}
-
-          
         </main>
         
         <aside className={styles.sidebarSection}>
@@ -433,9 +535,6 @@ const Forum = () => {
               <ul className={styles.topicList}>
                 {trendingTags.map((item) => (
                   <li key={item.tag} className={styles.topicItem} onClick={() => {
-                    // Se clicar na tag da sidebar, filtra por essa tag específica
-                    // ou podemos fazê-la ativar a Categoria Principal correspondente
-                    // A implementação atual filtra pela Tag específica
                     setSearchQuery(item.tag); 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}>
@@ -460,10 +559,68 @@ const Forum = () => {
               <li>Mantenha o foco do tópico.</li>
               <li>Não compartilhe dados sensíveis.</li>
             </ul>
+            
+            {/* NOVO BOTÃO: Denúncia Geral na Sidebar */}
+            <button 
+              className={styles.btnDenunciaGeral} 
+              onClick={abrirModalDenunciaGeral}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+              Relatar Problema Geral
+            </button>
           </div>
         </aside>
 
       </div>
+
+      {/* --- 7. MODERAÇÃO: RENDERIZAÇÃO DO MODAL --- */}
+      {isModalOpen && (
+        <div className={styles.modalOverlay} onClick={fecharModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{marginTop: 0, color: '#f8fafc', marginBottom: '20px', fontSize: '1.3rem'}}>
+              {postIdParaDenuncia ? "Relatar Publicação" : "Relatar Problema Geral"}
+            </h3>
+            
+            <form onSubmit={handleEnviarDenuncia}>
+              <label style={{display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem'}}>
+                {postIdParaDenuncia ? "Qual o problema desta publicação?" : "Qual a natureza do problema?"}
+              </label>
+              <select 
+                value={motivoDenuncia} 
+                onChange={(e) => setMotivoDenuncia(e.target.value)}
+                style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', boxSizing: 'border-box'}}
+              >
+                <option value="Conteúdo Inadequado/Ofensivo">Conteúdo Inadequado / Ofensivo</option>
+                <option value="Spam ou Propaganda">Spam ou Propaganda</option>
+                <option value="Assédio ou Bullying">Assédio ou Bullying</option>
+                {!postIdParaDenuncia && (
+                  <option value="Problema Técnico/Bug">Problema Técnico / Bug no Site</option>
+                )}
+                <option value="Outros">Outros</option>
+              </select>
+
+              <label style={{display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem'}}>Detalhes adicionais (obrigatório para melhor análise):</label>
+              <textarea 
+                required
+                rows="4" 
+                placeholder="Descreva com detalhes o que está acontecendo..."
+                value={detalhesDenuncia}
+                onChange={(e) => setDetalhesDenuncia(e.target.value)}
+                style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', resize: 'vertical', boxSizing: 'border-box'}}
+              />
+
+              <div style={{display: 'flex', justifyContent: 'flex-end', gap: '12px'}}>
+                <button type="button" onClick={fecharModal} style={{background: 'transparent', color: '#cbd5e1', border: '1px solid #475569', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: '0.2s'}}>
+                  Cancelar
+                </button>
+                <button type="submit" style={{background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s'}}>
+                  Enviar Denúncia
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

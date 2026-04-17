@@ -12,20 +12,24 @@ import {
   serverTimestamp 
 } from "firebase/firestore";
 
-// IMPORTAÇÃO DA IA
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// IMPORTAÇÃO DA GROQ 
+import OpenAI from "openai";
+
+// INICIALIZAÇÃO DA GROQ
+const groq = new OpenAI({
+  apiKey: import.meta.env.VITE_GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1", 
+  dangerouslyAllowBrowser: true 
+});
 
 // FUNÇÃO AUXILIAR DA IA (Focada em Múltipla Escolha)
 const avaliarRespostaComIA = async (pergunta, textoCorreta, textoEscolhida, acertou) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error("Falta a VITE_GEMINI_API_KEY no .env");
+  if (!import.meta.env.VITE_GROQ_API_KEY) {
+    console.error("Falta a VITE_GROQ_API_KEY no .env");
     return { feedback: "A API da IA não está configurada no sistema." };
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // ou "gemini-2.0-flash"
     const prompt = `
       Atue como um professor particular empático e didático.
       
@@ -46,9 +50,16 @@ const avaliarRespostaComIA = async (pergunta, textoCorreta, textoEscolhida, acer
       }
     `;
 
-    const result = await model.generateContent(prompt);
-    const textoLimpo = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(textoLimpo);
+    const response = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant", // <--- MODELO ATUALIZADO AQUI
+      messages: [
+        { role: "system", content: "Você é um avaliador educacional. Responda apenas com o JSON estruturado." },
+        { role: "user", content: prompt }
+      ],
+      response_format: { type: "json_object" } 
+    });
+
+    return JSON.parse(response.choices[0].message.content);
   } catch (error) {
     console.error("Erro na avaliação da IA:", error);
     return { feedback: "Houve uma instabilidade ao conectar com a inteligência artificial para gerar a justificativa desta questão." };
@@ -160,21 +171,19 @@ export default function QuizPlayer() {
     let acertos = 0;
     let novosFeedbacksIA = {}; 
     
-    // AVALIAÇÃO INTELIGENTE (Adaptada para Múltipla Escolha)
+    // AVALIAÇÃO INTELIGENTE 
     for (let index = 0; index < desafio.questoes.length; index++) {
       const q = desafio.questoes[index];
-      const respostaLetra = respostasUsuario[index]; // Ex: 'a', 'b', 'c', 'd'
+      const respostaLetra = respostasUsuario[index]; 
       
       const estaCorreta = respostaLetra === q.alternativaCorreta;
       if (estaCorreta) acertos++;
 
-      // Extrair os textos reais das alternativas para a IA conseguir justificar o contexto
       const textoCorreta = q.alternativas?.[q.alternativaCorreta]?.texto || "Sem texto na alternativa correta.";
       const textoEscolhida = respostaLetra 
         ? q.alternativas?.[respostaLetra]?.texto 
         : "O aluno não selecionou nenhuma alternativa (deixou em branco).";
 
-      // Chama a IA para gerar a justificativa
       const analise = await avaliarRespostaComIA(
         q.perguntaTexto, 
         textoCorreta, 
@@ -299,7 +308,6 @@ export default function QuizPlayer() {
               const textoResposta = questao.alternativas?.[respostaAluno]?.texto || "Não respondida";
               const textoCorreta = questao.alternativas?.[questao.alternativaCorreta]?.texto;
 
-              // Renderização do resumo com o feedback da IA incluído em cada questão
               return (
                 <div key={index} style={{ marginBottom: '20px', padding: '15px', borderRadius: '8px', border: (respondeuAlgo && estaCorreta) ? '2px solid #10B981' : '2px solid #EF4444', backgroundColor: (respondeuAlgo && estaCorreta) ? '#F0FDF4' : '#FEF2F2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -403,7 +411,7 @@ export default function QuizPlayer() {
         {modoRevisao && feedbacksIA[indiceAtual] && (
           <div className="caixa-justificativa-ia" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderLeft: '6px solid #0EA5E9', borderRadius: '8px' }}>
             <h3 style={{ color: '#0369A1', marginTop: 0, marginBottom: '10px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>XD</span> Justificativa do Professor IA:
+              <span>🤖</span> Justificativa do Professor IA:
             </h3>
             <p style={{ color: '#0284C7', whiteSpace: 'pre-wrap', margin: 0, lineHeight: '1.6', fontSize: '15px' }}>
               {feedbacksIA[indiceAtual]}
