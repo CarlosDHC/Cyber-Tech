@@ -20,6 +20,7 @@ import CertificadoRH from './pages/Certificado/CertificadoRH.jsx';
 import CertificadoMAR from './pages/Certificado/CertificadoMAR.jsx';
 import CertificadoDIR from './pages/Certificado/CertificadoDIR.jsx';
 import CertificadoENG from './pages/Certificado/CertificadoENG.jsx';
+import CerDesbloqueados from "./pages/Certificado/CerDesbloqueados.jsx";
 
 // Blog Pages (Categorias)
 import Tecnologia from "./pages/Blog/Tecnologia.jsx";
@@ -121,34 +122,42 @@ function App() {
 
             <Route path="/certificado/CertificadoRH.jsx" element={
               <ProtectedRoute>
-              <AnimatedPage>
-              <CertificadoRH />
-               </AnimatedPage>
-               </ProtectedRoute>
+                <AnimatedPage>
+                  <CertificadoRH />
+                </AnimatedPage>
+              </ProtectedRoute>
             } />
 
             <Route path="/certificado/CertificadoMAR.jsx" element={
               <ProtectedRoute>
-              <AnimatedPage>
-              <CertificadoMAR />
-               </AnimatedPage>
-               </ProtectedRoute>
+                <AnimatedPage>
+                  <CertificadoMAR />
+                </AnimatedPage>
+              </ProtectedRoute>
             } />
 
             <Route path="/certificado/CertificadoDIR.jsx" element={
               <ProtectedRoute>
-              <AnimatedPage>
-              <CertificadoDIR />
-               </AnimatedPage>
-               </ProtectedRoute>
+                <AnimatedPage>
+                  <CertificadoDIR />
+                </AnimatedPage>
+              </ProtectedRoute>
             } />
 
-             <Route path="/certificado/CertificadoENG.jsx" element={
+            <Route path="/certificado/CertificadoENG.jsx" element={
               <ProtectedRoute>
-              <AnimatedPage>
-              <CertificadoENG />
-               </AnimatedPage>
-               </ProtectedRoute>
+                <AnimatedPage>
+                  <CertificadoENG />
+                </AnimatedPage>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/Certificado/CerDesbloqueados" element={
+              <ProtectedRoute>
+                <AnimatedPage>
+                  <CerDesbloqueados />
+                </AnimatedPage>
+              </ProtectedRoute>
             } />
 
             {/* ROTA DE JOGO (QUIZ) */}

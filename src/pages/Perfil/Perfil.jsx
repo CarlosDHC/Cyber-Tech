@@ -164,16 +164,17 @@ export default function Perfil() {
           </div>
         </div>
 
-        <div className={styles.certificateSection}>
-          <h3>Meus Certificados</h3>
-          {/* Exemplo de link para um certificado específico */}
-          <button
-            className={`${styles.buttonBase} ${styles.primaryButton}`}
-            onClick={() => navigate(`/certificado/ID_DO_DESAFIO`)}
-          >
-            Visualizar Certificados
-          </button>
-        </div>
+       <div className={styles.certificateSection}>
+  <h3>Meus Certificados</h3>
+
+  <button
+    className={`${styles.buttonBase} ${styles.primaryButton}`}
+    onClick={() => navigate("/certificados/CerDesbloqueados.jsx")}
+  >
+    Visualizar Certificados
+  </button>
+
+</div>
 
         <div className={styles.content}>
           <div className={styles.imageAndLogin}>
