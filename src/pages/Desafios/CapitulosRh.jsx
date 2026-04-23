@@ -68,45 +68,27 @@ function CapitulosRh() {
 
   }, []);
 
-  // VERIFICAR SE LIBERA CERTIFICADO (mínimo 60%)
-
   useEffect(() => {
 
     const desafiosConcluidos =
       JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
 
-    let todosConcluidos = true;
-    let todosComNotaMinima = true;
+    const todosConcluidos = desafios.every((desafio) =>
+      desafiosConcluidos.includes(desafio.id)
+    );
 
-    desafios.forEach((desafio) => {
-
-      if (!desafiosConcluidos.includes(desafio.id)) {
-        todosConcluidos = false;
-      }
-
-      const nota = localStorage.getItem(`notaQuiz_${desafio.id}`);
-
-      if (!nota || Number(nota) < 60) {
-        todosComNotaMinima = false;
-      }
-
-    });
-
-    if (todosConcluidos && todosComNotaMinima && desafios.length > 0) {
-
+    if (todosConcluidos && desafios.length > 0) {
       setCertificadoLiberado(true);
       setMostrarAnimacao(true);
 
       setTimeout(() => {
         setMostrarAnimacao(false);
       }, 4000);
-
     }
 
   }, [desafios]);
 
   // CALCULAR PROGRESSO
-
   const desafiosConcluidos =
     JSON.parse(localStorage.getItem("desafiosConcluidos")) || [];
 
@@ -211,19 +193,6 @@ function CapitulosRh() {
 
       )}
 
-      {/* Aviso se não tiver nota suficiente */}
-
-      {!certificadoLiberado && (
-        <p style={{
-          textAlign: "center",
-          marginTop: "20px",
-          color: "#c62828",
-          fontWeight: "bold"
-        }}>
-          ⚠ Para liberar o certificado você precisa acertar pelo menos 60% em cada desafio.
-        </p>
-      )}
-
       {mostrarAnimacao && (
         <div className={styles.animacaoConquista}>
           🎉 Parabéns! Você concluiu todos os desafios!
@@ -232,7 +201,7 @@ function CapitulosRh() {
 
       {certificadoLiberado && (
         <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
-          <Link to="/Certificado/CertificadoRH">
+          <Link to="/Certificado/CertificadoRH.jsx">
             <button className={styles.botao}>
               🎓 Certificado desbloqueado!
             </button>
@@ -244,4 +213,4 @@ function CapitulosRh() {
   );
 }
 
-export default CapitulosRh;
+export default CapitulosRh; 
