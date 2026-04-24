@@ -168,11 +168,11 @@ export default function Perfil() {
   <h3>Meus Certificados</h3>
 
   <button
-    className={`${styles.buttonBase} ${styles.primaryButton}`}
-    onClick={() => navigate("/certificados/CerDesbloqueados.jsx")}
-  >
-    Visualizar Certificados
-  </button>
+  className={`${styles.buttonBase} ${styles.primaryButton}`}
+  onClick={() => navigate("/Certificado/CerDesbloqueados")}
+>
+  Certificados
+</button>
 
 </div>
 

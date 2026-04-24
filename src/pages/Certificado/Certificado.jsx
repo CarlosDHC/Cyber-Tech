@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../../../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 
-export default function Certificado({ nomeCurso, cargaHoraria }) {
+export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
 
   const [nomeUsuario, setNomeUsuario] = useState("");
 
@@ -74,11 +74,27 @@ export default function Certificado({ nomeCurso, cargaHoraria }) {
     };
 
     html2pdf().set(opt).from(elemento).save();
+
+    // SALVAR CERTIFICADO DESBLOQUEADO
+
+    const certificadosSalvos =
+      JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
+
+    if (!certificadosSalvos.includes("TEC")) {
+      certificadosSalvos.push("TEC");
+    }
+
+    localStorage.setItem(
+      "certificadosUsuario",
+      JSON.stringify(certificadosSalvos)
+    );
+
   };
 
   const dataHoje = new Date().toLocaleDateString("pt-BR");
 
   return (
+
     <div className={styles.container}>
 
       <div id="certificado" className={styles.certificado}>
@@ -112,6 +128,7 @@ export default function Certificado({ nomeCurso, cargaHoraria }) {
         </p>
 
         <div className={styles.assinatura}>
+
           <div className={styles.imagemAssinatura}>
             <img src="/AssinaturaCertificado.png" alt="assinatura" />
           </div>
@@ -120,15 +137,21 @@ export default function Certificado({ nomeCurso, cargaHoraria }) {
 
           <p>CyberTech</p>
           <span>Diretoria Responsável</span>
+
         </div>
 
       </div>
 
-      <button className={styles.botao} onClick={baixarCertificado}>
-  <span className={styles.icone}>🎓</span>
-  Baixar Certificado
-</button>
+      <button
+        className={styles.botao}
+        onClick={baixarCertificado}
+      >
+        <span className={styles.icone}>🎓</span>
+        Baixar Certificado
+      </button>
 
     </div>
+
   );
+
 }
