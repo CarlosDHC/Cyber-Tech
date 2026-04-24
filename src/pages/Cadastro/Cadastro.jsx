@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Cadastro.module.css";
 
 import { auth, db } from "../../../FirebaseConfig.js";
-
-// Adicionado o sendEmailVerification
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 
@@ -22,17 +20,13 @@ const Cadastro = () => {
 
   const navigate = useNavigate();
 
-  // --- NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE ---
+  // --- LÓGICA DE FORMATAÇÃO DO TELEFONE ---
   const formatPhone = (value) => {
     if (!value) return "";
     
-    // 1. Remove tudo o que não for número (impede letras e símbolos)
     let v = value.replace(/\D/g, ""); 
-    
-    // 2. Limita a 11 dígitos no máximo
     v = v.substring(0, 11); 
     
-    // 3. Aplica a máscara
     if (v.length >= 3 && v.length <= 7) {
       v = `(${v.substring(0, 2)}) ${v.substring(2)}`;
     } else if (v.length >= 8) {
@@ -41,14 +35,11 @@ const Cadastro = () => {
     
     return v;
   };
-  // ----------------------------------------------
 
-  // Função principal de cadastro
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    // Validações básicas
     if (password !== confirmPassword) {
       setError("As senhas não conferem!");
       return;
@@ -61,19 +52,15 @@ const Cadastro = () => {
     setLoading(true);
 
     try {
-      // 1. Cria o usuário no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. Atualiza o perfil com o nome
       await updateProfile(user, {
         displayName: nome
       });
 
-      // NOVO: Enviar o e-mail de verificação para o utilizador
       await sendEmailVerification(user);
 
-      // 3. Salva os dados detalhados no Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name: nome,
@@ -84,10 +71,8 @@ const Cadastro = () => {
         criadoEm: new Date().toISOString(),
       });
 
-      console.log("Usuário cadastrado com sucesso:", user.uid);
       setLoading(false);
 
-      // Alerta o utilizador para ir ao e-mail
       alert("Cadastro realizado com sucesso! Foi enviado um e-mail de verificação. Por favor, verifique a sua caixa de entrada ou spam antes de iniciar sessão.");
       navigate("/login");
 
@@ -109,42 +94,49 @@ const Cadastro = () => {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginCard}>
-        <h2>Crie sua conta</h2>
-        <p className={styles.loginSubtitle}>É rápido e fácil!</p>
+    <div className={styles.cadastroContainer}>
+      <div className={styles.cadastroWrapper}>
+        
+        {/* Lado Esquerdo: Imagem */}
+        <div className={styles.imageSection}>
+          {/* A imagem é inserida via CSS no background-image */}
+        </div>
 
-        <form onSubmit={handleSubmit} noValidate>
-          
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="nome">Nome Completo</label>
-              <input
-                type="text"
-                id="nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Seu nome completo"
-                required
-              />
-            </div>
+        {/* Lado Direito: Formulário com os seus campos */}
+        <div className={styles.formSection}>
+          <img src="/CybertechLogo.png" alt="Logo do Site" className={styles.logo} />
+          <h2 className={styles.cadastroSubtitle}>Crie sua conta</h2>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="apelido">Nome Social</label>
-              <input
-                type="text"
-                id="apelido"
-                value={apelido}
-                onChange={(e) => setApelido(e.target.value)}
-                placeholder="Como prefere ser chamado"
-              />
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="dataNascimento">Data de Nascimento</label>
+          <form onSubmit={handleSubmit} noValidate>
+            
+            <div className={styles.formRow}>
               <div className={styles.formGroup}>
+                <label htmlFor="nome">Nome Completo</label>
+                <input
+                  type="text"
+                  id="nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Seu nome completo"
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="apelido">Nome Social</label>
+                <input
+                  type="text"
+                  id="apelido"
+                  value={apelido}
+                  onChange={(e) => setApelido(e.target.value)}
+                  placeholder="Como prefere ser chamado"
+                />
+              </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="dataNascimento">Data de Nascimento</label>
                 <input
                   type="date"
                   id="dataNascimento"
@@ -155,75 +147,78 @@ const Cadastro = () => {
                   required
                 />
               </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="telefone">Telefone</label>
+                <input
+                  type="tel"
+                  id="telefone"
+                  value={telefone}
+                  onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                  placeholder="(11) 99999-9999"
+                  maxLength="15"
+                />
+              </div>
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="telefone">Telefone</label>
+              <label htmlFor="email">E-mail</label>
               <input
-                type="tel"
-                id="telefone"
-                value={telefone}
-                onChange={(e) => setTelefone(formatPhone(e.target.value))}
-                placeholder="(11) 99999-9999"
-                maxLength="15"
-              />
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="email">E-mail</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu.email@exemplo.com"
-              required
-            />
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="password">Senha</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu.email@exemplo.com"
                 required
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="confirmPassword">Confirmar Senha</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Repita a senha"
-                required
-              />
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="password">Senha</label>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="confirmPassword">Confirmar Senha</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repita a senha"
+                  required
+                />
+              </div>
             </div>
+
+            {error && <p className={styles.errorMessage}>{error}</p>}
+
+            <button
+              type="submit"
+              className={styles.cadastroButton}
+              disabled={loading}
+              aria-busy={loading}
+            >
+              {loading ? "Cadastrando..." : "Cadastrar"}
+            </button>
+          </form>
+
+          <div className={styles.switchAuth}>
+            <p>
+              <span style={{ fontWeight: 'bold', color: "white" }}>Já tem uma conta?</span>{" "}
+              <Link to="/login">
+                <span style={{ fontWeight: "normal", color: "lightgray" }}>Entre aqui</span>
+              </Link>
+            </p>
           </div>
-
-          {error && <p className={styles.errorMessage}>{error}</p>}
-
-          <button
-            type="submit"
-            className={styles.loginButton}
-            disabled={loading}
-            aria-busy={loading}
-          >
-            {loading ? "Cadastrando..." : "Cadastrar"}
-          </button>
-        </form>
-
-        <div className={styles.switchAuth}>
-          <p>
-            Já tem uma conta? <Link to="/login">Entre aqui</Link>
-          </p>
         </div>
       </div>
     </div>

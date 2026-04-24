@@ -21,18 +21,7 @@ const Login = () => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
-      const user = userCredential.user;
-
-      // Só descomente o bloco abaixo se a sua tela de Cadastro estiver configurada 
-      // para disparar o e-mail de verificação real para o usuário.
-      /*
-      if (!user.emailVerified) {
-        await signOut(auth); // Desloga o usuário imediatamente
-        setError("Por favor, verifique o seu e-mail antes de iniciar sessão. Verifique a sua caixa de entrada ou spam.");
-        setLoading(false);
-        return;
-      }
-      */
+      // const user = userCredential.user;
 
       // Se passou por tudo, redireciona para a Home imediatamente
       navigate("/");
@@ -53,71 +42,75 @@ const Login = () => {
         setError("Ocorreu um erro ao tentar iniciar sessão.");
       }
       
-      // O loading volta para false apenas se der erro, 
-      // liberando o botão para o usuário tentar de novo.
       setLoading(false);
     }
   };
 
   return (
     <div className={styles.loginContainer}>
-      <div className={styles.loginCard}>
-        <h2>Acesse sua conta</h2>
-        <p className={styles.loginSubtitle}>Bem-vindo de volta! Insira seus dados.</p>
-
-        <form onSubmit={handleSubmit} noValidate>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">E-mail</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu.email@exemplo.com"
-              required
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Senha</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Sua senha"
-              required
-            />
-          </div>
-
-          {error && <div className={styles.errorMessage}>{error}</div>}
-
-          <button type="submit" className={styles.loginButton} disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
-
-        <div className={styles.switchAuth}>
-          <p>
-            <span style={{
-              fontWeight: 'bold',
-              color: "white",
-            }}>Não tem uma conta?</span> <Link to="/cadastro"><span style={{ 
-              fontWeight: "normal",
-              color: "lightgray",
-            }}>Cadastre-se</span></Link>
-          </p>
+      {/* Novo Wrapper que vai segurar as duas metades */}
+      <div className={styles.loginWrapper}>
+        
+        {/* Lado Esquerdo: Imagem */}
+        <div className={styles.imageSection}>
+          {/* A imagem será definida via CSS no background, ou você pode colocar uma tag <img src="/caminho.jpg" /> aqui */}
         </div>
 
-        <div className={styles.passwordReset}>
-          <Link to="/esqueci-minha-senha" className={styles.passwordResetLink}>
-            <span
-            style={{ 
-              fontWeight: "normal",
-              color: "lightgray",
-            }}>Esqueci minha senha</span>
-          </Link>
+        {/* Lado Direito: Formulário */}
+        <div className={styles.formSection}>
+          <img src="/CybertechLogo.png" alt="Logo do Site" className={styles.logo} />
+          <p className={styles.loginSubtitle}>Bem-vindo de volta! Insira seus dados.</p>
+
+          <form onSubmit={handleSubmit} noValidate>
+            <div className={styles.formGroup}>
+              <label htmlFor="email">E-mail</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu.email@exemplo.com"
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Senha</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Sua senha"
+                required
+              />
+            </div>
+
+            {error && <div className={styles.errorMessage}>{error}</div>}
+
+            <button type="submit" className={styles.loginButton} disabled={loading}>
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
+
+          <div className={styles.switchAuth}>
+            <p>
+              <span style={{ fontWeight: 'bold', color: "white" }}>Não tem uma conta?</span>{" "}
+              <Link to="/cadastro">
+                <span style={{ fontWeight: "normal", color: "lightgray" }}>Cadastre-se</span>
+              </Link>
+            </p>
+          </div>
+
+          <div className={styles.passwordReset}>
+            <Link to="/esqueci-minha-senha" className={styles.passwordResetLink}>
+              <span style={{ fontWeight: "normal", color: "lightgray" }}>
+                Esqueci minha senha
+              </span>
+            </Link>
+          </div>
         </div>
+
       </div>
     </div>
   );

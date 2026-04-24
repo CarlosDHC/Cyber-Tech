@@ -1,44 +1,62 @@
 /* src/pages/Login/Login.module.css (Atualizado) */
 
 .loginContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem; /* Espaçamento para o card não grudar no header/footer */
-    width: 100%;
-    box-sizing: border-box;
-}
-  
-.loginCard {
-  background: #095e8b !important; /* Fundo BRANCO sólido para contraste */
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  padding: 2.5rem 2rem;
-  border-radius: 12px; 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 
-              0 2px 8px rgba(0, 0, 0, 0.1); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
   width: 100%;
-  max-width: 450px;
-  text-align: left;
+  min-height: calc(100vh - 80px); /* Garante que fique centralizado verticalmente na tela */
   box-sizing: border-box;
+}
+
+/* Novo Wrapper substitui o .loginCard antigo */
+.loginWrapper {
+  display: flex;
+  flex-direction: row; /* Coloca os itens lado a lado */
+  background: #095e8b; /* Fundo principal */
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 12px; 
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1); 
+  width: 100%;
+  max-width: 900px; /* Aumentado para comportar as duas metades */
+  overflow: hidden; /* Importante: impede que a imagem quadrada fure as bordas arredondadas do card */
   margin-top: 30px;
 }
 
-.loginCard h2 {
+/* Metade Esquerda: Imagem */
+.imageSection {
+  flex: 1; /* Ocupa 50% do espaço */
+  /* Substitua a URL abaixo pelo caminho da imagem desejada na sua pasta public */
+  background-image: url('/img-py.png'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #0d6efd; /* Cor de fallback caso a imagem demore a carregar */
+}
+
+/* Metade Direita: Formulário */
+.formSection {
+  flex: 1; /* Ocupa 50% do espaço */
+  padding: 2.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.formSection h2 {
   text-align: center;
   margin-bottom: 0.75rem;
   font-weight: 700;
   font-size: 1.875rem;
-  color: #ffffff; /* Texto ESCURO para contraste */
+  color: #ffffff;
   letter-spacing: -0.02em;
-}
-
-.loginCard p {
-  color: #ffffff; 
 }
 
 .loginSubtitle {
   text-align: center;
-  color: #ffffff; /* Cinza mais escuro para melhor legibilidade */
+  color: #ffffff;
   margin-bottom: 2rem;
   font-size: 0.95rem;
 }
@@ -61,16 +79,15 @@
   border-radius: 8px;
   box-sizing: border-box; 
   transition: all 0.3s;
-  color: #1e293b; /* Texto escuro */
-  background-color: #ffffff; /* Fundo branco sólido */
+  color: #1e293b;
+  background-color: #ffffff;
   font-size: 1rem;
 }
 
 .formGroup input:hover {
-   transform: translateY(-2px);
+  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
-
 
 .formGroup input::placeholder {
   color: #94a3b8;
@@ -81,7 +98,6 @@
   box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.25);
   outline: none;
 }
-
 
 .loginButton {
   width: 100%;
@@ -113,25 +129,22 @@
   text-align: center;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
-  color: #ffffff; /* Cinza mais escuro */
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Linha divisória mais sutil no fundo azul */
+  color: #ffffff;
   font-size: 0.9rem;
 }
 
 .switchAuth a {
-  color: #0d6efd; /* Azul Cadastre-se */
+  color: #3b9dff;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.2s;
 }
 
 .switchAuth a:hover {
-  color: #3b9dff;
+  color: #60a5fa;
   text-decoration: underline;
 }
-
-/* --- SEÇÃO ATUALIZADA --- */
-/* Estilos migrados do Login.css antigo */
 
 .passwordReset{
   margin-top: 10px;
@@ -139,8 +152,7 @@
 }
 
 .passwordResetLink {
-  /* Estilos do Login.css, adaptados para as variáveis do front-end */
-  color: 0F0F0F; /* Cor primária do front-end */
+  color: #ffffff;
   font-size: 0.9rem;
   text-decoration: none;
 }
@@ -149,7 +161,6 @@
   text-decoration: underline;
 }
 
-/* Estilos para mensagens de erro */
 .errorMessage {
   background: linear-gradient(135deg, #fee 0%, #fdd 100%);
   color: #dc2626;
@@ -162,23 +173,31 @@
   text-align: center;
 }
 
-/* --- RESPONSIVIDADE PARA FORMULÁRIOS --- */
-
-@media (max-width: 600px) {
-  .loginContainer {
-    padding: 10px;
-    align-items: flex-start; /* Começa do topo */
-    padding-top: 100px; /* Espaço para o header */
+/* --- RESPONSIVIDADE PARA CELULARES --- */
+@media (max-width: 768px) {
+  .loginWrapper {
+    flex-direction: column; /* Em telas menores, a imagem vai para cima ou esconde */
+    max-width: 450px;
+  }
+  
+  .imageSection {
+    /* Pode ocultar a imagem no celular trocando para 'display: none;' */
+    height: 200px; 
+    flex: none;
   }
 
-  .loginCard {
-    padding: 1rem;
-    max-width: 100%;
-    border-radius: 8px;
+  .formSection {
+    padding: 2rem 1.5rem;
+  }
+
+  .loginContainer {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 100px;
   }
 
   .formGroup input {
-    font-size: 16px; /* Evita zoom automático no iOS */
+    font-size: 16px;
     padding: 12px;
   }
 
