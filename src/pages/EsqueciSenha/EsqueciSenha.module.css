@@ -1,32 +1,32 @@
-/* src/pages/Cadastro/Cadastro.module.css */
+/* src/pages/EsqueciSenha/EsqueciSenha.module.css */
 
-.cadastroContainer {
+.esqueciContainer {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
   width: 100%;
-  min-height: calc(100vh - 80px); /* Garante centralização na tela toda */
+  min-height: calc(100vh - 80px);
   box-sizing: border-box;
 }
-  
-.cadastroWrapper {
+
+.esqueciWrapper {
   display: flex;
   flex-direction: row;
   background: #095e8b;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 12px; 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1); 
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 1000px; /* Um pouco mais largo que o Login para comportar as 2 colunas do formulário */
+  max-width: 900px; /* Mantém a largura do ecrã de Login */
   overflow: hidden;
   margin-top: 30px;
-} 
+}
 
 /* Metade Esquerda: Imagem */
 .imageSection {
   flex: 1;
-  background-image: url('/img-py.png'); /* Lembre-se de trocar o caminho se a imagem for outra */
+  background-image: url('/img-py.png'); /* Mesma imagem base */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -35,8 +35,8 @@
 
 /* Metade Direita: Formulário */
 .formSection {
-  flex: 1.2; /* Dá um espaço ligeiramente maior ao formulário */
-  padding: 2.5rem 2rem;
+  flex: 1;
+  padding: 2.5rem 2.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -52,47 +52,35 @@
   letter-spacing: -0.02em;
 }
 
-.cadastroSubtitle {
+.esqueciSubtitle {
   text-align: center;
   color: #ffffff;
   margin-bottom: 2rem;
   font-size: 0.95rem;
-}
-
-.formRow {
-  display: flex;
-  gap: 1rem; 
-  margin-bottom: 1rem; 
-}
-
-.formRow .formGroup {
-  flex: 1; 
-  margin-bottom: 0; 
+  line-height: 1.5;
 }
 
 .formGroup {
-  margin-bottom: 1rem; /* Reduzido levemente para o formulário grande não ultrapassar o ecrã */
+  margin-bottom: 1.5rem;
 }
 
 .formGroup label {
   display: block;
-  margin-bottom: 0.4rem;
-  font-weight: 600;
-  color: #ffffff; 
-  font-size: 0.9rem;
-  letter-spacing: 0.01em;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #ffffff;
 }
 
 .formGroup input {
   width: 100%;
-  padding: 0.8rem 1rem;
+  padding: 0.875rem 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   transition: all 0.3s;
-  color: #1e293b; 
-  background-color: #ffffff; 
-  font-size: 0.95rem;
+  color: #1e293b;
+  background-color: #ffffff;
+  font-size: 1rem;
 }
 
 .formGroup input:hover {
@@ -100,19 +88,13 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-.formGroup input::placeholder {
-  color: #94a3b8;
-}
-
 .formGroup input:focus {
-  border-color: #0d6efd; 
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1), 0 0 0 1px #0d6efd;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.25);
   outline: none;
-  transform: translateY(-1px);
 }
 
-.cadastroButton {
+.esqueciButton {
   width: 100%;
   padding: 1rem;
   border: none;
@@ -124,15 +106,15 @@
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-.cadastroButton:hover {
+.esqueciButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-.cadastroButton:disabled {
+.esqueciButton:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
@@ -140,15 +122,15 @@
 
 .switchAuth {
   text-align: center;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
   font-size: 0.9rem;
 }
 
 .switchAuth a {
-  color: #3b9dff; 
+  color: #3b9dff;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.2s;
@@ -159,12 +141,13 @@
   text-decoration: underline;
 }
 
+/* ESTILOS DE MENSAGENS */
 .errorMessage {
   background: linear-gradient(135deg, #fee 0%, #fdd 100%);
   color: #dc2626;
   padding: 1rem;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 0.9rem;
   border: 2px solid #fecaca;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
@@ -172,17 +155,22 @@
 }
 
 .successMessage {
-  color: #0b875b; 
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #15803d;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
   font-size: 0.9rem;
+  border: 2px solid #bbf7d0;
+  box-shadow: 0 2px 8px rgba(21, 128, 61, 0.1);
   text-align: center;
-  margin-bottom: 15px;
 }
 
-/* --- RESPONSIVIDADE PARA DISPOSITIVOS MÓVEIS --- */
+/* --- RESPONSIVIDADE PARA CELULARES --- */
 @media (max-width: 768px) {
-  .cadastroWrapper {
+  .esqueciWrapper {
     flex-direction: column;
-    max-width: 500px;
+    max-width: 450px;
   }
   
   .imageSection {
@@ -194,22 +182,13 @@
     padding: 2rem 1.5rem;
   }
 
-  .formRow {
-    display: block;
-    margin-bottom: 0;
-  }
-  
-  .formRow .formGroup {
-    margin-bottom: 1rem; 
-  }
-
-  .cadastroContainer {
+  .esqueciContainer {
     padding: 10px;
-    align-items: flex-start; 
-    padding-top: 80px; 
+    align-items: flex-start;
+    padding-top: 100px;
   }
 
   .formGroup input {
-    font-size: 16px; /* Evita zoom automático no iOS */
+    font-size: 16px; /* Impede que os navegadores iOS deem zoom indesejado ao clicar no campo */
   }
 }
