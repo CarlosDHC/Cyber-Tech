@@ -49,6 +49,7 @@ import Curtidas from './admin/Subpagina/Curtidas.jsx';
 import Newdesafios from './admin/Subpagina/Newdesafios.jsx';
 import Notas from './admin/Subpagina/Notas.jsx';
 import Comentarios from './admin/Subpagina/Comentarios.jsx';
+import Denuncia from './admin/Subpagina/Denuncia.jsx';
 
 // Rotas protegidas
 import ProtectedRoute from './context/ProtectedRoute.jsx';
@@ -191,6 +192,7 @@ function App() {
             <Route path="/admin/newdesafios" element={<ProtectedAdminRoute><AnimatedPage><Newdesafios /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/notas" element={<ProtectedAdminRoute><AnimatedPage><Notas /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/comentarios" element={<ProtectedAdminRoute><AnimatedPage><Comentarios /></AnimatedPage></ProtectedAdminRoute>} />
+            <Route path="/admin/denuncias" element={<ProtectedAdminRoute><AnimatedPage><Denuncia /></AnimatedPage></ProtectedAdminRoute>} />
 
             {/* Rota 404 */}
             <Route path="*" element={<div style={{ textAlign: 'center', padding: '50px' }}>Página não encontrada</div>} />
