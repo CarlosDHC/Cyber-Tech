@@ -192,7 +192,7 @@ function App() {
             <Route path="/admin/newdesafios" element={<ProtectedAdminRoute><AnimatedPage><Newdesafios /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/notas" element={<ProtectedAdminRoute><AnimatedPage><Notas /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/comentarios" element={<ProtectedAdminRoute><AnimatedPage><Comentarios /></AnimatedPage></ProtectedAdminRoute>} />
-            <Route path="/admin/denuncias" element={<ProtectedAdminRoute><AnimatedPage><Denuncia /></AnimatedPage></ProtectedAdminRoute>} />
+            <Route path="/admin/denuncia" element={<ProtectedAdminRoute><AnimatedPage><Denuncia /></AnimatedPage></ProtectedAdminRoute>} />
 
             {/* Rota 404 */}
             <Route path="*" element={<div style={{ textAlign: 'center', padding: '50px' }}>Página não encontrada</div>} />

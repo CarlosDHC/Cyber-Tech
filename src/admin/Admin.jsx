@@ -151,7 +151,7 @@ export default function Admin() {
           <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
           <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
           <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
-          <li><Link to="/admin/denucia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denuncia</span></Link></li>
+          <li><Link to="/admin/denuncia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denuncia</span></Link></li>
         </ul>
       </aside>
 
