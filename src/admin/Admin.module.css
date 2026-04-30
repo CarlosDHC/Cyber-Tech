@@ -642,6 +642,83 @@
   margin-bottom: 0 !important;
 }
 
+/* Botao pagina de denúncias */
+.btnResolve {
+  background-color: #52c41a;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btnResolve:hover {
+  opacity: 0.85;
+}
+
+.btnReopen {
+  background-color: #faad14;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btnReopen:hover {
+  opacity: 0.85;
+}
+
+.btnView {
+  background-color: var(--color-primary-light);
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #ffffff;
+}
+
+.btnView:hover {
+  background-color: #357abd;
+}
+
+.btnDeleteOriginal {
+  background-color: var(--color-primary-light);
+  color: #ffffff;
+  border: 1px solid #ffccc7;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btnDeleteOriginal:hover {
+  color: #000000;
+  background-color: #ffa8a8;
+}
+
+.btnDeleteRecord {
+  background: var(--color-primary-light);
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btnDeleteRecord:hover {
+  text-decoration: #357abd;
+}
+
 @media (max-width: 768px) {
   .headerFlex {
     flex-direction: column;
@@ -652,14 +729,14 @@
   .main {
     padding: 15px;
     width: 100%;
-    margin-left: 0; 
+    margin-left: 0;
   }
 
-  .publishBtn, 
+  .publishBtn,
   .btnAdd {
     width: 350px;
     text-align: center;
-    margin-left: 0 !important; 
+    margin-left: 0 !important;
   }
 
   .blockHeader {

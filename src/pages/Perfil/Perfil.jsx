@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./Perfil.module.css";
 import { motion } from "framer-motion";
-
-import { doc, getDoc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { deleteUser } from "firebase/auth";
-import { db, auth } from "../../../FirebaseConfig";
 import { useNavigate } from "react-router-dom";
+import md5 from "crypto-js/md5"; // Importando o gerador de Hash para o Gravatar
+
+// Imports apenas do Firestore e Auth (Storage removido)
+import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { deleteUser } from "firebase/auth";
+import { db, auth } from "../../../FirebaseConfig"; 
 
 export default function Perfil() {
   const { currentUser } = useAuth();
   const [profile, setProfile] = useState(null);
-
+  
   const [form, setForm] = useState({
     name: "",
     dataNascimento: "",
@@ -64,28 +66,26 @@ export default function Perfil() {
     );
   }
 
-  //  NOVA LÓGICA DE FORMATAÇÃO DO TELEFONE JAJAJA.
+  // Geração automática da URL da foto via Gravatar
+  const emailParaHash = currentUser.email ? currentUser.email.trim().toLowerCase() : "";
+  const hash = emailParaHash ? md5(emailParaHash).toString() : "";
+  // O "identicon" gera um desenho geométrico único caso o usuário não tenha conta no Gravatar
+  const avatarUrl = `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
 
-  // Resposta para o comentário acima: Azideia desse cara.
   const formatPhone = (value) => {
     if (!value) return "";
-
     let v = value.replace(/\D/g, "");
-
     v = v.substring(0, 11);
-
     if (v.length >= 3 && v.length <= 7) {
       v = `(${v.substring(0, 2)}) ${v.substring(2)}`;
     } else if (v.length >= 8) {
       v = `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7)}`;
     }
-
     return v;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "telefone") {
       setForm((s) => ({ ...s, telefone: formatPhone(value) }));
     } else {
@@ -98,16 +98,14 @@ export default function Perfil() {
       alert("Por favor, informe o nome completo.");
       return;
     }
+    
     setSaving(true);
     try {
       const userRef = doc(db, "users", currentUser.uid);
-
+      
+      // Salva apenas os dados de texto, a foto é puxada dinamicamente pelo e-mail!
       await setDoc(userRef, {
-        name: form.name,
-        dataNascimento: form.dataNascimento || "",
-        telefone: form.telefone || "",
-        apelido: form.apelido || "",
-        Escolaridade: form.Escolaridade || "Ensino Fundamental",
+        ...form,
         updatedAt: new Date(),
       }, { merge: true });
 
@@ -164,22 +162,48 @@ export default function Perfil() {
           </div>
         </div>
 
-       <div className={styles.certificateSection}>
-  <h3>Meus Certificados</h3>
-
-  <button
-  className={`${styles.buttonBase} ${styles.primaryButton}`}
-  onClick={() => navigate("/Certificado/CerDesbloqueados")}
->
-  Certificados
-</button>
-
-</div>
+        <div className={styles.certificateSection}>
+          <h3>Meus Certificados</h3>
+          <button
+            className={`${styles.buttonBase} ${styles.primaryButton}`}
+            onClick={() => navigate("/Certificado/CerDesbloqueados")}
+          >
+            Certificados
+          </button>
+        </div>
 
         <div className={styles.content}>
-          <div className={styles.imageAndLogin}>
+          
+          {/* SEÇÃO DA FOTO DE PERFIL (GRAVATAR) E LOGIN */}
+          <div className={styles.imageAndLogin} style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+              <div 
+                style={{ 
+                  width: '120px', 
+                  height: '120px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#ccc', 
+                  overflow: 'hidden',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  border: '2px solid #e0e0e0'
+                }}
+              >
+                <img src={avatarUrl} alt="Foto de Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <a 
+                href="https://pt.gravatar.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ fontSize: '11px', color: '#666', textDecoration: 'underline' }}
+              >
+                Mudar foto no Gravatar
+              </a>
+            </div>
 
-            <div className={styles.loginGroup}>
+            <div className={styles.loginGroup} style={{ flex: 1 }}>
               <div className={styles.inputGroup}>
                 <label className={styles.required}>Login</label>
                 <input
@@ -200,9 +224,8 @@ export default function Perfil() {
             </div>
           </div>
 
+          {/* FORMULÁRIO DE DADOS */}
           <div className={styles.formGrid}>
-
-            {/* Linha 1 */}
             <div className={styles.inputGroup}>
               <label className={styles.required}>Nome*</label>
               <input name="name" value={form.name} onChange={handleChange} />
@@ -212,7 +235,6 @@ export default function Perfil() {
               <input name="apelido" value={form.apelido} onChange={handleChange} placeholder="Como prefere ser chamado" />
             </div>
 
-            {/* Linha 2 */}
             <div className={styles.inputGroup}>
               <label>Telefone</label>
               <input
@@ -233,7 +255,6 @@ export default function Perfil() {
               />
             </div>
 
-            {/* Linha 3 */}
             <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
               <label>Escolaridade</label>
               <select name="Escolaridade" value={form.Escolaridade} onChange={handleChange}>
@@ -242,10 +263,9 @@ export default function Perfil() {
                 <option value="ENSINO SUPERIOR">Ensino Superior</option>
               </select>
             </div>
-
           </div>
 
-          {/* Rodapé com botões */}
+          {/* AÇÕES */}
           <div className={styles.actions}>
             <button
               className={`${styles.buttonBase} ${styles.primaryButton}`}
@@ -261,7 +281,6 @@ export default function Perfil() {
             >
               Excluir Conta
             </button>
-
           </div>
 
         </div>
