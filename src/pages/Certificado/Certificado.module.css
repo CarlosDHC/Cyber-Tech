@@ -1,44 +1,38 @@
-.container{
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-height:100vh;
-padding-bottom: 0 ;
-margin-bottom: 1px;
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Use min-height em vez de height fixo */
+  padding: 20px 0;
+  background-color: #f5f5f5; /* Apenas para visualização na tela */
 }
 
 
-.certificado{
+.certificado {
+  /* GARANTE QUE O PDF NÃO QUEBRE */
+  page-break-inside: avoid;
+  page-break-after: avoid;
+  page-break-before: avoid;
 
-page-break-before: avoid;
-
-page-break-after: avoid;
-
-width:900px;
-
-height:600px;
-
-page-break-inside: avoid;
-
-padding:70px;
-
-background:white;
-
-border:6px solid #0b3a75;
-
-margin-top: 40px;
-
-position:relative;
-
-text-align:center;
-
-font-family:"Times New Roman", serif;
-
-box-shadow:0 25px 60px rgba(0,0,0,0.25);
-
-overflow:hidden;
-
+  width: 900px;
+  height: 600px;
+  padding: 70px;
+  background: white;
+  border: 6px solid #0b3a75;
+  
+  /* REMOVA O MARGIN-TOP AQUI */
+  /* Se precisar de espaço na tela, use o container. No PDF o margin vaza folha. */
+  margin: 0; 
+  
+  position: relative;
+  text-align: center;
+  font-family: "Times New Roman", serif;
+  overflow: hidden;
+  box-sizing: border-box; /* ESSENCIAL: Garante que padding/border não aumentem os 600px */
+  
+  /* Shadow deve ser removida ou tratada no JS para não gerar bordas pretas no PDF */
+  box-shadow: 0 25px 60px rgba(0,0,0,0.1); 
 }
 
 /* moldura interna */
@@ -326,9 +320,12 @@ width:250px;
 
 }
 
-.imagemAssinatura img{
+.imagemAssinatura img {
   width: 180px;
-  margin-bottom: -24px;
+  margin-bottom: -15px; /* Ajustado para não criar espaço extra */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .linha{

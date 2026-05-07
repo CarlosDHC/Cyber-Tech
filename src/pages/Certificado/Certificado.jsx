@@ -13,40 +13,41 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
   const horas = cargaHoraria || "10 horas";
 
   useEffect(() => {
+  const buscarNome = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
 
-    const buscarNome = async () => {
+    try {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
 
-      const user = auth.currentUser;
+      if (docSnap.exists()) {
+        const dados = docSnap.data();
 
-      if (!user) return;
+        // 1. Buscamos as informações do Firestore
+        const nomeCompleto = dados.name || "";
+        const apelido = dados.apelido || "";
 
-      try {
+        // 2. Criamos a lógica de exibição sem parênteses
+        let nomeFinal = "";
 
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-
-          const dados = docSnap.data();
-
-          const nome =
-            dados.apelido ||
-            dados.name ||
-            "Estudante";
-
-          setNomeUsuario(nome);
-
+        if (nomeCompleto && apelido) {
+          // Exemplo: Carlos Silva Carlinhos
+          nomeFinal = `${nomeCompleto} ${apelido}`;
+        } else {
+          // Caso falte um deles, usa o que estiver disponível ou "Estudante"
+          nomeFinal = nomeCompleto || apelido || "Estudante";
         }
 
-      } catch (erro) {
-        console.log("Erro ao buscar nome:", erro);
+        setNomeUsuario(nomeFinal);
       }
+    } catch (erro) {
+      console.log("Erro ao buscar nome:", erro);
+    }
+  };
 
-    };
-
-    buscarNome();
-
-  }, []);
+  buscarNome();
+}, []);
 
   const usuario = nomeUsuario || "Estudante";
 
@@ -57,21 +58,24 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
     if (!elemento) return;
 
     const opt = {
-      margin: 0,
-      filename: `Certificado_${usuario}.pdf`,
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: {
-        scale: 3,
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        useCORS: true
-      },
-      jsPDF: {
-        unit: "px",
-        format: [900, 600],
-        orientation: "landscape"
-      }
-    };
+    margin: 0,
+    filename: `Certificado_${usuario}.pdf`,
+    image: { type: "jpeg", quality: 1 },
+    html2canvas: {
+      scale: 3,
+      useCORS: true,
+      logging: false,
+      scrollY: 0, // FORÇA O SCROLL EM 0 PARA A CAPTURA
+      windowHeight: elemento.scrollHeight // Captura apenas a altura real do elemento
+    },
+    jsPDF: {
+      unit: "px",
+      format: [900, 600],
+      orientation: "landscape"
+    }
+  };
+
+  html2pdf().set(opt).from(elemento).save();
 
     html2pdf().set(opt).from(elemento).save();
 
