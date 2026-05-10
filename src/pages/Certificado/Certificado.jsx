@@ -52,47 +52,48 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
   const usuario = nomeUsuario || "Estudante";
 
   const baixarCertificado = () => {
+    // Força o ecrã para o topo para evitar que o scroll crie páginas em branco
+    window.scrollTo(0, 0);
 
     const elemento = document.getElementById("certificado");
-
     if (!elemento) return;
 
     const opt = {
-    margin: 0,
-    filename: `Certificado_${usuario}.pdf`,
-    image: { type: "jpeg", quality: 1 },
-    html2canvas: {
-      scale: 3,
-      useCORS: true,
-      logging: false,
-      scrollY: 0, // FORÇA O SCROLL EM 0 PARA A CAPTURA
-      windowHeight: elemento.scrollHeight // Captura apenas a altura real do elemento
-    },
-    jsPDF: {
-      unit: "px",
-      format: [900, 600],
-      orientation: "landscape"
-    }
-  };
+      margin: 0, // Sem margem externa no PDF
+      filename: `Certificado_${usuario}.pdf`,
+      image: { type: "jpeg", quality: 0.98 }, // 0.98 otimiza bem sem perder qualidade
+      pagebreak: { mode: 'avoid-all' }, // Força a NÃO quebrar a página
+      html2canvas: {
+        scale: 2, // Scale 2 é o equilíbrio perfeito entre nitidez e tamanho de ficheiro para A4
+        useCORS: true,
+        logging: false,
+        scrollY: 0,
+        scrollX: 0
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4", // Tamanho exato de uma folha sulfite
+        orientation: "landscape" // Deitado
+      }
+    };
 
-  html2pdf().set(opt).from(elemento).save();
+    html2pdf()
+      .set(opt)
+      .from(elemento)
+      .save()
+      .then(() => {
+        // SALVAR CERTIFICADO DESBLOQUEADO
+        const certificadosSalvos = JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
 
-    html2pdf().set(opt).from(elemento).save();
+        if (!certificadosSalvos.includes("TEC")) {
+          certificadosSalvos.push("TEC");
+        }
 
-    // SALVAR CERTIFICADO DESBLOQUEADO
-
-    const certificadosSalvos =
-      JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
-
-    if (!certificadosSalvos.includes("TEC")) {
-      certificadosSalvos.push("TEC");
-    }
-
-    localStorage.setItem(
-      "certificadosUsuario",
-      JSON.stringify(certificadosSalvos)
-    );
-
+        localStorage.setItem(
+          "certificadosUsuario",
+          JSON.stringify(certificadosSalvos)
+        );
+      });
   };
 
   const dataHoje = new Date().toLocaleDateString("pt-BR");
@@ -112,7 +113,7 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
         </p>
 
         <div className={styles.logo}>
-          <img src="/LogoEniacDourada.png" alt="logo" />
+          <img src="/CybertechLogo.png" alt="logo" />
         </div>
 
         <div className={styles.selo}>
@@ -140,7 +141,7 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
           <div className={styles.linha}></div>
 
           <p>CyberTech</p>
-          <span>Diretoria Responsável</span>
+          <span >Diretoria Responsável</span>
 
         </div>
 
