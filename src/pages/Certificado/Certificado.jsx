@@ -6,75 +6,106 @@ import { auth, db } from "../../../FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 
 export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
-
+  
   const [nomeUsuario, setNomeUsuario] = useState("");
 
   const curso = nomeCurso || "Tecnologia";
   const horas = cargaHoraria || "10 horas";
 
   useEffect(() => {
-  const buscarNome = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
 
-    try {
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
+    const buscarNome = async () => {
 
-      if (docSnap.exists()) {
-        const dados = docSnap.data();
+      const user = auth.currentUser;
 
-        // 1. Buscamos as informações do Firestore
-        const nomeCompleto = dados.name || "";
-        const apelido = dados.apelido || "";
+      if (!user) {
+        setNomeUsuario("Estudante");
+        return;
+      }
 
-        // 2. Criamos a lógica de exibição sem parênteses
-        let nomeFinal = "";
+      try {
 
-        if (nomeCompleto && apelido) {
-          // Exemplo: Carlos Silva Carlinhos
-          nomeFinal = `${nomeCompleto} ${apelido}`;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+
+          const dados = docSnap.data();
+
+          const nomeCompleto = dados.name || "";
+          const apelido = dados.apelido || "";
+
+          let nomeFinal = "";
+
+          if (nomeCompleto && apelido) {
+
+            // Exemplo: Carlos Silva Carlinhos
+            nomeFinal = `${nomeCompleto}`;
+
+          } else {
+
+            nomeFinal =
+              nomeCompleto ||
+              "Estudante";
+          }
+
+          setNomeUsuario(nomeFinal);
+
         } else {
-          // Caso falte um deles, usa o que estiver disponível ou "Estudante"
-          nomeFinal = nomeCompleto || apelido || "Estudante";
+
+          setNomeUsuario("Estudante");
+
         }
 
-        setNomeUsuario(nomeFinal);
-      }
-    } catch (erro) {
-      console.log("Erro ao buscar nome:", erro);
-    }
-  };
+      } catch (erro) {
 
-  buscarNome();
-}, []);
+        console.log("Erro ao buscar nome:", erro);
+        setNomeUsuario("Estudante");
+
+      }
+
+    };
+
+    buscarNome();
+
+  }, []);
 
   const usuario = nomeUsuario || "Estudante";
 
   const baixarCertificado = () => {
-    // Força o ecrã para o topo para evitar que o scroll crie páginas em branco
+
     window.scrollTo(0, 0);
 
     const elemento = document.getElementById("certificado");
+
     if (!elemento) return;
 
     const opt = {
-      margin: 0, // Sem margem externa no PDF
+      margin: 0,
       filename: `Certificado_${usuario}.pdf`,
-      image: { type: "jpeg", quality: 0.98 }, // 0.98 otimiza bem sem perder qualidade
-      pagebreak: { mode: 'avoid-all' }, // Força a NÃO quebrar a página
+
+      image: {
+        type: "jpeg",
+        quality: 0.98,
+      },
+
+      pagebreak: {
+        mode: ["avoid-all", "css", "legacy"],
+      },
+
       html2canvas: {
-        scale: 2, // Scale 2 é o equilíbrio perfeito entre nitidez e tamanho de ficheiro para A4
+        scale: 2,
         useCORS: true,
         logging: false,
         scrollY: 0,
-        scrollX: 0
+        scrollX: 0,
       },
+
       jsPDF: {
         unit: "mm",
-        format: "a4", // Tamanho exato de uma folha sulfite
-        orientation: "landscape" // Deitado
-      }
+        format: "a4",
+        orientation: "landscape",
+      },
     };
 
     html2pdf()
@@ -82,18 +113,23 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
       .from(elemento)
       .save()
       .then(() => {
-        // SALVAR CERTIFICADO DESBLOQUEADO
-        const certificadosSalvos = JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
+
+        const certificadosSalvos =
+          JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
 
         if (!certificadosSalvos.includes("TEC")) {
+
           certificadosSalvos.push("TEC");
+
         }
 
         localStorage.setItem(
           "certificadosUsuario",
           JSON.stringify(certificadosSalvos)
         );
+
       });
+
   };
 
   const dataHoje = new Date().toLocaleDateString("pt-BR");
@@ -102,29 +138,44 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
 
     <div className={styles.container}>
 
-      <div id="certificado" className={styles.certificado}>
+      <div
+        id="certificado"
+        className={styles.certificado}
+      >
 
         <div className={styles.topo}></div>
 
-        <h1 className={styles.titulo}>CERTIFICADO</h1>
+        <h1 className={styles.titulo}>
+          CERTIFICADO
+        </h1>
 
         <p className={styles.subtitulo}>
           ESTE CERTIFICADO COMPROVA QUE
         </p>
 
         <div className={styles.logo}>
-          <img src="/CybertechLogo.png" alt="logo" />
+          <img
+            src="/CybertechLogo.png"
+            alt="Logo"
+          />
         </div>
 
         <div className={styles.selo}>
-          <img src="/Selo.jpg" alt="Selo" />
+          <img
+            src="/Selo.jpg"
+            alt="Selo"
+          />
         </div>
 
-        <h2 className={styles.nome}>{usuario}</h2>
+        <h2 className={styles.nome}>
+          {usuario}
+        </h2>
 
         <p className={styles.texto}>
-          Concluiu com êxito o curso de <strong>{curso}</strong>,
-          com carga horária de <strong>{horas}</strong>,
+          Concluiu com êxito o curso de{" "}
+          <strong>{curso}</strong>,
+          com carga horária de{" "}
+          <strong>{horas}</strong>,
           demonstrando dedicação e desempenho exemplares.
         </p>
 
@@ -135,13 +186,19 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
         <div className={styles.assinatura}>
 
           <div className={styles.imagemAssinatura}>
-            <img src="/AssinaturaCertificado.png" alt="assinatura" />
+            <img
+              src="/AssinaturaCertificado.png"
+              alt="Assinatura"
+            />
           </div>
 
           <div className={styles.linha}></div>
 
           <p>CyberTech</p>
-          <span >Diretoria Responsável</span>
+
+          <span>
+            Diretoria Responsável
+          </span>
 
         </div>
 
@@ -151,8 +208,13 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
         className={styles.botao}
         onClick={baixarCertificado}
       >
-        <span className={styles.icone}>🎓</span>
+
+        <span className={styles.icone}>
+          🎓
+        </span>
+
         Baixar Certificado
+
       </button>
 
     </div>
