@@ -9,7 +9,8 @@ import {
   getDoc, 
   getDocFromServer,
   setDoc, 
-  serverTimestamp 
+  serverTimestamp,
+  arrayUnion // <--- ADICIONADO AQUI
 } from "firebase/firestore";
 
 // IMPORTAÇÃO DA GROQ 
@@ -244,6 +245,7 @@ export default function QuizPlayer() {
           }
       }
 
+      // SALVA A PONTUAÇÃO DO QUIZ
       await setDoc(scoreRef, {
         uid: auth.currentUser.uid,
         email: auth.currentUser.email,
@@ -259,7 +261,22 @@ export default function QuizPlayer() {
         tentativas: novaContagem,
         data: serverTimestamp()
       }, { merge: true });
+
+      // ======================================================================
+      // NOVO: ATUALIZA O DOCUMENTO DO USUÁRIO PARA A BARRA DE PROGRESSO
+      // ======================================================================
+      const userRef = doc(db, "users", auth.currentUser.uid);
       
+      // Cria a chave dinamicamente (ex: se for "Marketing", vira "desafiosConcluidosMarketing")
+      // Isso permite que o mesmo QuizPlayer atualize corretamente qualquer área.
+      const areaDesafioFormatada = desafio.area ? desafio.area.replace(/\s+/g, '') : "Geral";
+      const campoConcluidos = `desafiosConcluidos${areaDesafioFormatada}`;
+      
+      await setDoc(userRef, {
+        [campoConcluidos]: arrayUnion(id)
+      }, { merge: true });
+      // ======================================================================
+
       setTentativasUsadas(novaContagem);
       setMelhorNotaAnterior(notaDefinitiva); 
       setRespostasUsuario(respostasDefinitivas); 

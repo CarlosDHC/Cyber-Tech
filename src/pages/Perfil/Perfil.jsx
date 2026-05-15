@@ -231,7 +231,7 @@ export default function Perfil() {
               <input name="name" value={form.name} onChange={handleChange} />
             </div>
             <div className={styles.inputGroup}>
-              <label>Apelido</label>
+              <label>Sobrenome</label>
               <input name="apelido" value={form.apelido} onChange={handleChange} placeholder="Como prefere ser chamado" />
             </div>
 

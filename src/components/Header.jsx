@@ -1,14 +1,14 @@
-// src/components/Header.jsx
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom"; 
+import React, { useState, useEffect } from "react"; // Certifique-se de que useState está aqui dentro das chaves
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
 import { useAuth } from "../context/AuthContext";
-import { auth, db } from "../../FirebaseConfig"; 
+import { auth, db } from "../../FirebaseConfig";
 import { signOut } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore"; 
+import { doc, onSnapshot } from "firebase/firestore";
+import md5 from "md5";
 
 // UID do Admin para mostrar o botão extra no menu
-const ADMIN_UID = "SswilmG3ZQPAfIfCaA4NohaKZzM2"; 
+const ADMIN_UID = "SswilmG3ZQPAfIfCaA4NohaKZzM2";
 
 const getFirstName = (fullName) => {
   if (!fullName) return '';
@@ -17,24 +17,54 @@ const getFirstName = (fullName) => {
 };
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [userName, setUserName] = useState(""); 
+  // Inicialização dos estados[cite: 1]
+  const [menuLeftOpen, setMenuLeftOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+  
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
-  // Verifica se é admin
   const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
+  // Lógica do Gravatar[cite: 1]
+  const emailParaHash = currentUser?.email ? currentUser.email.trim().toLowerCase() : "";
+  const hash = emailParaHash ? md5(emailParaHash).toString() : "";
+  const avatarUrl = `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
+
+  // Listener em tempo real para o nome do usuário[cite: 1]
+  useEffect(() => {
+    let unsubscribe = () => { };
+    if (currentUser?.uid) {
+      const docRef = doc(db, "users", currentUser.uid);
+      unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setUserName(docSnap.data().name || "");
+        }
+      }, (error) => {
+        if (error.code !== 'permission-denied') {
+          console.error("Erro no Header:", error);
+        }
+      });
+    } else {
+      setUserName("");
+    }
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // Atualiza título da aba conforme o nome do usuário[cite: 1]
+  useEffect(() => {
+    document.title = userName ? `CyberTech | ${getFirstName(userName)}` : "CyberTech";
+  }, [userName]);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); // 1. Desloga do Firebase
-      navigate("/login");  // 2. Força a ida para a tela de login
-      setMenuOpen(false);  // 3. Fecha o menu mobile se estiver aberto
+      await signOut(auth);
+      setProfileOpen(false);
+      navigate("/login");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("Erro ao sair:", error);
     }
   };
 
@@ -42,136 +72,82 @@ export default function Header() {
     if (location.pathname === path) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    setMenuOpen(false);
+    setMenuLeftOpen(false);
+    setProfileOpen(false);
   };
 
-  // Alerta para as rotas blog e desafios
   const handleProtectedClick = (e, path) => {
     if (!currentUser) {
-      e.preventDefault(); 
-      alert("Você precisa realizar o login para acessar esta área!");
-      navigate("/login"); 
-      setMenuOpen(false); 
+      e.preventDefault();
+      alert("Você precisa realizar o login!");
+      navigate("/login");
+      setMenuLeftOpen(false);
     } else {
       handleNavClick(path);
     }
   };
 
-  // Efeito para buscar o nome do usuário em tempo real
-  useEffect(() => {
-    let unsubscribe = () => {};
-
-    if (currentUser && currentUser.uid) {
-      const docRef = doc(db, "users", currentUser.uid);
-      unsubscribe = onSnapshot(
-        docRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            setUserName(data.name || ""); 
-          }
-        },
-        (error) => {
-          // Tratamento para evitar o erro vermelho no console durante o logout
-          if (error.code === 'permission-denied') {
-            console.log("Leitura do Header interrompida (logout ou permissão negada).");
-          } else {
-            console.error("Erro no onSnapshot do Header:", error);
-          }
-        }
-      );
-    } else {
-      setUserName("");
-    }
-    return () => unsubscribe();
-  }, [currentUser]);
-
-  // Atualiza o título da aba
-  useEffect(() => {
-    if (userName) {
-      document.title = `CyberTech | ${getFirstName(userName)}`;
-    } else {
-      document.title = "CyberTech";
-    }
-  }, [userName]);
-
   return (
-    <header id="site-header" className={styles.header}>
-      <div className={styles.logo}>
-        <Link to="/" onClick={() => handleNavClick("/")}>
-          {currentUser && userName ? `Olá, ${getFirstName(userName)}!` : "CyberTech"}
-        </Link>
-      </div>
-
-      <nav className={`${styles.nav} ${menuOpen ? styles.open : ""}`}>
-        <Link to="/" onClick={() => handleNavClick("/")} style={{fontWeight: 'bold'}}>Início</Link>
+    <header className={styles.header}>
+      <div className={styles.container}>
         
-        {/* --- LINKS PROTEGIDOS COM ALERTA --- */}
-        <Link 
-          to="/blog" 
-          onClick={(e) => handleProtectedClick(e, "/blog")} 
-          style={{fontWeight: 'bold'}}
-        >
-          Blog
-        </Link>
-        
-        <Link 
-          to="/desafios" 
-          onClick={(e) => handleProtectedClick(e, "/desafios")} 
-          style={{fontWeight: 'bold'}}
-        >
-          Desafios
-        </Link>
-
-        {/* Botão Admin só aparece para o admin */}
-        {isAdmin && (
-          <Link 
-            to="/admin" 
-            onClick={() => handleNavClick("/admin")}
-            style={{
-              //textAlign: 'center',
-              color: '#F0F0F0', 
-              fontWeight: 'bold',
-              padding: '10px 14px',
-              borderRadius: '5px',
-              marginRight: '10px'
-            }}
+        {/* Lado Esquerdo: Hambúrguer de Opções e Logo */}
+        <div className={styles.leftSection}>
+          <button 
+            className={styles.hamburger} 
+            onClick={() => setMenuLeftOpen(!menuLeftOpen)}
+            aria-label="Menu de navegação"
           >
-           Administrativo
-          </Link>
-        )}
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          
+          <div className={styles.logo}>
+            <img src="/CybertechLogo.png" alt="CyberTech" className={styles.logoImg}/>
+          </div>
+        </div>
 
-        {currentUser ? (
-          <>
-            <Link 
-              to="/perfil" 
-              className={styles.profileButton}
-              onClick={() => handleNavClick("/perfil")}
-              style={{fontWeight: 'bold'}}
-            >
-              Perfil
+        {/* Centro: Opções de Navegação (Centralizado no Desktop) */}
+        <nav className={`${styles.nav} ${menuLeftOpen ? styles.navOpen : ""}`}>
+          <Link to="/" onClick={() => handleNavClick("/")}>Início</Link>
+          <Link to="/blog" onClick={(e) => handleProtectedClick(e, "/blog")}>Blog</Link>
+          <Link to="/desafios" onClick={(e) => handleProtectedClick(e, "/desafios")}>Desafios</Link>
+          {isAdmin && (
+            <Link to="/admin" onClick={() => handleNavClick("/admin")} className={styles.adminLink}>
+              Admin
             </Link>
+          )}
+        </nav>
 
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              Sair
-            </button>
-          </>
-        ) : (
-          <Link to="/login" onClick={() => handleNavClick("/login")} style={{fontWeight: 'bold'}}>
-            Login
-          </Link>
-        )}
-      </nav>
+        {/* Lado Direito: Imagem de Perfil (Abre opções no clique) */}
+        <div className={styles.rightSection}>
+          {currentUser ? (
+            <div className={styles.profileWrapper}>
+              <img 
+                src={avatarUrl} 
+                alt="Perfil" 
+                className={styles.profilePic} 
+                onClick={() => setProfileOpen(!profileOpen)} 
+              />
+              
+              {profileOpen && (
+                <div className={styles.dropdown}>
+                  <p className={styles.dropName}><strong>{userName || "Usuário"}</strong></p>
+                  <hr className={styles.divider} />
+                  <Link to="/perfil" onClick={() => setProfileOpen(false)}>Minha Conta</Link>
+                  <button onClick={handleLogout} className={styles.logoutBtn}>Sair</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className={styles.loginLink} onClick={() => handleNavClick("/login")}>
+              Login
+            </Link>
+          )}
+        </div>
 
-      <button
-        className={`${styles.hamburger}`}
-        onClick={toggleMenu}
-        aria-label="Abrir menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      </div>
     </header>
   );
 }
