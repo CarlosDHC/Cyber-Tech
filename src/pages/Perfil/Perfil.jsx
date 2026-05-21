@@ -3,9 +3,9 @@ import { useAuth } from "../../context/AuthContext";
 import styles from "./Perfil.module.css";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import md5 from "crypto-js/md5"; // Importando o gerador de Hash para o Gravatar
+import md5 from "crypto-js/md5";
 
-// Imports apenas do Firestore e Auth (Storage removido)
+// Imports apenas do Firestore e Auth
 import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { deleteUser } from "firebase/auth";
 import { db, auth } from "../../../FirebaseConfig"; 
@@ -60,7 +60,7 @@ export default function Perfil() {
     return (
       <div className={styles.container}>
         <div className={styles.profileBox}>
-          <h2>Você precisa estar logado para ver seu perfil.</h2>
+          <h2 className={styles.warningText}>Você precisa estar logado para ver seu perfil.</h2>
         </div>
       </div>
     );
@@ -69,7 +69,6 @@ export default function Perfil() {
   // Geração automática da URL da foto via Gravatar
   const emailParaHash = currentUser.email ? currentUser.email.trim().toLowerCase() : "";
   const hash = emailParaHash ? md5(emailParaHash).toString() : "";
-  // O "identicon" gera um desenho geométrico único caso o usuário não tenha conta no Gravatar
   const avatarUrl = `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
 
   const formatPhone = (value) => {
@@ -93,7 +92,9 @@ export default function Perfil() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    if (e) e.preventDefault(); // Previne o reload se chamado via submit do form
+
     if (!form.name.trim()) {
       alert("Por favor, informe o nome completo.");
       return;
@@ -103,7 +104,6 @@ export default function Perfil() {
     try {
       const userRef = doc(db, "users", currentUser.uid);
       
-      // Salva apenas os dados de texto, a foto é puxada dinamicamente pelo e-mail!
       await setDoc(userRef, {
         ...form,
         updatedAt: new Date(),
@@ -119,14 +119,8 @@ export default function Perfil() {
     }
   };
 
-  const handleNavigateToChangePassword = () => {
-    navigate("/alterar-senha");
-  };
-
   const handleDeleteAccount = async () => {
-    const ok = window.confirm(
-      "Tem certeza que deseja excluir sua conta? Esta ação é irreversível."
-    );
+    const ok = window.confirm("Tem certeza que deseja excluir sua conta? Esta ação é irreversível.");
     if (!ok) return;
 
     const user = auth.currentUser;
@@ -138,7 +132,6 @@ export default function Perfil() {
     try {
       await deleteDoc(doc(db, "users", user.uid));
       await deleteUser(user);
-
       alert("Conta excluída com sucesso.");
       navigate("/");
     } catch (err) {
@@ -153,8 +146,11 @@ export default function Perfil() {
 
   return (
     <div className={styles.container}>
-      <motion.div className={styles.profileBox} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
-
+      <motion.div 
+        className={styles.profileBox} 
+        initial={{ opacity: 0, y: 15 }} 
+        animate={{ opacity: 1, y: 0 }}
+      >
         <div className={styles.header}>
           <h2>Meu Perfil</h2>
           <div className={styles.tabs}>
@@ -162,50 +158,26 @@ export default function Perfil() {
           </div>
         </div>
 
-        <div className={styles.certificateSection}>
-          <h3>Meus Certificados</h3>
-          <button
-            className={`${styles.buttonBase} ${styles.primaryButton}`}
-            onClick={() => navigate("/Certificado/CerDesbloqueados")}
-          >
-            Certificados
-          </button>
-        </div>
-
         <div className={styles.content}>
-          
           {/* SEÇÃO DA FOTO DE PERFIL (GRAVATAR) E LOGIN */}
-          <div className={styles.imageAndLogin} style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-              <div 
-                style={{ 
-                  width: '120px', 
-                  height: '120px', 
-                  borderRadius: '50%', 
-                  backgroundColor: '#ccc', 
-                  overflow: 'hidden',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  border: '2px solid #e0e0e0'
-                }}
-              >
-                <img src={avatarUrl} alt="Foto de Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div className={styles.topSection}>
+            <div className={styles.avatarContainer}>
+              <div className={styles.avatarImageWrapper}>
+                <img src={avatarUrl} alt="Foto de Perfil" className={styles.avatarImage} />
               </div>
               <a 
                 href="https://pt.gravatar.com/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                style={{ fontSize: '11px', color: '#666', textDecoration: 'underline' }}
+                className={styles.gravatarLink}
               >
                 Mudar foto no Gravatar
               </a>
             </div>
 
-            <div className={styles.loginGroup} style={{ flex: 1 }}>
+            <div className={styles.loginGroup}>
               <div className={styles.inputGroup}>
-                <label className={styles.required}>Login</label>
+                <label className={styles.required}>Email de Acesso</label>
                 <input
                   type="email"
                   value={profile?.email || currentUser.email}
@@ -215,73 +187,103 @@ export default function Perfil() {
                 />
               </div>
 
-              <button
-                className={`${styles.buttonBase} ${styles.dangerButton}`}
-                onClick={handleNavigateToChangePassword}
-              >
-                Alterar Senha
-              </button>
+              <div className={styles.actionButtonsRow}>
+                <button
+                  type="button"
+                  className={`${styles.buttonBase} ${styles.secondaryButton}`}
+                  onClick={() => navigate("/alterar-senha")}
+                >
+                  Alterar Senha
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.buttonBase} ${styles.certificateButton}`}
+                  onClick={() => navigate("/Certificado/CerDesbloqueados")}
+                >
+                  Meus Certificados
+                </button>
+              </div>
             </div>
           </div>
+
+          <hr className={styles.divider} />
 
           {/* FORMULÁRIO DE DADOS */}
-          <div className={styles.formGrid}>
-            <div className={styles.inputGroup}>
-              <label className={styles.required}>Nome*</label>
-              <input name="name" value={form.name} onChange={handleChange} />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>Sobrenome</label>
-              <input name="apelido" value={form.apelido} onChange={handleChange} placeholder="Como prefere ser chamado" />
+          <form onSubmit={handleSave} className={styles.formContainer}>
+            <h3 className={styles.sectionTitle}>Informações Pessoais</h3>
+            
+            <div className={styles.formGrid}>
+              <div className={styles.inputGroup}>
+                <label className={styles.required}>Nome Completo*</label>
+                <input 
+                  name="name" 
+                  value={form.name} 
+                  onChange={handleChange} 
+                  placeholder="Seu nome completo"
+                />
+              </div>
+              <div className={styles.inputGroup}>
+                <label>Como prefere ser chamado</label>
+                <input 
+                  name="apelido" 
+                  value={form.apelido} 
+                  onChange={handleChange} 
+                  placeholder="Apelido ou nome social" 
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Telefone</label>
+                <input
+                  name="telefone"
+                  value={form.telefone}
+                  onChange={handleChange}
+                  placeholder="(11) 99999-9999"
+                  id="telefone"
+                  maxLength="15"
+                />
+              </div>
+              <div className={styles.inputGroup}>
+                <label>Data de Nascimento</label>
+                <input 
+                  name="dataNascimento" 
+                  type="date" 
+                  value={form.dataNascimento} 
+                  onChange={handleChange}
+                  id="dataNascimento"
+                  min="1900-01-01"
+                  max="2099-12-31"
+                />
+              </div>
+
+              <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
+                <label>Escolaridade</label>
+                <select name="Escolaridade" value={form.Escolaridade} onChange={handleChange}>
+                  <option value="ENSINO FUNDAMENTAL">Ensino Fundamental</option>
+                  <option value="ENSINO MEDIO">Ensino Médio</option>
+                  <option value="ENSINO SUPERIOR">Ensino Superior</option>
+                </select>
+              </div>
             </div>
 
-            <div className={styles.inputGroup}>
-              <label>Telefone</label>
-              <input
-                name="telefone"
-                value={form.telefone}
-                onChange={handleChange}
-                placeholder="(11) 99999-9999"
-                id="telefone"
-                maxLength="15"
-              />
+            {/* AÇÕES FINAIS DO FORMULÁRIO */}
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={`${styles.buttonBase} ${styles.dangerButton}`}
+                onClick={handleDeleteAccount}
+              >
+                Excluir Conta
+              </button>
+              <button
+                type="submit"
+                className={`${styles.buttonBase} ${styles.primaryButton}`}
+                disabled={saving}
+              >
+                {saving ? "Salvando..." : "Salvar Alterações"}
+              </button>
             </div>
-            <div className={styles.inputGroup}>
-              <label>Data de Nascimento</label>
-              <input name="dataNascimento" type="date" value={form.dataNascimento} onChange={handleChange}
-                id="dataNascimento"
-                min="1900-01-01"
-                max="2099-12-31"
-              />
-            </div>
-
-            <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
-              <label>Escolaridade</label>
-              <select name="Escolaridade" value={form.Escolaridade} onChange={handleChange}>
-                <option value="ENSINO FUNDAMENTAL">Ensino Fundamental</option>
-                <option value="ENSINO MEDIO">Ensino Médio</option>
-                <option value="ENSINO SUPERIOR">Ensino Superior</option>
-              </select>
-            </div>
-          </div>
-
-          {/* AÇÕES */}
-          <div className={styles.actions}>
-            <button
-              className={`${styles.buttonBase} ${styles.primaryButton}`}
-              onClick={handleSave}
-              disabled={saving}
-            >
-              {saving ? "Salvando..." : "Salvar"}
-            </button>
-
-            <button
-              className={`${styles.buttonBase} ${styles.dangerButton}`}
-              onClick={handleDeleteAccount}
-            >
-              Excluir Conta
-            </button>
-          </div>
+          </form>
 
         </div>
       </motion.div>

@@ -1,124 +1,76 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import styles from "./CerDesbloqueados.module.css"; 
+
+// Adicionada a propriedade "imagem" com os caminhos da pasta public
+const LISTA_CERTIFICADOS = [
+  { id: "TEC", nome: "Tecnologia", rota: "/Certificado/Certificado.jsx", imagem: "/tec-card.jpg" },
+  { id: "RH", nome: "RH", rota: "/Certificado/CertificadoRH.jsx", imagem: "/rh-card.jpg" },
+  { id: "ENG", nome: "Engenharia", rota: "/Certificado/CertificadoENG.jsx", imagem: "/eng-card.jpg" },
+  { id: "DIR", nome: "Direito", rota: "/Certificado/CertificadoDIR.jsx", imagem: "/direito-card.jpg" },
+  { id: "MAR", nome: "Marketing", rota: "/Certificado/CertificadoMAR.jsx", imagem: "/marketing-card.jpg" }
+];
 
 export default function CerDesbloqueados() {
-
   const [certificados, setCertificados] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const lista =
-      JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
+    const lista = JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
     setCertificados(lista);
   }, []);
 
-  const listaCertificados = [
-    { id: "TEC", nome: "💻 Tecnologia", rota: "/Certificado/Certificado.jsx" },
-    { id: "RH", nome: "🏢 RH", rota: "/Certificado/CertificadoRH.jsx" },
-    { id: "ENG", nome: "⚙️ Engenharia", rota: "/Certificado/CertificadoENG.jsx" },
-    { id: "DIR", nome: "⚖️ Direito", rota: "/Certificado/CertificadoDIR.jsx" },
-    { id: "MAR", nome: "📊 Marketing", rota: "/Certificado/CertificadoMAR.jsx" }
-  ];
+  const certificadosDesbloqueados = LISTA_CERTIFICADOS.filter(cert =>
+    certificados.includes(cert.id)
+  );
 
   return (
-    <div style={container}>
-
+    <div className={styles.container}>
+      
       <motion.h1
-        style={titulo}
+        className={styles.titulo}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         🎓 Meus Certificados
       </motion.h1>
 
-      {certificados.length === 0 && (
-        <p style={mensagem}>
+      {certificadosDesbloqueados.length === 0 ? (
+        <p className={styles.mensagem}>
           Você ainda não desbloqueou nenhum certificado.
         </p>
-      )}
-
-      <div style={grid}>
-
-        {listaCertificados.map((cert, index) => {
-
-          if (!certificados.includes(cert.id)) return null;
-
-          return (
-
+      ) : (
+        <div className={styles.grid}>
+          {certificadosDesbloqueados.map((cert, index) => (
             <motion.div
               key={cert.id}
-              style={card}
+              className={styles.card}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.15 }}
               whileHover={{ scale: 1.05 }}
             >
+              {/* Imagem adicionada aqui */}
+              <img 
+                src={cert.imagem} 
+                alt={`Imagem do curso de ${cert.nome}`} 
+                className={styles.cardImagem} 
+              />
 
-              <h3>{cert.nome}</h3>
+              <h3 className={styles.cardTitulo}>{cert.nome}</h3>
 
               <button
-                style={botao}
+                className={styles.botao}
                 onClick={() => navigate(cert.rota)}
               >
                 Visualizar Certificado
               </button>
-
             </motion.div>
-
-          );
-
-        })}
-
-      </div>
-
+          ))}
+        </div>
+      )}
+      
     </div>
   );
 }
-
-/* ---------- ESTILOS ---------- */
-
-const container = {
-  padding: "50px",
-  textAlign: "center",
-  minHeight: "80vh",
-  background: "#f5f7fb"
-};
-
-const titulo = {
-  fontSize: "36px",
-  marginBottom: "40px"
-};
-
-const mensagem = {
-  fontSize: "18px",
-  color: "#666"
-};
-
-const grid = {
-  display: "flex",
-  flexWrap: "wrap",
-  justifyContent: "center",
-  gap: "25px"
-};
-
-const card = {
-  background: "#fff",
-  borderRadius: "12px",
-  padding: "30px",
-  width: "260px",
-  boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-  transition: "all 0.3s ease"
-};
-
-const botao = {
-  marginTop: "18px",
-  padding: "12px 20px",
-  border: "none",
-  borderRadius: "6px",
-  background: "#0a66c2",
-  color: "white",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "14px"
-};
