@@ -1,52 +1,60 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+// Importação do signOut adicionada aqui
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../FirebaseConfig"; 
 
-//  Criação do contexto
 const AuthContext = createContext();
 
-//  Provedor global
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false); // O estado de admin
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        try {
-          // 1. Defina as referências para os dois documentos
-          const userDocRef = doc(db, "users", user.uid);
-          const adminDocRef = doc(db, "admins", user.uid); // Coleção "admins"
+        
+        // --- BARREIRA DE SEGURANÇA GLOBAL ---
+        // Se o Firebase detetar um login, mas o e-mail não estiver validado,
+        // forçamos a saída imediatamente e ignoramos a criação da sessão.
+        if (!user.emailVerified) {
+          await signOut(auth);
+          setCurrentUser(null);
+          setIsAdmin(false);
+          setLoading(false);
+          return; // Interrompe o processo para não carregar os dados do utilizador!
+        }
+        // ------------------------------------
 
-          // 2. Busque os dois documentos em paralelo
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const adminDocRef = doc(db, "admins", user.uid);
+
           const [userDocSnap, adminDocSnap] = await Promise.all([
             getDoc(userDocRef),
             getDoc(adminDocRef)
           ]);
 
-          // 3. Verifique a permissão de Admin
           if (adminDocSnap.exists()) {
             setIsAdmin(true);
           } else {
             setIsAdmin(false);
           }
 
-          // 4. Defina os dados do usuário
           if (userDocSnap.exists()) {
-            setCurrentUser({ uid: user.uid, ...userDocSnap.data() });
+            // Adicionado o emailVerified ao estado para garantir a leitura correta
+            setCurrentUser({ uid: user.uid, emailVerified: user.emailVerified, ...userDocSnap.data() });
           } else {
-            setCurrentUser({ uid: user.uid, email: user.email });
+            setCurrentUser({ uid: user.uid, email: user.email, emailVerified: user.emailVerified });
           }
 
         } catch (error) {
           console.error("Erro ao buscar dados do usuário:", error);
-          setCurrentUser({ uid: user.uid, email: user.email });
-          setIsAdmin(false); // Garante que não é admin em caso de erro
+          setCurrentUser({ uid: user.uid, email: user.email, emailVerified: user.emailVerified });
+          setIsAdmin(false);
         }
       } else {
-        // Usuário deslogado
         setCurrentUser(null);
         setIsAdmin(false);
       }
@@ -63,7 +71,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 🔹 Hook customizado
 export const useAuth = () => {
   return useContext(AuthContext);
 };

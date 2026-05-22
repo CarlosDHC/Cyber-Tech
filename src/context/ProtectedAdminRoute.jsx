@@ -1,34 +1,26 @@
-// src/context/ProtectedAdminRoute.jsx
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 const ProtectedAdminRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
-  const location = useLocation();
-  
-  // Seu UID de Administrador
-  const ADMIN_UID = "SswilmG3ZQPAfIfCaA4NohaKZzM2"; 
+  const { currentUser, isAdmin, loading } = useAuth();
 
+  // 1. Aguarda enquanto o Firebase verifica a sessão e lê o banco de dados
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px', color: '#fff' }}>
-        <p>Carregando...</p>
-      </div>
-    );
+    return <div>A carregar painel...</div>; // Pode substituir por um spinner ou o seu componente <Loading />
   }
 
-  // 1. Se não estiver logado -> Manda para o Login
+  // 2. Se a pessoa não estiver logada, é enviada para a página de Login
   if (!currentUser) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  // 2. Se estiver logado mas NÃO for o admin -> Manda para a Home
-  if (currentUser.uid !== ADMIN_UID) {
+  // 3. Se a pessoa estiver logada, mas a variável isAdmin for FALSA, é expulsa para a página principal (Home)
+  if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 
-  // 3. Se for admin -> Acesso liberado
+  // 4. Se passou em tudo (está logado E é admin), liberta o acesso ao conteúdo!
   return children;
 };
 

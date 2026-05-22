@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // Certifique-se de que useState está aqui dentro das chaves
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
 import { useAuth } from "../context/AuthContext";
@@ -7,9 +7,6 @@ import { signOut } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
 import md5 from "md5";
 
-// UID do Admin para mostrar o botão extra no menu
-const ADMIN_UID = "SswilmG3ZQPAfIfCaA4NohaKZzM2";
-
 const getFirstName = (fullName) => {
   if (!fullName) return '';
   const firstName = fullName.split(' ')[0];
@@ -17,23 +14,21 @@ const getFirstName = (fullName) => {
 };
 
 export default function Header() {
-  // Inicialização dos estados[cite: 1]
   const [menuLeftOpen, setMenuLeftOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [userName, setUserName] = useState("");
   
-  const { currentUser } = useAuth();
+  // Aqui está a nova regra: importamos isAdmin diretamente do AuthContext
+  const { currentUser, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
-
-  // Lógica do Gravatar[cite: 1]
+  // Lógica do Gravatar
   const emailParaHash = currentUser?.email ? currentUser.email.trim().toLowerCase() : "";
   const hash = emailParaHash ? md5(emailParaHash).toString() : "";
   const avatarUrl = `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
 
-  // Listener em tempo real para o nome do usuário[cite: 1]
+  // Listener em tempo real para o nome do usuário
   useEffect(() => {
     let unsubscribe = () => { };
     if (currentUser?.uid) {
@@ -53,7 +48,7 @@ export default function Header() {
     return () => unsubscribe();
   }, [currentUser]);
 
-  // Atualiza título da aba conforme o nome do usuário[cite: 1]
+  // Atualiza título da aba conforme o nome do usuário
   useEffect(() => {
     document.title = userName ? `CyberTech | ${getFirstName(userName)}` : "CyberTech";
   }, [userName]);
@@ -113,6 +108,8 @@ export default function Header() {
           <Link to="/" onClick={() => handleNavClick("/")}>Início</Link>
           <Link to="/blog" onClick={(e) => handleProtectedClick(e, "/blog")}>Blog</Link>
           <Link to="/desafios" onClick={(e) => handleProtectedClick(e, "/desafios")}>Desafios</Link>
+          
+          {/* O menu verifica a variável isAdmin que vem do Firebase */}
           {isAdmin && (
             <Link to="/admin" onClick={() => handleNavClick("/admin")} className={styles.adminLink}>
               Admin
