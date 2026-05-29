@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Cadastro.module.css";
 
 import { auth, db } from "../../../FirebaseConfig.js";
-// Adicionada a importação do signOut
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 

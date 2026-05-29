@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import emailjs from '@emailjs/browser'; 
 import styles from "./Login.module.css";
 
-import { auth } from "../../../FirebaseConfig.js";
+import { auth, db } from "../../../FirebaseConfig.js";
 import { signInWithEmailAndPassword, signOut, sendEmailVerification } from "firebase/auth";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,25 +28,34 @@ const Login = () => {
 
       // 2. VERIFICAÇÃO CRÍTICA: O e-mail foi validado?
       if (!user.emailVerified) {
-        
-        // NOVIDADE: Dispara um NOVO e-mail de verificação antes de desconectar
         try {
+          // Dispara um novo e-mail ANTES de desconectar o utilizador!
           await sendEmailVerification(user);
         } catch (emailErr) {
           console.error("Erro ao reenviar e-mail de verificação:", emailErr);
-          // Mesmo se falhar (ex: limite de envios), continuamos a desconectar a pessoa
         }
-
+        
         // Desconecta o utilizador imediatamente
         await signOut(auth);
         
-        // Avisa o utilizador que um novo e-mail foi enviado
         setError("A sua conta ainda não foi validada. Acabámos de enviar um novo link para a sua caixa de entrada.");
         setLoading(false);
-        return; // Interrompe o fluxo (não envia o EmailJS nem navega)
+        return; // Interrompe o fluxo (não regista atividade, não envia o EmailJS nem navega)
       }
 
-      // 3. Preparação dos dados para o template do EmailJS (Apenas se verificado)
+      // 3. REGISTAR A ÚLTIMA ATIVIDADE (Apenas se o e-mail estiver verificado)
+      try {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          ultimaAtividade: serverTimestamp() // Salva a hora exata do servidor da Google
+        });
+        console.log("Atividade registada com sucesso no Firestore.");
+      } catch (dbErr) {
+        console.error("Erro ao atualizar a última atividade:", dbErr);
+        // Não precisamos de interromper o login se isto falhar
+      }
+
+      // 4. Preparação dos dados para o template do EmailJS
       const dataAtual = new Date().toLocaleString('pt-BR');
       const infoNavegador = navigator.userAgent;
 
@@ -56,7 +66,7 @@ const Login = () => {
         browser_info: infoNavegador
       };
 
-      // 4. Envio da notificação e navegação controlada
+      // 5. Envio da notificação e navegação controlada
       emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,

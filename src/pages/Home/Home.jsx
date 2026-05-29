@@ -5,22 +5,16 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
 import styles from "./Home.module.css";
 import challenges from "../../data/challenges.json";
-
-// Importação obrigatória dos estilos base do Swiper
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
-
-
-
-// Ícones
 import iconAlgoritmo from "../../assets/icons/icon-algoritmo.png";
 import iconPerson from "../../assets/icons/icon-person.png";
 import iconFood from "../../assets/icons/icon-food.png";
 import iconSunMoon from "../../assets/icons/icon-sun-moon.png";
 import { title } from "framer-motion/client";
 
-// IMPORT DO BOTÃO FLUTUANTE
+
 import ForumButton from "../../components/ForumButton";
 
 const BrickText = ({ text }) => {
@@ -83,9 +77,9 @@ function Home() {
   };
 
   const customTitles = {
-    "estudar-ou-descansar": "Tecnologia",  
-    "fome": "Engenharia Civil",                
-    "dia-ou-noite": "Direito",  
+    "estudar-ou-descansar": "Tecnologia",
+    "fome": "Engenharia Civil",
+    "dia-ou-noite": "Direito",
   };
 
   const [activeCarouselIndex, setActiveCarouselIndex] = React.useState(0);
@@ -173,7 +167,7 @@ function Home() {
     .filter((c) => c.slug !== "o-que-e-algoritmo")
     .slice(0, 6);
 
-  
+
   const slides = [
     {
       id: 1,
@@ -183,7 +177,7 @@ function Home() {
     },
     {
       id: 2,
-      title: 'Engenharia Civil',  
+      title: 'Engenharia Civil',
       subtitle: 'Construa o futuro com inovação e sustentabilidade.'
     },
     {
@@ -217,48 +211,48 @@ function Home() {
       >
         {/* HERO */}
         <section className={styles.heroSection}>
-        <Swiper
-          modules={[Autoplay, EffectFade, Pagination]}
-          effect="fade" // Transição suave de esmaecimento
-          autoplay={{
-            delay: 4000,
-            disableOnInteraction: false,
-          }}
-          pagination={{ clickable: true }}
-          loop={true}
-          className={styles.mySwiper}
-          onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
+          <Swiper
+            modules={[Autoplay, EffectFade, Pagination]}
+            effect="fade" // Transição suave de esmaecimento
+            autoplay={{
+              delay: 4000,
+              disableOnInteraction: false,
+            }}
+            pagination={{ clickable: true }}
+            loop={true}
+            className={styles.mySwiper}
+            onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
 
-        >
-          {slides.map((slide) => (
-            <SwiperSlide key={slide.id} className={styles.slideItem}>
-              {/* Overlay para o texto aparecer sobre o gradiente */}
-              <div className={styles.overlay}>
-                <motion.h1
-                  key={`title-${activeSlide}`} // Key necessária para reiniciar animação
+          >
+            {slides.map((slide) => (
+              <SwiperSlide key={slide.id} className={styles.slideItem}>
+                {/* Overlay para o texto aparecer sobre o gradiente */}
+                <div className={styles.overlay}>
+                  <motion.h1
+                    key={`title-${activeSlide}`} // Key necessária para reiniciar animação
                     className={styles.mainTitle}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    
-                >
-                  <BrickText text={slide.title} />    
-                </motion.h1>
-                
-                <motion.h2
-                  key={`sub-${slide.id}`}
-                  className={styles.subtitle}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  {slide.subtitle}
-                </motion.h2>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </section>
+
+                  >
+                    <BrickText text={slide.title} />
+                  </motion.h1>
+
+                  <motion.h2
+                    key={`sub-${slide.id}`}
+                    className={styles.subtitle}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    {slide.subtitle}
+                  </motion.h2>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </section>
 
         <div className="container">
           {/* SEÇÃO DE INTRODUÇÃO */}
@@ -270,7 +264,7 @@ function Home() {
           >
             <div className={styles.introductionContent}>
               <h2 className={styles.introductionTitle}>Bem-vindos à Jornada Profissional CyberTech</h2>
-              
+
               <p className={styles.introductionText}>
                 Nesta plataforma, você aprenderá conceitos isolados, mas como as engrenagens do mercado atual se conectam. Prepare-se para dominar as competências essenciais que definem o profissional do futuro:
               </p>
@@ -280,12 +274,12 @@ function Home() {
                   <h3>Engenharia Civil & Tecnologia</h3>
                   <p>Entenda as bases da construção e infraestrutura integradas às inovações digitais e ferramentas que otimizam processos.</p>
                 </div>
-                
+
                 <div className={styles.introductionCard}>
                   <h3>Marketing Digital & RH</h3>
                   <p>Aprenda a construir uma marca forte e a gerir o capital mais valioso de qualquer empresa: as pessoas.</p>
                 </div>
-                
+
                 <div className={styles.introductionCard}>
                   <h3>Direito & Ética</h3>
                   <p>Navegue com segurança pelas normas jurídicas e regulamentações que regem os negócios e as relações de trabalho.</p>
@@ -317,7 +311,7 @@ function Home() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
                 />
-                
+
                 {/* Botões de navegação */}
                 <button
                   className={styles.carouselBtn + " " + styles.prevBtn}
@@ -410,7 +404,7 @@ function Home() {
                       <p>{tituloExibido}</p>
                     </Link>
                   </motion.div>
-                  
+
                 );
               })}
             </div>

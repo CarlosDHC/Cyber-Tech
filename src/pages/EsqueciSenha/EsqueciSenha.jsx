@@ -38,7 +38,7 @@ const EsqueciSenha = () => {
   return (
     <div className={styles.esqueciContainer}>
       <div className={styles.esqueciWrapper}>
-        
+
         {/* Lado Esquerdo: Imagem */}
         <div className={styles.imageSection}>
           {/* Imagem configurada no CSS */}

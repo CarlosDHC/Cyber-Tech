@@ -694,8 +694,9 @@ body {
 .tabsContainer {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom:0px;
   flex-wrap: wrap;
+  margin-top: 30px;
 }
 
 .tabsContainer button {
