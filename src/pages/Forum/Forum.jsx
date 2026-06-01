@@ -27,7 +27,7 @@ const aplicarFiltroDePalavroes = (texto) => {
   });
   return textoFiltrado;
 };
-// ------------------------------------------------
+
 
 const Forum = () => {
   const [posts, setPosts] = useState([]);
@@ -58,9 +58,7 @@ const Forum = () => {
   const [postIdParaDenuncia, setPostIdParaDenuncia] = useState(null);
   const [motivoDenuncia, setMotivoDenuncia] = useState("Conteúdo Inadequado/Ofensivo");
   const [detalhesDenuncia, setDetalhesDenuncia] = useState("");
-  // ---------------------------------------------------
-
-  // --- CONFIGURAÇÃO INTELIGENTE DE CATEGORIAS ---
+ 
   const mainCategories = [
     "Todas", "Tecnologia", "Direito", "Engenharia", 
     "Marketing", "RH", "Geral"

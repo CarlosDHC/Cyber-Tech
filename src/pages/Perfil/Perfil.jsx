@@ -93,7 +93,7 @@ export default function Perfil() {
   };
 
   const handleSave = async (e) => {
-    if (e) e.preventDefault(); // Previne o reload se chamado via submit do form
+    if (e) e.preventDefault(); 
 
     if (!form.name.trim()) {
       alert("Por favor, informe o nome completo.");

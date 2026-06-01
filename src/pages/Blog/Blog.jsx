@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styles from "../Home/Home.module.css"; 
+import styles from "../Home/Home.module.css";
 import ForumButton from '../../components/ForumButton';
 
 function Blog() {
@@ -18,52 +18,52 @@ function Blog() {
         <div className={styles.challengeCardsList}>
           {/* Tecnologia */}
           <Link to="/tecnologia" className={styles.challengeCard}>
-            <img 
-              src="/Tec-blog.png" 
-              alt="Tecnologia" 
-              onError={(e) => e.target.src = "https://imgur.com/A6MA8Ua.jpg"} 
+            <img
+              src="/Tec-blog.png"
+              alt="Tecnologia"
+              onError={(e) => e.target.src = "https://imgur.com/A6MA8Ua.jpg"}
             />
             <p>Tecnologia</p>
           </Link>
 
           {/* Direito */}
           <Link to="/direito" className={styles.challengeCard}>
-            <img 
-              src="/Dir-blog.png" 
-              alt="Direito" 
-              onError={(e) => e.target.src = "https://imgur.com/6RTD2WO.jpg"} 
+            <img
+              src="/Dir-blog.png"
+              alt="Direito"
+              onError={(e) => e.target.src = "https://imgur.com/6RTD2WO.jpg"}
             />
             <p>Direito</p>
           </Link>
 
           {/* Engenharia */}
           <Link to="/engenharia" className={styles.challengeCard}>
-            <img 
-              src="/Eng-blog.png" 
-              alt="Engenharia" 
-              onError={(e) => e.target.src = "https://imgur.com/5KHksLP.jpg"} 
+            <img
+              src="/Eng-blog.png"
+              alt="Engenharia"
+              onError={(e) => e.target.src = "https://imgur.com/5KHksLP.jpg"}
             />
             <p>Engenharia Civil</p>
           </Link>
 
 
-        {/* Marketing */}
-        <Link to="/marketing" className={styles.challengeCard}>
-          <img 
-            src="/Mk-blog.png" 
-            alt="Marketing" 
-          />
-          <p>Marketing Digital</p>
-        </Link>
+          {/* Marketing */}
+          <Link to="/marketing" className={styles.challengeCard}>
+            <img
+              src="/Mk-blog.png"
+              alt="Marketing"
+            />
+            <p>Marketing Digital</p>
+          </Link>
 
-        {/* RH */}
-        <Link to="/rh" className={styles.challengeCard}>
-          <img 
-            src="/Rh-blog.png" 
-            alt="RH" 
-          />
-          <p>Recursos Humanos</p>
-        </Link>
+          {/* RH */}
+          <Link to="/rh" className={styles.challengeCard}>
+            <img
+              src="/Rh-blog.png"
+              alt="RH"
+            />
+            <p>Recursos Humanos</p>
+          </Link>
 
         </div>
 

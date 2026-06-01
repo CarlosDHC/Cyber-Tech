@@ -16,14 +16,12 @@ export const AuthProvider = ({ children }) => {
       if (user) {
         
         // --- BARREIRA DE SEGURANÇA GLOBAL ---
-        // Se o Firebase detetar um login, mas o e-mail não estiver validado,
-        // forçamos a saída imediatamente e ignoramos a criação da sessão.
         if (!user.emailVerified) {
           await signOut(auth);
           setCurrentUser(null);
           setIsAdmin(false);
           setLoading(false);
-          return; // Interrompe o processo para não carregar os dados do utilizador!
+          return; // Interrompe o processo
         }
         // ------------------------------------
 
@@ -43,7 +41,6 @@ export const AuthProvider = ({ children }) => {
           }
 
           if (userDocSnap.exists()) {
-            // Adicionado o emailVerified ao estado para garantir a leitura correta
             setCurrentUser({ uid: user.uid, emailVerified: user.emailVerified, ...userDocSnap.data() });
           } else {
             setCurrentUser({ uid: user.uid, email: user.email, emailVerified: user.emailVerified });
@@ -63,6 +60,80 @@ export const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
+
+
+  // --- NOVA LÓGICA DE INATIVIDADE COM REDIS (COM O LINK DO RENDER) ---
+  useEffect(() => {
+    // Só executa se o utilizador estiver logado
+    if (!currentUser) return;
+
+    let heartbeatTimeout;
+    
+    // Função para avisar o backend (Render) que o usuário mexeu na tela
+    const sendHeartbeat = async () => {
+      try {
+        await fetch('https://cyber-tech-backend.onrender.com/api/heartbeat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: currentUser.uid })
+        });
+      } catch (error) {
+        console.error("Erro ao comunicar com o servidor", error);
+      }
+    };
+
+    // Controla requisições: envia um sinal ao servidor a cada 1 minuto de atividade contínua
+    const handleActivity = () => {
+      if (!heartbeatTimeout) {
+        sendHeartbeat();
+        heartbeatTimeout = setTimeout(() => {
+          heartbeatTimeout = null;
+        }, 60000); 
+      }
+    };
+
+    // Função que verifica periodicamente se a sessão no Redis (nuvem) expirou
+    const checkRedisSession = async () => {
+      try {
+        const response = await fetch('https://cyber-tech-backend.onrender.com/api/check-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: currentUser.uid })
+        });
+        
+        if (response.status === 401) {
+          // Redis deletou a chave por inatividade! Força logout na plataforma.
+          console.log("Inatividade detetada. Sessão terminada.");
+          await signOut(auth);
+        }
+      } catch (error) {
+        console.error("Erro ao checar sessão", error);
+      }
+    };
+
+    // Adiciona os detetores de movimento e cliques
+    window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("keydown", handleActivity);
+    window.addEventListener("click", handleActivity);
+    window.addEventListener("scroll", handleActivity);
+
+    // Envia o primeiro sinal mal o utilizador entra
+    sendHeartbeat();
+
+    // Cria um loop que checa se o tempo acabou a cada 5 minutos
+    const sessionCheckInterval = setInterval(checkRedisSession, 300000); 
+
+    // Limpeza automática ao sair
+    return () => {
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+      window.removeEventListener("click", handleActivity);
+      window.removeEventListener("scroll", handleActivity);
+      clearInterval(sessionCheckInterval);
+      if (heartbeatTimeout) clearTimeout(heartbeatTimeout);
+    };
+  }, [currentUser]);
+  // -------------------------------------------------------------------
 
   return (
     <AuthContext.Provider value={{ currentUser, isAdmin, loading }}>
