@@ -38,6 +38,7 @@ import Cadastro from './pages/Cadastro/Cadastro.jsx';
 import EsqueciSenha from './pages/EsqueciSenha/EsqueciSenha.jsx';
 import EsqueciSenhaPerfil from './pages/EsqueciSenha/EsqueciSenhaPerfil.jsx';
 import Perfil from './pages/Perfil/Perfil.jsx';
+import Tutorial from './pages/Perfil/Tutorial/Tutorial.jsx';
 
 // JOGO DO QUIZ
 import QuizPlayer from './pages/Quiz/QuizPlayer.jsx';

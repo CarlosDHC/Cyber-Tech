@@ -8,12 +8,12 @@ import md5 from "crypto-js/md5";
 // Imports apenas do Firestore e Auth
 import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { deleteUser } from "firebase/auth";
-import { db, auth } from "../../../FirebaseConfig"; 
+import { db, auth } from "../../../FirebaseConfig";
 
 export default function Perfil() {
   const { currentUser } = useAuth();
   const [profile, setProfile] = useState(null);
-  
+
   const [form, setForm] = useState({
     name: "",
     dataNascimento: "",
@@ -93,17 +93,17 @@ export default function Perfil() {
   };
 
   const handleSave = async (e) => {
-    if (e) e.preventDefault(); 
+    if (e) e.preventDefault();
 
     if (!form.name.trim()) {
       alert("Por favor, informe o nome completo.");
       return;
     }
-    
+
     setSaving(true);
     try {
       const userRef = doc(db, "users", currentUser.uid);
-      
+
       await setDoc(userRef, {
         ...form,
         updatedAt: new Date(),
@@ -146,9 +146,9 @@ export default function Perfil() {
 
   return (
     <div className={styles.container}>
-      <motion.div 
-        className={styles.profileBox} 
-        initial={{ opacity: 0, y: 15 }} 
+      <motion.div
+        className={styles.profileBox}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <div className={styles.header}>
@@ -165,9 +165,9 @@ export default function Perfil() {
               <div className={styles.avatarImageWrapper}>
                 <img src={avatarUrl} alt="Foto de Perfil" className={styles.avatarImage} />
               </div>
-              <a 
-                href="https://pt.gravatar.com/" 
-                target="_blank" 
+              <a
+                href="https://pt.gravatar.com/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className={styles.gravatarLink}
               >
@@ -202,6 +202,13 @@ export default function Perfil() {
                 >
                   Meus Certificados
                 </button>
+                <button
+                  type="button"
+                  className={`${styles.buttonBase} ${styles.primaryButton}`}
+                  onClick={() => navigate("/Tutorial")}
+                >
+                  Vídeos de Introdução
+                </button>
               </div>
             </div>
           </div>
@@ -211,24 +218,24 @@ export default function Perfil() {
           {/* FORMULÁRIO DE DADOS */}
           <form onSubmit={handleSave} className={styles.formContainer}>
             <h3 className={styles.sectionTitle}>Informações Pessoais</h3>
-            
+
             <div className={styles.formGrid}>
               <div className={styles.inputGroup}>
                 <label className={styles.required}>Nome Completo*</label>
-                <input 
-                  name="name" 
-                  value={form.name} 
-                  onChange={handleChange} 
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Seu nome completo"
                 />
               </div>
               <div className={styles.inputGroup}>
                 <label>Como prefere ser chamado</label>
-                <input 
-                  name="apelido" 
-                  value={form.apelido} 
-                  onChange={handleChange} 
-                  placeholder="Apelido ou nome social" 
+                <input
+                  name="apelido"
+                  value={form.apelido}
+                  onChange={handleChange}
+                  placeholder="Apelido ou nome social"
                 />
               </div>
 
@@ -245,10 +252,10 @@ export default function Perfil() {
               </div>
               <div className={styles.inputGroup}>
                 <label>Data de Nascimento</label>
-                <input 
-                  name="dataNascimento" 
-                  type="date" 
-                  value={form.dataNascimento} 
+                <input
+                  name="dataNascimento"
+                  type="date"
+                  value={form.dataNascimento}
                   onChange={handleChange}
                   id="dataNascimento"
                   min="1900-01-01"
