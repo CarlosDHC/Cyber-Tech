@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import emailjs from '@emailjs/browser'; 
 import styles from "./Login.module.css";
 
 import { auth, db } from "../../../FirebaseConfig.js";
@@ -40,7 +39,7 @@ const Login = () => {
         
         setError("A sua conta ainda não foi validada. Acabámos de enviar um novo link para a sua caixa de entrada.");
         setLoading(false);
-        return; // Interrompe o fluxo (não regista atividade, não envia o EmailJS nem navega)
+        return; // Interrompe o fluxo
       }
 
       // 3. REGISTAR A ÚLTIMA ATIVIDADE (Apenas se o e-mail estiver verificado)
@@ -55,32 +54,8 @@ const Login = () => {
         // Não precisamos de interromper o login se isto falhar
       }
 
-      // 4. Preparação dos dados para o template do EmailJS
-      const dataAtual = new Date().toLocaleString('pt-BR');
-      const infoNavegador = navigator.userAgent;
-
-      const templateParams = {
-        to_name: user.displayName || 'Estudante',
-        user_email: user.email, 
-        login_date: dataAtual, 
-        browser_info: infoNavegador
-      };
-
-      // 5. Envio da notificação e navegação controlada
-      emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        templateParams,
-        import.meta.env.VITE_EMAILJS_API_KEY
-      )
-      .then((response) => {
-        console.log('Email de boas-vindas enviado!', response.status);
-        navigate("/"); // Navega após sucesso no envio
-      })
-      .catch((err) => {
-        console.error('Erro no EmailJS, mas redirecionando...', err);
-        navigate("/"); // Navega mesmo que o email falhe para não prender o utilizador
-      });
+      // 4. Navegação controlada para a página principal após o sucesso
+      navigate("/");
 
     } catch (err) {
       console.error("Erro detalhado no login:", err);
