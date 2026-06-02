@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-// Importação do signOut adicionada aqui
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../FirebaseConfig"; 
@@ -41,9 +40,35 @@ export const AuthProvider = ({ children }) => {
           }
 
           if (userDocSnap.exists()) {
-            setCurrentUser({ uid: user.uid, emailVerified: user.emailVerified, ...userDocSnap.data() });
+            const userData = userDocSnap.data();
+            setCurrentUser({ uid: user.uid, emailVerified: user.emailVerified, ...userData });
+            
+            // --- NOVO: NOTIFICAÇÃO DE LOGIN COM ESCUDO ANTI-SPAM ---
+            fetch('https://cyber-tech-backend.onrender.com/api/notify-login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                uid: user.uid, 
+                email: user.email,
+                name: userData.name || ''
+              })
+            }).catch(err => console.error("Erro ao notificar login:", err));
+            // --------------------------------------------------------
+
           } else {
             setCurrentUser({ uid: user.uid, email: user.email, emailVerified: user.emailVerified });
+            
+            // --- NOVO: NOTIFICAÇÃO DE LOGIN (CASO SEJA PRIMEIRO ACESSO) ---
+            fetch('https://cyber-tech-backend.onrender.com/api/notify-login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                uid: user.uid, 
+                email: user.email,
+                name: ''
+              })
+            }).catch(err => console.error("Erro ao notificar login:", err));
+            // --------------------------------------------------------------
           }
 
         } catch (error) {
@@ -62,14 +87,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  // --- NOVA LÓGICA DE INATIVIDADE COM REDIS (COM O LINK DO RENDER) ---
+  // --- LÓGICA DE INATIVIDADE COM REDIS ---
   useEffect(() => {
-    // Só executa se o utilizador estiver logado
     if (!currentUser) return;
 
     let heartbeatTimeout;
     
-    // Função para avisar o backend (Render) que o usuário mexeu na tela
     const sendHeartbeat = async () => {
       try {
         await fetch('https://cyber-tech-backend.onrender.com/api/heartbeat', {
@@ -82,7 +105,6 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    // Controla requisições: envia um sinal ao servidor a cada 1 minuto de atividade contínua
     const handleActivity = () => {
       if (!heartbeatTimeout) {
         sendHeartbeat();
@@ -92,7 +114,6 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    // Função que verifica periodicamente se a sessão no Redis (nuvem) expirou
     const checkRedisSession = async () => {
       try {
         const response = await fetch('https://cyber-tech-backend.onrender.com/api/check-session', {
@@ -102,7 +123,6 @@ export const AuthProvider = ({ children }) => {
         });
         
         if (response.status === 401) {
-          // Redis deletou a chave por inatividade! Força logout na plataforma.
           console.log("Inatividade detetada. Sessão terminada.");
           await signOut(auth);
         }
@@ -111,19 +131,15 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    // Adiciona os detetores de movimento e cliques
     window.addEventListener("mousemove", handleActivity);
     window.addEventListener("keydown", handleActivity);
     window.addEventListener("click", handleActivity);
     window.addEventListener("scroll", handleActivity);
 
-    // Envia o primeiro sinal mal o utilizador entra
     sendHeartbeat();
 
-    // Cria um loop que checa se o tempo acabou a cada 5 minutos
     const sessionCheckInterval = setInterval(checkRedisSession, 300000); 
 
-    // Limpeza automática ao sair
     return () => {
       window.removeEventListener("mousemove", handleActivity);
       window.removeEventListener("keydown", handleActivity);
