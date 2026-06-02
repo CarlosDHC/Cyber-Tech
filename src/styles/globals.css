@@ -74,11 +74,10 @@ h1, h2, h3, h4, h5, h6 {
   width: 90%;             /* Ocupa 90% da largura disponível */
   max-width: 1200px;      /* Trava a largura máxima */
   margin: 50px auto;      /* 50px em cima/baixo, AUTO nas laterais para centralizar */
-
-  /* Glassmorphism Moderno */
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(6px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  margin-top: 65px;
 }
 
 /* Botões */
@@ -116,7 +115,7 @@ main {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;    
-  padding-top: 20px;
+  padding-top: 0px;
   padding-bottom: 10px;     
 }
 

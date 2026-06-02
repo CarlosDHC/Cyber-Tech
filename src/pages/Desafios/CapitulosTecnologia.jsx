@@ -15,12 +15,11 @@ function CapitulosTecnologia() {
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
   const [progresso, setProgresso] = useState(0); 
 
-  // =============== CONFIGURAÇÕES DA ÁREA ===============
+  //  CONFIGURAÇÕES DA ÁREA 
   const AREA_ATUAL = "Tecnologia"; 
   const CAMPO_FIREBASE = "desafiosConcluidosTecnologia";
   const ROTA_CERTIFICADO = "/Certificado/CertificadoTEC.jsx";
   const TEXTO_SUBTITULO = "Aprofunde-se em programação, infraestrutura e inovação tecnológica.";
-  // =====================================================
 
   const auth = getAuth(); 
 

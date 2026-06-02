@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import emailjs from '@emailjs/browser'; 
 import styles from "./Login.module.css";
 
-import { auth } from "../../../FirebaseConfig.js";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../../FirebaseConfig.js";
+import { signInWithEmailAndPassword, signOut, sendEmailVerification } from "firebase/auth";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -25,32 +25,37 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
       const user = userCredential.user;
 
-      // 2. Preparação dos dados para o template do EmailJS
-      const dataAtual = new Date().toLocaleString('pt-BR');
-      const infoNavegador = navigator.userAgent;
+      // 2. VERIFICAÇÃO CRÍTICA: O e-mail foi validado?
+      if (!user.emailVerified) {
+        try {
+          // Dispara um novo e-mail ANTES de desconectar o utilizador!
+          await sendEmailVerification(user);
+        } catch (emailErr) {
+          console.error("Erro ao reenviar e-mail de verificação:", emailErr);
+        }
+        
+        // Desconecta o utilizador imediatamente
+        await signOut(auth);
+        
+        setError("A sua conta ainda não foi validada. Acabámos de enviar um novo link para a sua caixa de entrada.");
+        setLoading(false);
+        return; // Interrompe o fluxo
+      }
 
-      const templateParams = {
-        to_name: user.displayName || 'Estudante',
-        user_email: user.email, 
-        login_date: dataAtual, 
-        browser_info: infoNavegador
-      };
+      // 3. REGISTAR A ÚLTIMA ATIVIDADE (Apenas se o e-mail estiver verificado)
+      try {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          ultimaAtividade: serverTimestamp() // Salva a hora exata do servidor da Google
+        });
+        console.log("Atividade registada com sucesso no Firestore.");
+      } catch (dbErr) {
+        console.error("Erro ao atualizar a última atividade:", dbErr);
+        // Não precisamos de interromper o login se isto falhar
+      }
 
-      // 3. Envio da notificação e navegação controlada
-      emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        templateParams,
-        import.meta.env.VITE_EMAILJS_API_KEY
-      )
-      .then((response) => {
-        console.log('Email de boas-vindas enviado!', response.status);
-        navigate("/"); // Navega após sucesso no envio
-      })
-      .catch((err) => {
-        console.error('Erro no EmailJS, mas redirecionando...', err);
-        navigate("/"); // Navega mesmo que o email falhe para não prender o utilizador
-      });
+      // 4. Navegação controlada para a página principal após o sucesso
+      navigate("/");
 
     } catch (err) {
       console.error("Erro detalhado no login:", err);

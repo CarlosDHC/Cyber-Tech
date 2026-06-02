@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Cadastro.module.css";
 
 import { auth, db } from "../../../FirebaseConfig.js";
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 
 const Cadastro = () => {
@@ -36,10 +36,12 @@ const Cadastro = () => {
     return v;
   };
 
+  // ÚNICA FUNÇÃO handleSubmit (dentro do componente)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
+    // Validações básicas
     if (password !== confirmPassword) {
       setError("As senhas não conferem!");
       return;
@@ -52,15 +54,19 @@ const Cadastro = () => {
     setLoading(true);
 
     try {
+      // 1. Cria a conta no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // 2. Atualiza o perfil no Authentication com o nome
       await updateProfile(user, {
         displayName: nome
       });
 
+      // 3. Dispara o e-mail de verificação
       await sendEmailVerification(user);
 
+      // 4. Salva os dados extras no Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name: nome,
@@ -71,14 +77,20 @@ const Cadastro = () => {
         criadoEm: new Date().toISOString(),
       });
 
+      // 5. Faz o logout imediatamente para impedir o acesso sem verificação
+      await signOut(auth);
+
       setLoading(false);
 
-      alert("Cadastro realizado com sucesso! Foi enviado um e-mail de verificação. Por favor, verifique a sua caixa de entrada ou spam antes de iniciar sessão.");
+      // 6. Mostra mensagem de sucesso e redireciona
+      alert("Cadastro realizado com sucesso! 🚀 Foi enviado um e-mail de verificação. Por favor, verifique a sua caixa de entrada (ou spam) antes de iniciar sessão.");
       navigate("/login");
 
     } catch (err) {
       setLoading(false);
       console.error("Erro detalhado no cadastro:", err);
+      
+      // Tratamento de erros do Firebase
       if (err.code === "auth/email-already-in-use") {
         setError("Este e-mail já está em uso.");
       } else if (err.code === "auth/invalid-email") {

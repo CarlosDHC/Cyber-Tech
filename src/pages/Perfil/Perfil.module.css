@@ -7,6 +7,7 @@
     align-items: flex-start;
     padding: 24px 16px;
     min-height: 100vh;
+    margin-top: 50px;
 }
 
 .profileBox {
@@ -126,12 +127,12 @@
     flex-wrap: wrap;
 }
 
-.divider {
+/*.divider {
     border: none;
     height: 1px;
     background-color: #e2e8f0;
     margin: 32px 0;
-}
+}*/
 
 /* =========================================
    FORMS & INPUTS
@@ -280,7 +281,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 36px;
+    /*margin-top: 36px;*/
     padding-top: 24px;
     border-top: 1px solid #e2e8f0;
 }
