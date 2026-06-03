@@ -185,7 +185,8 @@ function App() {
             <Route path="/perfil" element={<ProtectedRoute><AnimatedPage><Perfil /></AnimatedPage></ProtectedRoute>} />
             <Route path="/forum" element={<ProtectedRoute><AnimatedPage><Forum /></AnimatedPage></ProtectedRoute>} />
             <Route path="/alterar-senha" element={<ProtectedRoute><AnimatedPage><EsqueciSenhaPerfil /></AnimatedPage></ProtectedRoute>} />
-
+            <Route path="/tutorial" element={<ProtectedRoute><AnimatedPage><Tutorial /></AnimatedPage></ProtectedRoute>} />
+            
             {/* Rotas Admin */}
             <Route path="/admin" element={<ProtectedAdminRoute><AnimatedPage><Admin /></AnimatedPage></ProtectedAdminRoute>} />
             <Route path="/admin/newblog" element={<ProtectedAdminRoute><AnimatedPage><Newblog /></AnimatedPage></ProtectedAdminRoute>} />

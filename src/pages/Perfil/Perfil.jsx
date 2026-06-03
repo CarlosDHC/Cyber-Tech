@@ -205,7 +205,7 @@ export default function Perfil() {
                 <button
                   type="button"
                   className={`${styles.buttonBase} ${styles.primaryButton}`}
-                  onClick={() => navigate("/Tutorial")}
+                  onClick={() => navigate("/tutorial")}
                 >
                   Vídeos de Introdução
                 </button>

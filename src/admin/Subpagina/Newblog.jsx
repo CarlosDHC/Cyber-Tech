@@ -163,6 +163,7 @@ export default function NewBlog() {
           <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
           <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
           <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
+          <li><Link to="/admin/denuncia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denuncia</span></Link></li>
         </ul>
       </aside>
 
@@ -190,7 +191,7 @@ export default function NewBlog() {
             
             {activeTab === "create" && (
               <>
-                <button className={styles.btnAdd} onClick={() => setModoPreview(!modoPreview)} style={{marginLeft: '15px'}}>
+                <button className={styles.btnAdd} onClick={() => setModoPreview(!modoPreview)}>
                   {modoPreview ? "Voltar ao Editor" : "Ver Prévia"}
                 </button>
                 <button className={styles.publishBtn} onClick={salvarPost} disabled={loading}>

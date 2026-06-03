@@ -130,6 +130,8 @@ export default function Comentarios() {
           <li><Link to="/admin/newdesafios" className={adminStyles.navLink}><img src="/idesafio.png" alt="D" /><span className={adminStyles.linkText}>Criar Desafios</span></Link></li>
           <li><Link to="/admin/curtidas" className={adminStyles.navLink}><img src="/curti.png" alt="L" /><span className={adminStyles.linkText}>Historico de curtidas</span></Link></li>
           <li><Link to="/admin/comentarios" className={adminStyles.navLink}><img src="/icomentarios.png" alt="L" /><span className={adminStyles.linkText}>Comentarios Fórum</span></Link></li>
+          <li><Link to="/admin/denuncia" className={adminStyles.navLink}><img src="/denuncia.png" alt="U" /><span className={adminStyles.linkText}>Denuncia</span></Link></li>
+
         </ul>
       </aside>
 

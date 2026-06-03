@@ -33,7 +33,7 @@ export default function CerDesbloqueados() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        🎓 Meus Certificados
+       Meus Certificados
       </motion.h1>
 
       {certificadosDesbloqueados.length === 0 ? (

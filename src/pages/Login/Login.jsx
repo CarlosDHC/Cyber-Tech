@@ -104,7 +104,7 @@ const Login = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="password">Palavra-passe</label>
+              <label htmlFor="password">Senha</label>
               <input
                 type="password"
                 id="password"
@@ -134,7 +134,7 @@ const Login = () => {
           <div className={styles.passwordReset}>
             <Link to="/esqueci-minha-senha" className={styles.passwordResetLink}>
               <span style={{ fontWeight: "normal", color: "lightgray" }}>
-                Esqueci-me da minha palavra-passe
+                Esqueci-me da minha senha
               </span>
             </Link>
           </div>

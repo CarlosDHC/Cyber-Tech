@@ -26,9 +26,9 @@
 
 /* Metade Esquerda: Imagem */
 .imageSection {
-  flex: 1; /* Ocupa 50% do espaço */
+  flex: 1.5; /* Ocupa 50% do espaço */
   /* Substitua a URL abaixo pelo caminho da imagem desejada na sua pasta public */
-  background-image: url('/img-py.png'); 
+  background-image: url('/iconeIntro.png'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -173,6 +173,7 @@
   text-align: center;
 }
 
+
 /* --- RESPONSIVIDADE PARA CELULARES --- */
 @media (max-width: 768px) {
   .loginWrapper {
@@ -183,7 +184,7 @@
   .imageSection {
     /* Pode ocultar a imagem no celular trocando para 'display: none;' */
     height: 200px; 
-    flex: none;
+    display: none;
   }
 
   .formSection {
@@ -193,7 +194,7 @@
   .loginContainer {
     padding: 10px;
     align-items: flex-start;
-    padding-top: 100px;
+    padding-top: 2rem;
   }
 
   .formGroup input {

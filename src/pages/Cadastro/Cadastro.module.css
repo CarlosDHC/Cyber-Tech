@@ -25,8 +25,9 @@
 
 /* Metade Esquerda: Imagem */
 .imageSection {
-  flex: 1;
-  background-image: url('/img-py.png'); /* Lembre-se de trocar o caminho se a imagem for outra */
+  flex: 1.5; /* Ocupa 50% do espaço */
+  /* Substitua a URL abaixo pelo caminho da imagem desejada na sua pasta public */
+  background-image: url('/iconeIntro.png'); /* Lembre-se de trocar o caminho se a imagem for outra */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
