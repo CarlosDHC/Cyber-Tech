@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../Home/Home.module.css";
 
-// Firebase Imports
-import { collection, query, where, getDocs, orderBy, doc, onSnapshot } from "firebase/firestore";
+// Firebase Imports (com onSnapshot, setDoc e arrayUnion)
+import { collection, query, where, getDocs, orderBy, doc, onSnapshot, setDoc, arrayUnion } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../../FirebaseConfig";
 
@@ -13,10 +13,16 @@ function CapitulosMarketing() {
   const [desafiosConcluidos, setDesafiosConcluidos] = useState([]);
   const [certificadoLiberado, setCertificadoLiberado] = useState(false);
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
-  const [progresso, setProgresso] = useState(0);
+  const [progresso, setProgresso] = useState(0); 
 
-  const AREA_ATUAL = "Marketing";
-  const auth = getAuth();
+  // CONFIGURAÇÕES ESPECÍFICAS DA ÁREA DE MARKETING
+  const AREA_ATUAL = "Marketing"; 
+  const CAMPO_FIREBASE = "desafiosConcluidosMarketing";
+  const ROTA_CERTIFICADO = "/Certificado/CertificadoMAR.jsx";
+  const TEXTO_SUBTITULO = "Domine estratégias de branding, análise de mercado e campanhas digitais.";
+  const TAG_CERTIFICADO = "MAR"; // Tag exata para a página de certificados desbloqueados
+
+  const auth = getAuth(); 
 
   // 1. BUSCAR A LISTA DE DESAFIOS DA ÁREA DE MARKETING
   useEffect(() => {
@@ -35,7 +41,7 @@ function CapitulosMarketing() {
         }));
         setDesafios(listaDesafios);
       } catch (error) {
-        console.error("Erro ao buscar desafios:", error);
+        console.error(`Erro ao buscar desafios de ${AREA_ATUAL}:`, error);
       } finally {
         setLoading(false);
       }
@@ -43,42 +49,33 @@ function CapitulosMarketing() {
     fetchDesafios();
   }, []);
 
- // 2. LER O PROGRESSO DO USUÁRIO LOGADO NO FIREBASE EM TEMPO REAL
+  // 2. LER O PROGRESSO DO USUÁRIO NO FIREBASE EM TEMPO REAL
   useEffect(() => {
-    // Variável para guardar o "ouvinte" da base de dados e podermos desligá-lo depois
     let unsubscribeSnapshot = null;
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userRef = doc(db, "users", user.uid);
         
-        // onSnapshot: Fica a ouvir as alterações do utilizador no Firebase em tempo real
+        // Fica a ouvir as atualizações em tempo real
         unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
           if (docSnap.exists()) {
             const dados = docSnap.data();
-            // Atualiza a barra assim que o valor no banco muda
             setDesafiosConcluidos(dados[CAMPO_FIREBASE] || []);
           }
         });
       } else {
-        // Se não houver utilizador logado, zera os desafios e desliga o ouvinte
         setDesafiosConcluidos([]); 
-        if (unsubscribeSnapshot) {
-          unsubscribeSnapshot();
-        }
       }
     });
 
     return () => {
-      // Quando o utilizador sai desta página, desligamos as escutas para poupar memória e leituras
       unsubscribeAuth();
-      if (unsubscribeSnapshot) {
-        unsubscribeSnapshot();
-      }
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
   }, [auth]);
 
-  // 3. CALCULAR A BARRA DE PROGRESSO
+  // 3. CALCULAR A BARRA DE PROGRESSO E SALVAR CERTIFICADO AUTOMATICAMENTE
   useEffect(() => {
     const concluidos = desafios.filter((desafio) =>
       desafiosConcluidos.includes(desafio.id)
@@ -89,18 +86,38 @@ function CapitulosMarketing() {
 
     const todosConcluidos = concluidos === desafios.length && desafios.length > 0;
 
-    if (todosConcluidos) {
-      setCertificadoLiberado(true);
+    // Se concluiu tudo e o certificado ainda não foi gravado como liberado nesta sessão
+    if (todosConcluidos && !certificadoLiberado) {
+      
+      setCertificadoLiberado(true); 
       setMostrarAnimacao(true);
       setTimeout(() => { setMostrarAnimacao(false); }, 4000);
+
+      // ---> GRAVAR AUTOMATICAMENTE NO BANCO DE DADOS <---
+      const salvarCertificadoAutomaticamente = async () => {
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            const userRef = doc(db, "users", user.uid);
+            await setDoc(userRef, {
+              certificadosDesbloqueados: arrayUnion(TAG_CERTIFICADO) // Salva a tag "MAR"
+            }, { merge: true });
+            console.log(`Certificado ${TAG_CERTIFICADO} salvo no Firebase com sucesso!`);
+          } catch (error) {
+            console.error("Erro ao salvar certificado automático:", error);
+          }
+        }
+      };
+
+      salvarCertificadoAutomaticamente();
     }
-  }, [desafios, desafiosConcluidos]);
+  }, [desafios, desafiosConcluidos, certificadoLiberado, auth]);
 
   return (
     <div className={`container ${styles.challengeListContainer}`}>
       <h1 className={styles.pageTitle}>{AREA_ATUAL}</h1>
       <p className={styles.pageSubtitle}>
-        Domine estratégias, métricas e criatividade com nossos desafios práticos.
+        {TEXTO_SUBTITULO}
       </p>
 
       {/* BARRA DE PROGRESSO */}
@@ -123,10 +140,9 @@ function CapitulosMarketing() {
                 to={`/quiz/${desafio.id}`}
                 key={desafio.id}
                 className={styles.challengeCard}
-              // REMOVIDO O ONCLICK DAQUI! Ele apenas navega para a página do quiz agora.
               >
                 <img
-                  src={desafio.imagemCapa || "https://placehold.co/600x400?text=Marketing"}
+                  src={desafio.imagemCapa || `https://placehold.co/600x400?text=${AREA_ATUAL.replace(/\s+/g, '+')}`}
                   alt={desafio.titulo}
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
@@ -143,7 +159,7 @@ function CapitulosMarketing() {
               </Link>
             ))
           ) : (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>Nenhum desafio encontrado.</p>
+            <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>Nenhum desafio encontrado para a área de {AREA_ATUAL} no momento.</p>
           )}
         </div>
       )}
@@ -152,9 +168,10 @@ function CapitulosMarketing() {
         <div className={styles.animacaoConquista}>🎉 Parabéns! Você concluiu todos os desafios!</div>
       )}
 
+      {/* BOTÃO DO CERTIFICADO */}
       {certificadoLiberado && (
-        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px" }}>
-          <Link to="/Certificado/CertificadoMAR.jsx">
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
+          <Link to={ROTA_CERTIFICADO}>
             <button className={styles.botao}>🎓 Certificado desbloqueado!</button>
           </Link>
         </div>

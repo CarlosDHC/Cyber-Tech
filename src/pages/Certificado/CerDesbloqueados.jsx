@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import styles from "./CerDesbloqueados.module.css"; 
 
+// ---> NOVO: Importações do Firebase para ler da nuvem <---
+import { auth, db } from "../../../FirebaseConfig";
+import { doc, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
 // Adicionada a propriedade "imagem" com os caminhos da pasta public
 const LISTA_CERTIFICADOS = [
   { id: "TEC", nome: "Tecnologia", rota: "/Certificado/Certificado.jsx", imagem: "/tec-card.jpg" },
@@ -16,9 +21,33 @@ export default function CerDesbloqueados() {
   const [certificados, setCertificados] = useState([]);
   const navigate = useNavigate();
 
+  // ---> NOVO: LER DO FIREBASE EM TEMPO REAL EM VEZ DO LOCALSTORAGE <---
   useEffect(() => {
-    const lista = JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
-    setCertificados(lista);
+    let unsubscribeSnapshot = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Aponta para o documento do utilizador logado no banco de dados
+        const userRef = doc(db, "users", user.uid);
+        
+        // Fica a ouvir as alterações na nuvem
+        unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const dados = docSnap.data();
+            // Atualiza o ecrã puxando o array 'certificadosDesbloqueados'
+            setCertificados(dados.certificadosDesbloqueados || []);
+          }
+        });
+      } else {
+        setCertificados([]);
+      }
+    });
+
+    return () => {
+      // Limpeza de segurança ao sair da página
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+    };
   }, []);
 
   const certificadosDesbloqueados = LISTA_CERTIFICADOS.filter(cert =>

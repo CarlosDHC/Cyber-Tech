@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../Home/Home.module.css";
 
-// Firebase Imports
-import { collection, query, where, getDocs, orderBy, doc, onSnapshot } from "firebase/firestore";
+// Firebase Imports (com onSnapshot, setDoc e arrayUnion)
+import { collection, query, where, getDocs, orderBy, doc, onSnapshot, setDoc, arrayUnion } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../../FirebaseConfig";
 
@@ -13,16 +13,16 @@ function CapitulosEngenharia() {
   const [desafiosConcluidos, setDesafiosConcluidos] = useState([]);
   const [certificadoLiberado, setCertificadoLiberado] = useState(false);
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
-  const [progresso, setProgresso] = useState(0);
+  const [progresso, setProgresso] = useState(0); 
 
-  // =============== CONFIGURAÇÕES DA ÁREA ===============
-  const AREA_ATUAL = "Engenharia";
+  // CONFIGURAÇÕES ESPECÍFICAS DA ÁREA DE ENGENHARIA
+  const AREA_ATUAL = "Engenharia"; 
   const CAMPO_FIREBASE = "desafiosConcluidosEngenharia";
   const ROTA_CERTIFICADO = "/Certificado/CertificadoENG.jsx";
-  const TEXTO_SUBTITULO = "Solucione problemas práticos e desenvolva projetos em áreas como sistemas renováveis e novos materiais.";
-  // =====================================================
+  const TEXTO_SUBTITULO = "Explore cálculos estruturais, geotecnia, infraestrutura e inovação em engenharia.";
+  const TAG_CERTIFICADO = "ENG"; // Tag exata para a página de certificados desbloqueados
 
-  const auth = getAuth();
+  const auth = getAuth(); 
 
   // 1. BUSCAR A LISTA DE DESAFIOS DA ÁREA DE ENGENHARIA
   useEffect(() => {
@@ -49,42 +49,33 @@ function CapitulosEngenharia() {
     fetchDesafios();
   }, []);
 
-  // 2. LER O PROGRESSO DO USUÁRIO LOGADO NO FIREBASE EM TEMPO REAL
+  // 2. LER O PROGRESSO DO USUÁRIO NO FIREBASE EM TEMPO REAL
   useEffect(() => {
-    // Variável para guardar o "ouvinte" da base de dados e podermos desligá-lo depois
     let unsubscribeSnapshot = null;
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userRef = doc(db, "users", user.uid);
-
-        // onSnapshot: Fica a ouvir as alterações do utilizador no Firebase em tempo real
+        
+        // Fica a ouvir as atualizações em tempo real
         unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
           if (docSnap.exists()) {
             const dados = docSnap.data();
-            // Atualiza a barra assim que o valor no banco muda
             setDesafiosConcluidos(dados[CAMPO_FIREBASE] || []);
           }
         });
       } else {
-        // Se não houver utilizador logado, zera os desafios e desliga o ouvinte
-        setDesafiosConcluidos([]);
-        if (unsubscribeSnapshot) {
-          unsubscribeSnapshot();
-        }
+        setDesafiosConcluidos([]); 
       }
     });
 
     return () => {
-      // Quando o utilizador sai desta página, desligamos as escutas para poupar memória e leituras
       unsubscribeAuth();
-      if (unsubscribeSnapshot) {
-        unsubscribeSnapshot();
-      }
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
   }, [auth]);
 
-  // 3. CALCULAR A BARRA DE PROGRESSO
+  // 3. CALCULAR A BARRA DE PROGRESSO E SALVAR CERTIFICADO AUTOMATICAMENTE
   useEffect(() => {
     const concluidos = desafios.filter((desafio) =>
       desafiosConcluidos.includes(desafio.id)
@@ -95,12 +86,32 @@ function CapitulosEngenharia() {
 
     const todosConcluidos = concluidos === desafios.length && desafios.length > 0;
 
-    if (todosConcluidos) {
-      setCertificadoLiberado(true);
+    // Se concluiu tudo e o certificado ainda não foi gravado como liberado nesta sessão
+    if (todosConcluidos && !certificadoLiberado) {
+      
+      setCertificadoLiberado(true); 
       setMostrarAnimacao(true);
       setTimeout(() => { setMostrarAnimacao(false); }, 4000);
+
+      // ---> GRAVAR AUTOMATICAMENTE NO BANCO DE DADOS <---
+      const salvarCertificadoAutomaticamente = async () => {
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            const userRef = doc(db, "users", user.uid);
+            await setDoc(userRef, {
+              certificadosDesbloqueados: arrayUnion(TAG_CERTIFICADO) // Salva a tag "ENG"
+            }, { merge: true });
+            console.log(`Certificado ${TAG_CERTIFICADO} salvo no Firebase com sucesso!`);
+          } catch (error) {
+            console.error("Erro ao salvar certificado automático:", error);
+          }
+        }
+      };
+
+      salvarCertificadoAutomaticamente();
     }
-  }, [desafios, desafiosConcluidos]);
+  }, [desafios, desafiosConcluidos, certificadoLiberado, auth]);
 
   return (
     <div className={`container ${styles.challengeListContainer}`}>
@@ -131,7 +142,7 @@ function CapitulosEngenharia() {
                 className={styles.challengeCard}
               >
                 <img
-                  src={desafio.imagemCapa || `https://placehold.co/600x400?text=${AREA_ATUAL}`}
+                  src={desafio.imagemCapa || `https://placehold.co/600x400?text=${AREA_ATUAL.replace(/\s+/g, '+')}`}
                   alt={desafio.titulo}
                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Sem+Imagem"; }}
                   style={{ objectFit: 'cover' }}
@@ -157,8 +168,9 @@ function CapitulosEngenharia() {
         <div className={styles.animacaoConquista}>🎉 Parabéns! Você concluiu todos os desafios!</div>
       )}
 
+      {/* BOTÃO DO CERTIFICADO */}
       {certificadoLiberado && (
-        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px" }}>
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
           <Link to={ROTA_CERTIFICADO}>
             <button className={styles.botao}>🎓 Certificado desbloqueado!</button>
           </Link>
