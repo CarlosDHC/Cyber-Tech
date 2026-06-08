@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../Home/Home.module.css";
 
-// Firebase Imports
-import { collection, query, where, getDocs, orderBy, doc, getDoc } from "firebase/firestore";
+// Firebase Import
+import { collection, query, where, getDocs, orderBy, doc, onSnapshot } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../../FirebaseConfig";
 
@@ -50,24 +50,39 @@ function CapitulosDireito() {
     fetchDesafios();
   }, []);
 
-  // 2. LER O PROGRESSO DO USUÁRIO LOGADO NO FIREBASE
+ // 2. LER O PROGRESSO DO USUÁRIO LOGADO NO FIREBASE EM TEMPO REAL
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    // Variável para guardar o "ouvinte" da base de dados e podermos desligá-lo depois
+    let unsubscribeSnapshot = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
-
-        if (docSnap.exists()) {
-          const dados = docSnap.data();
-          // Usa a variável dinâmica para buscar o array correto no banco
-          setDesafiosConcluidos(dados[CAMPO_FIREBASE] || []);
-        }
+        
+        // onSnapshot: Fica a ouvir as alterações do utilizador no Firebase em tempo real
+        unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const dados = docSnap.data();
+            // Atualiza a barra assim que o valor no banco muda
+            setDesafiosConcluidos(dados[CAMPO_FIREBASE] || []);
+          }
+        });
       } else {
+        // Se não houver utilizador logado, zera os desafios e desliga o ouvinte
         setDesafiosConcluidos([]); 
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+        }
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      // Quando o utilizador sai desta página, desligamos as escutas para poupar memória e leituras
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+      }
+    };
   }, [auth]);
 
   // 3. CALCULAR A BARRA DE PROGRESSO

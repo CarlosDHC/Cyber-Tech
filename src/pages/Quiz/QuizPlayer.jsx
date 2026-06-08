@@ -10,7 +10,7 @@ import {
   getDocFromServer,
   setDoc, 
   serverTimestamp,
-  arrayUnion // <--- ADICIONADO AQUI
+  arrayUnion
 } from "firebase/firestore";
 
 // IMPORTAÇÃO DA GROQ 
@@ -52,7 +52,7 @@ const avaliarRespostaComIA = async (pergunta, textoCorreta, textoEscolhida, acer
     `;
 
     const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant", // <--- MODELO ATUALIZADO AQUI
+      model: "llama-3.1-8b-instant", 
       messages: [
         { role: "system", content: "Você é um avaliador educacional. Responda apenas com o JSON estruturado." },
         { role: "user", content: prompt }
@@ -146,6 +146,22 @@ export default function QuizPlayer() {
     return () => unsubscribe();
   }, [id, navigate]);
 
+  // ROTAS CORESPONDENTE PARA CADA PAGINA DESAFIO
+  const obterRotaRetorno = () => {
+    if (!desafio || !desafio.area) return '/desafios'; 
+    
+    const area = desafio.area.toLowerCase();
+    
+    // Agora aponta para as rotas corretas dos Capítulos de Desafios
+    if (area.includes('tecnologia')) return '/desafios/capitulostecnologia';
+    if (area.includes('direito')) return '/desafios/capitulosdireito';
+    if (area.includes('marketing')) return '/desafios/capitulosmarketing';
+    if (area.includes('engenharia')) return '/desafios/capitulosengenharia';
+    if (area.includes('rh') || area.includes('recursos humanos')) return '/desafios/capitulosrh';
+    
+    return '/desafios'; // Rota padrão de segurança
+  };
+
   const lidarComResposta = (valor) => {
     if (modoRevisao) return; 
     setRespostasUsuario(prev => ({ ...prev, [indiceAtual]: valor }));
@@ -156,7 +172,8 @@ export default function QuizPlayer() {
       setIndiceAtual(indiceAtual + 1);
     } else {
       if (modoRevisao) {
-        navigate('/desafios'); 
+        // ---> ALTERAÇÃO AQUI: Em vez de voltar para '/desafios', volta para a área certa <---
+        navigate(obterRotaRetorno()); 
       } else {
         calcularESalvarResultado(); 
       }
@@ -172,7 +189,6 @@ export default function QuizPlayer() {
     let acertos = 0;
     let novosFeedbacksIA = {}; 
     
-    // AVALIAÇÃO INTELIGENTE 
     for (let index = 0; index < desafio.questoes.length; index++) {
       const q = desafio.questoes[index];
       const respostaLetra = respostasUsuario[index]; 
@@ -245,7 +261,6 @@ export default function QuizPlayer() {
           }
       }
 
-      // SALVA A PONTUAÇÃO DO QUIZ
       await setDoc(scoreRef, {
         uid: auth.currentUser.uid,
         email: auth.currentUser.email,
@@ -262,20 +277,13 @@ export default function QuizPlayer() {
         data: serverTimestamp()
       }, { merge: true });
 
-      // ======================================================================
-      // NOVO: ATUALIZA O DOCUMENTO DO USUÁRIO PARA A BARRA DE PROGRESSO
-      // ======================================================================
       const userRef = doc(db, "users", auth.currentUser.uid);
-      
-      // Cria a chave dinamicamente (ex: se for "Marketing", vira "desafiosConcluidosMarketing")
-      // Isso permite que o mesmo QuizPlayer atualize corretamente qualquer área.
       const areaDesafioFormatada = desafio.area ? desafio.area.replace(/\s+/g, '') : "Geral";
       const campoConcluidos = `desafiosConcluidos${areaDesafioFormatada}`;
       
       await setDoc(userRef, {
         [campoConcluidos]: arrayUnion(id)
       }, { merge: true });
-      // ======================================================================
 
       setTentativasUsadas(novaContagem);
       setMelhorNotaAnterior(notaDefinitiva); 
@@ -344,7 +352,6 @@ export default function QuizPlayer() {
                     </p>
                   )}
 
-                  {/* CAIXA COM A EXPLICAÇÃO DA IA */}
                   {feedbackDaIA && (
                     <div style={{ marginTop: '15px', padding: '12px', backgroundColor: '#E0F2FE', borderRadius: '6px', borderLeft: '4px solid #0EA5E9' }}>
                       <p style={{ margin: 0, fontSize: '14px', color: '#0369A1' }}>
@@ -367,8 +374,9 @@ export default function QuizPlayer() {
                   Repetir tentativa do exercício
                 </button>
               )}
-              <Link to="/desafios" className="btn-sair" style={{ textDecoration: 'none', color: '#666', padding: '12px 20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-                Voltar ao Menu
+              {/* ---> ALTERAÇÃO AQUI: Botão de voltar para o capítulo específico <--- */}
+              <Link to={obterRotaRetorno()} className="btn-sair" style={{ textDecoration: 'none', color: '#666', padding: '12px 20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+                Voltar para {desafio.area}
               </Link>
           </div>
         </div>
@@ -411,7 +419,6 @@ export default function QuizPlayer() {
           })}
         </div>
 
-        {/* FEEDBACK VISUAL RÁPIDO - MODO REVISÃO */}
         {modoRevisao && respostasUsuario[indiceAtual] && respostasUsuario[indiceAtual] !== questaoAtual.alternativaCorreta && (
            <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', borderRadius: '4px' }}>
              <p style={{ color: '#B91C1C', margin: 0, fontWeight: 'bold' }}>Resposta Incorreta selecionada! <br />A alternativa correta é a letra {questaoAtual.alternativaCorreta?.toUpperCase()}.</p>
@@ -424,7 +431,6 @@ export default function QuizPlayer() {
            </div>
         )}
 
-        {/*CAIXA DA IA NO MODO REVISÃO */}
         {modoRevisao && feedbacksIA[indiceAtual] && (
           <div className="caixa-justificativa-ia" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', borderLeft: '6px solid #0EA5E9', borderRadius: '8px' }}>
             <h3 style={{ color: '#0369A1', marginTop: 0, marginBottom: '10px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>

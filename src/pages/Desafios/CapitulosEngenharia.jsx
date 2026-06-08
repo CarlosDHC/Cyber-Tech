@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "../Home/Home.module.css";
 
 // Firebase Imports
-import { collection, query, where, getDocs, orderBy, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, doc, onSnapshot } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../../../FirebaseConfig";
 
@@ -13,16 +13,16 @@ function CapitulosEngenharia() {
   const [desafiosConcluidos, setDesafiosConcluidos] = useState([]);
   const [certificadoLiberado, setCertificadoLiberado] = useState(false);
   const [mostrarAnimacao, setMostrarAnimacao] = useState(false);
-  const [progresso, setProgresso] = useState(0); 
+  const [progresso, setProgresso] = useState(0);
 
   // =============== CONFIGURAÇÕES DA ÁREA ===============
-  const AREA_ATUAL = "Engenharia"; 
+  const AREA_ATUAL = "Engenharia";
   const CAMPO_FIREBASE = "desafiosConcluidosEngenharia";
   const ROTA_CERTIFICADO = "/Certificado/CertificadoENG.jsx";
   const TEXTO_SUBTITULO = "Solucione problemas práticos e desenvolva projetos em áreas como sistemas renováveis e novos materiais.";
   // =====================================================
 
-  const auth = getAuth(); 
+  const auth = getAuth();
 
   // 1. BUSCAR A LISTA DE DESAFIOS DA ÁREA DE ENGENHARIA
   useEffect(() => {
@@ -49,24 +49,39 @@ function CapitulosEngenharia() {
     fetchDesafios();
   }, []);
 
-  // 2. LER O PROGRESSO DO USUÁRIO LOGADO NO FIREBASE
+  // 2. LER O PROGRESSO DO USUÁRIO LOGADO NO FIREBASE EM TEMPO REAL
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    // Variável para guardar o "ouvinte" da base de dados e podermos desligá-lo depois
+    let unsubscribeSnapshot = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
 
-        if (docSnap.exists()) {
-          const dados = docSnap.data();
-          // Usa a variável dinâmica para buscar o array correto no banco
-          setDesafiosConcluidos(dados[CAMPO_FIREBASE] || []);
-        }
+        // onSnapshot: Fica a ouvir as alterações do utilizador no Firebase em tempo real
+        unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const dados = docSnap.data();
+            // Atualiza a barra assim que o valor no banco muda
+            setDesafiosConcluidos(dados[CAMPO_FIREBASE] || []);
+          }
+        });
       } else {
-        setDesafiosConcluidos([]); 
+        // Se não houver utilizador logado, zera os desafios e desliga o ouvinte
+        setDesafiosConcluidos([]);
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+        }
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      // Quando o utilizador sai desta página, desligamos as escutas para poupar memória e leituras
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+      }
+    };
   }, [auth]);
 
   // 3. CALCULAR A BARRA DE PROGRESSO
@@ -143,7 +158,7 @@ function CapitulosEngenharia() {
       )}
 
       {certificadoLiberado && (
-        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px"}}>
+        <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px", padding: "20px 95px" }}>
           <Link to={ROTA_CERTIFICADO}>
             <button className={styles.botao}>🎓 Certificado desbloqueado!</button>
           </Link>

@@ -3,7 +3,7 @@ import html2pdf from "html2pdf.js";
 
 import { useEffect, useState } from "react";
 import { auth, db } from "../../../FirebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, arrayUnion } from "firebase/firestore";
 
 export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
   
@@ -73,26 +73,20 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
   const usuario = nomeUsuario || "Estudante";
 
   const baixarCertificado = () => {
-
     window.scrollTo(0, 0);
-
     const elemento = document.getElementById("certificado");
-
     if (!elemento) return;
 
     const opt = {
       margin: 0,
       filename: `Certificado_${usuario}.pdf`,
-
       image: {
         type: "jpeg",
         quality: 0.98,
       },
-
       pagebreak: {
         mode: ["avoid-all", "css", "legacy"],
       },
-
       html2canvas: {
         scale: 2,
         useCORS: true,
@@ -100,7 +94,6 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
         scrollY: 0,
         scrollX: 0,
       },
-
       jsPDF: {
         unit: "mm",
         format: "a4",
@@ -112,24 +105,30 @@ export default function CertificadoMAR({ nomeCurso, cargaHoraria }) {
       .set(opt)
       .from(elemento)
       .save()
-      .then(() => {
-
-        const certificadosSalvos =
-          JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
-
+      .then(async () => { 
+        
+        // Mantém a gravação local por precaução/cache
+        const certificadosSalvos = JSON.parse(localStorage.getItem("certificadosUsuario")) || [];
         if (!certificadosSalvos.includes("TEC")) {
-
           certificadosSalvos.push("TEC");
+        }
+        localStorage.setItem("certificadosUsuario", JSON.stringify(certificadosSalvos));
 
+        // ---> CÓDIGO NOVO: GRAVAÇÃO NO BANCO DE DADOS FIREBASE <---
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            const userRef = doc(db, "users", user.uid);
+            await setDoc(userRef, {
+              certificadosDesbloqueados: arrayUnion("TEC") // Salva a tag do certificado
+            }, { merge: true });
+            console.log("Certificado sincronizado na nuvem com sucesso!");
+          } catch (error) {
+            console.error("Erro ao salvar certificado no Firestore:", error);
+          }
         }
 
-        localStorage.setItem(
-          "certificadosUsuario",
-          JSON.stringify(certificadosSalvos)
-        );
-
       });
-
   };
 
   const dataHoje = new Date().toLocaleDateString("pt-BR");
