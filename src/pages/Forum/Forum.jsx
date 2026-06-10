@@ -1,59 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Forum.module.css';
-
-// Imports do Firebase
+import { moderarConteudo } from "../../services/moderacao"; 
 import { db, auth } from "../../../FirebaseConfig";
 import { 
-  collection, 
-  addDoc, 
-  query, 
-  orderBy, 
-  onSnapshot, 
-  serverTimestamp, 
-  updateDoc, 
-  doc, 
-  arrayUnion, 
-  arrayRemove 
+  collection, addDoc, query, orderBy, onSnapshot, 
+  serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove 
 } from "firebase/firestore";
-
-// --- 1. MODERAÇÃO: Filtro Local de Palavrões ---
-const palavrasProibidas = ["merda", "idiota", "imbecil", "porra","caralho"]; // Adicione suas palavras aqui
-
-const aplicarFiltroDePalavroes = (texto) => {
-  let textoFiltrado = texto;
-  palavrasProibidas.forEach(palavra => {
-    const regex = new RegExp(`\\b${palavra}\\b`, 'gi'); 
-    textoFiltrado = textoFiltrado.replace(regex, '*'.repeat(palavra.length));
-  });
-  return textoFiltrado;
-};
-
 
 const Forum = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Sidebar
   const [trendingTags, setTrendingTags] = useState([]);
-  
-  // Filtros
   const [activeFilter, setActiveFilter] = useState("Todas"); 
   const [searchQuery, setSearchQuery] = useState(""); 
-
-  // Nova pergunta
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
   const [imageLink, setImageLink] = useState(""); 
-  
-  // Tags
   const [selectedTags, setSelectedTags] = useState(["Geral"]); 
   const [tagInput, setTagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Comentários
   const [commentInputs, setCommentInputs] = useState({}); 
 
-  // --- 2. MODERAÇÃO: ESTADOS DO MODAL DE DENÚNCIA ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postIdParaDenuncia, setPostIdParaDenuncia] = useState(null);
   const [motivoDenuncia, setMotivoDenuncia] = useState("Conteúdo Inadequado/Ofensivo");
@@ -172,42 +139,24 @@ const Forum = () => {
     if (finalTags.length === 0) { alert("Adicione pelo menos uma tag."); return; }
 
     const user = auth.currentUser;
-    if (!user) { alert("Faça login para publicar."); return; }
+    if (!user) { alert("Faz login para publicar."); return; }
 
     setIsSubmitting(true);
     
+    // CHAMADA DA IA AQUI (Valida título, texto e imagem de uma vez)
+    const ehSeguro = await moderarConteudo(newTitle, newContent, imageLink);
+
+    if (!ehSeguro) {
+      alert("Conteúdo impróprio ou link não seguro detetado. Por favor, revê a tua publicação de acordo com as regras da comunidade.");
+      setIsSubmitting(false);
+      return; 
+    }
+
     try {
-      // --- 3. MODERAÇÃO: VERIFICAÇÃO COM OPENAI ---
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-      const textoAnalise = `${newTitle}. ${newContent}`;
-      
-      const respostaIA = await fetch("https://api.openai.com/v1/moderations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({ input: textoAnalise })
-      });
-
-      const dadosIA = await respostaIA.json();
-      const contemOdio = dadosIA.results[0].flagged;
-
-      if (contemOdio) {
-        alert("Sua publicação contém termos que violam as regras do fórum (Discurso de ódio ou assédio).");
-        setIsSubmitting(false);
-        return; 
-      }
-
-      // --- 4. MODERAÇÃO: APLICAR FILTRO DE PALAVRÕES ---
-      const tituloLimpo = aplicarFiltroDePalavroes(newTitle);
-      const conteudoLimpo = aplicarFiltroDePalavroes(newContent);
-      // ------------------------------------------------
-
       const safeName = getSafeUserName(user);
       await addDoc(collection(db, "forum_posts"), {
-        title: tituloLimpo, 
-        content: conteudoLimpo, 
+        title: newTitle.trim(), 
+        content: newContent.trim(), 
         imageUrl: imageLink.trim(),
         author: safeName, 
         authorId: user.uid, 
@@ -225,7 +174,7 @@ const Forum = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) { 
       console.error(error); 
-      alert("Erro ao publicar. Verifique sua conexão ou configurações.");
+      alert("Erro ao publicar. Verifica a tua ligação.");
     } finally { 
       setIsSubmitting(false); 
     }
@@ -233,7 +182,7 @@ const Forum = () => {
 
   const handleLike = async (postId, likedByArray = []) => {
     const user = auth.currentUser;
-    if (!user) { alert("Faça login."); return; }
+    if (!user) { alert("Faz login."); return; }
     const postRef = doc(db, "forum_posts", postId);
     const safeLikedBy = Array.isArray(likedByArray) ? likedByArray : [];
     const hasLiked = safeLikedBy.includes(user.uid);
@@ -246,11 +195,20 @@ const Forum = () => {
   const handleAddComment = async (postId) => {
     const text = commentInputs[postId];
     if (!text?.trim()) return;
+    
     const user = auth.currentUser;
-    if (!user) return alert("Faça login.");
+    if (!user) {
+      alert("Faz login para comentar.");
+      return;
+    }
 
-    // --- 5. MODERAÇÃO: Filtra palavrões nos comentários ---
-    const comentarioLimpo = aplicarFiltroDePalavroes(text);
+    // CHAMADA DA IA PARA COMENTÁRIOS AQUI
+    const ehSeguro = await moderarConteudo("", text, "");
+    
+    if (!ehSeguro) {
+      alert("Comentário bloqueado por violar as diretrizes de segurança da comunidade.");
+      return;
+    }
 
     try {
       const safeName = getSafeUserName(user);
@@ -258,7 +216,7 @@ const Forum = () => {
       await updateDoc(postRef, {
         comments: arrayUnion({
           id: Date.now(), 
-          text: comentarioLimpo, 
+          text: text.trim(), 
           author: safeName, 
           authorId: user.uid, 
           createdAt: new Date().toISOString()
@@ -268,7 +226,6 @@ const Forum = () => {
     } catch (error) { console.error(error); }
   };
 
-  // --- 6. MODERAÇÃO: LÓGICA DO SISTEMA DE DENÚNCIAS ---
   const abrirModalDenuncia = (postId) => {
     setPostIdParaDenuncia(postId);
     setIsModalOpen(true);
@@ -299,14 +256,13 @@ const Forum = () => {
         status: "pendente",
         data: serverTimestamp() 
       });
-      alert("Denúncia enviada com sucesso! Nossa equipe analisará em breve.");
+      alert("Denúncia enviada com sucesso! A nossa equipa analisará em breve.");
       fecharModal();
     } catch (error) {
       console.error("Erro ao enviar denúncia:", error);
-      alert("Erro ao enviar denúncia. Tente novamente.");
+      alert("Erro ao enviar denúncia. Tenta novamente.");
     }
   };
-  // --------------------------------------
 
   const formatTime = (timestamp) => {
     if (!timestamp) return "...";
@@ -321,7 +277,7 @@ const Forum = () => {
         <main className={styles.feedSection}>
           <div className={styles.headerBlock}>
             <h1 className={styles.pageTitle}>Fórum de Discussões</h1>
-            <p className={styles.pageSubtitle}>Conecte-se com especialistas e tire suas dúvidas.</p>
+            <p className={styles.pageSubtitle}>Conecta-te com especialistas e tira as tuas dúvidas.</p>
             
             <div className={styles.searchBar}>
               <div className={styles.searchIcon}>
@@ -332,7 +288,7 @@ const Forum = () => {
               </div>
               <input 
                 type="text" 
-                placeholder="Buscar por título ou assunto..." 
+                placeholder="Procurar por título ou assunto..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -354,7 +310,7 @@ const Forum = () => {
           <div className={styles.newQuestionArea}>
             <h3>Iniciar nova discussão</h3>
             {!auth.currentUser ? (
-              <p className={styles.loginWarn}>Faça login para participar.</p>
+              <p className={styles.loginWarn}>Faz login para participares.</p>
             ) : (
               <form onSubmit={handlePublish} className={styles.inputGroup}>
                 <input 
@@ -388,7 +344,7 @@ const Forum = () => {
                 <div className={styles.imageInputContainer}>
                   <input 
                     type="url" 
-                    placeholder="Cole aqui o link da imagem (http://...)" 
+                    placeholder="Cola aqui o link da imagem (http://...)" 
                     value={imageLink} 
                     onChange={(e) => setImageLink(e.target.value)} 
                     disabled={isSubmitting} 
@@ -404,20 +360,20 @@ const Forum = () => {
 
                 <textarea 
                   rows="3" 
-                  placeholder="No que você está pensando?" 
+                  placeholder="No que estás a pensar?" 
                   value={newContent} 
                   onChange={(e) => setNewContent(e.target.value)} 
                   disabled={isSubmitting} 
                   className={styles.cleanTextarea} 
                 />
                 <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                  {isSubmitting ? 'Analisando...' : 'Publicar'}
+                  {isSubmitting ? 'A analisar...' : 'Publicar'}
                 </button>
               </form>
             )}
           </div>
 
-          {loading && <p className={styles.loadingMsg}>Carregando...</p>}
+          {loading && <p className={styles.loadingMsg}>A carregar...</p>}
 
           {!loading && displayedPosts.length === 0 && (
             <div className={styles.emptyState}>
@@ -425,7 +381,7 @@ const Forum = () => {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
               <h3>Nenhuma discussão encontrada</h3>
-              <p>Não encontramos posts para <strong>{activeFilter}</strong> com esse termo.</p>
+              <p>Não encontrámos posts para <strong>{activeFilter}</strong> com esse termo.</p>
             </div>
           )}
           
@@ -475,7 +431,6 @@ const Forum = () => {
                     {post.comments?.length || 0} Comentários
                   </button>
                   
-                  {/* Botão de Denunciar Post */}
                   <button 
                     className={styles.actionBtn} 
                     style={{marginLeft: 'auto', color: '#ef4444'}} 
@@ -519,7 +474,7 @@ const Forum = () => {
               </div>
               <div>
                 <h3>Comunidade</h3>
-                <p>Conecte-se e evolua.</p>
+                <p>Conecta-te e evolui.</p>
               </div>
             </div>
           </div>
@@ -554,11 +509,10 @@ const Forum = () => {
             </div>
             <ul className={styles.rulesList}>
               <li>Respeito mútuo sempre.</li>
-              <li>Mantenha o foco do tópico.</li>
-              <li>Não compartilhe dados sensíveis.</li>
+              <li>Mantém o foco do tópico.</li>
+              <li>Não partilhes dados sensíveis.</li>
             </ul>
             
-            {/* NOVO BOTÃO: Denúncia Geral na Sidebar */}
             <button 
               className={styles.btnDenunciaGeral} 
               onClick={abrirModalDenunciaGeral}
@@ -571,7 +525,6 @@ const Forum = () => {
 
       </div>
 
-      {/* --- 7. MODERAÇÃO: RENDERIZAÇÃO DO MODAL --- */}
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={fecharModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -601,7 +554,7 @@ const Forum = () => {
               <textarea 
                 required
                 rows="4" 
-                placeholder="Descreva com detalhes o que está acontecendo..."
+                placeholder="Descreve com detalhes o que está a acontecer..."
                 value={detalhesDenuncia}
                 onChange={(e) => setDetalhesDenuncia(e.target.value)}
                 style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', resize: 'vertical', boxSizing: 'border-box'}}
