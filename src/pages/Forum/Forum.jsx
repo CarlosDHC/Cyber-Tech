@@ -8,6 +8,9 @@ import {
 } from "firebase/firestore";
 
 const Forum = () => {
+  // --- ESTADO DE NAVEGAÇÃO ---
+  const [viewMode, setViewMode] = useState('feed'); // 'feed' ou 'create'
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [trendingTags, setTrendingTags] = useState([]);
@@ -21,8 +24,9 @@ const Forum = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentInputs, setCommentInputs] = useState({}); 
 
+  // --- ESTADOS DO MODAL DE DENÚNCIA ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [postIdParaDenuncia, setPostIdParaDenuncia] = useState(null);
+  const [alvoDenuncia, setAlvoDenuncia] = useState({ tipo: null, postId: null, commentId: null, extraText: "" });
   const [motivoDenuncia, setMotivoDenuncia] = useState("Conteúdo Inadequado/Ofensivo");
   const [detalhesDenuncia, setDetalhesDenuncia] = useState("");
  
@@ -86,13 +90,10 @@ const Forum = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleCategoryClick = (category) => {
-    setActiveFilter(category);
-  };
+  const handleCategoryClick = (category) => setActiveFilter(category);
 
   const displayedPosts = posts.filter(post => {
     let matchesCategory = false;
-
     if (activeFilter === "Todas") {
       matchesCategory = true;
     } else {
@@ -104,12 +105,10 @@ const Forum = () => {
         });
       }
     }
-
     const matchesSearch = searchQuery 
       ? (post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
          post.content.toLowerCase().includes(searchQuery.toLowerCase()))
       : true;
-
     return matchesCategory && matchesSearch;
   });
 
@@ -121,12 +120,8 @@ const Forum = () => {
     }
   };
 
-  const handleTagKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTagLogic(); }
-  };
-
+  const handleTagKeyDown = (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTagLogic(); } };
   const handleManualAddTag = (e) => { e.preventDefault(); addTagLogic(); };
-  
   const removeTag = (tagToRemove) => { setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove)); };
 
   const handlePublish = async (e) => {
@@ -139,15 +134,14 @@ const Forum = () => {
     if (finalTags.length === 0) { alert("Adicione pelo menos uma tag."); return; }
 
     const user = auth.currentUser;
-    if (!user) { alert("Faz login para publicar."); return; }
+    if (!user) { alert("Faça login para publicar."); return; }
 
     setIsSubmitting(true);
     
-    // CHAMADA DA IA AQUI (Valida título, texto e imagem de uma vez)
     const ehSeguro = await moderarConteudo(newTitle, newContent, imageLink);
 
     if (!ehSeguro) {
-      alert("Conteúdo impróprio ou link não seguro detetado. Por favor, revê a tua publicação de acordo com as regras da comunidade.");
+      alert("Conteúdo impróprio ou link não seguro detectado. Revise sua publicação.");
       setIsSubmitting(false);
       return; 
     }
@@ -170,11 +164,10 @@ const Forum = () => {
       
       setNewTitle(""); setNewContent(""); setImageLink(""); 
       setSelectedTags(["Geral"]); setTagInput(""); 
-      setSearchQuery("");
+      setViewMode('feed'); // Volta para o feed após publicar com sucesso
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) { 
-      console.error(error); 
-      alert("Erro ao publicar. Verifica a tua ligação.");
+      alert("Erro ao publicar. Verifique sua conexão.");
     } finally { 
       setIsSubmitting(false); 
     }
@@ -182,7 +175,7 @@ const Forum = () => {
 
   const handleLike = async (postId, likedByArray = []) => {
     const user = auth.currentUser;
-    if (!user) { alert("Faz login."); return; }
+    if (!user) { alert("Faça login."); return; }
     const postRef = doc(db, "forum_posts", postId);
     const safeLikedBy = Array.isArray(likedByArray) ? likedByArray : [];
     const hasLiked = safeLikedBy.includes(user.uid);
@@ -197,14 +190,9 @@ const Forum = () => {
     if (!text?.trim()) return;
     
     const user = auth.currentUser;
-    if (!user) {
-      alert("Faz login para comentar.");
-      return;
-    }
+    if (!user) { alert("Faça login para comentar."); return; }
 
-    // CHAMADA DA IA PARA COMENTÁRIOS AQUI
     const ehSeguro = await moderarConteudo("", text, "");
-    
     if (!ehSeguro) {
       alert("Comentário bloqueado por violar as diretrizes de segurança da comunidade.");
       return;
@@ -215,7 +203,7 @@ const Forum = () => {
       const postRef = doc(db, "forum_posts", postId);
       await updateDoc(postRef, {
         comments: arrayUnion({
-          id: Date.now(), 
+          id: Date.now().toString(), 
           text: text.trim(), 
           author: safeName, 
           authorId: user.uid, 
@@ -226,19 +214,25 @@ const Forum = () => {
     } catch (error) { console.error(error); }
   };
 
-  const abrirModalDenuncia = (postId) => {
-    setPostIdParaDenuncia(postId);
+  // --- LÓGICA DO SISTEMA DE DENÚNCIAS ---
+  const abrirModalDenunciaPost = (postId) => {
+    setAlvoDenuncia({ tipo: "post", postId: postId, commentId: null, extraText: "" });
+    setIsModalOpen(true);
+  };
+
+  const abrirModalDenunciaComentario = (postId, comment) => {
+    setAlvoDenuncia({ tipo: "comentario", postId: postId, commentId: comment.id, extraText: comment.text });
     setIsModalOpen(true);
   };
 
   const abrirModalDenunciaGeral = () => {
-    setPostIdParaDenuncia(null); 
+    setAlvoDenuncia({ tipo: "geral", postId: null, commentId: null, extraText: "" });
     setIsModalOpen(true);
   };
 
   const fecharModal = () => {
     setIsModalOpen(false);
-    setPostIdParaDenuncia(null);
+    setAlvoDenuncia({ tipo: null, postId: null, commentId: null, extraText: "" });
     setDetalhesDenuncia("");
   };
 
@@ -246,21 +240,26 @@ const Forum = () => {
     e.preventDefault();
     const user = auth.currentUser;
 
+    let tipoDenunciaStr = "Denúncia Geral";
+    if (alvoDenuncia.tipo === "post") tipoDenunciaStr = "Denúncia de Post";
+    if (alvoDenuncia.tipo === "comentario") tipoDenunciaStr = "Denúncia de Comentário";
+
     try {
       await addDoc(collection(db, "denuncias"), {
-        tipo: postIdParaDenuncia ? "Denúncia de Post" : "Denúncia Geral", 
-        postId: postIdParaDenuncia || "N/A", 
+        tipo: tipoDenunciaStr, 
+        postId: alvoDenuncia.postId || "N/A", 
+        commentId: alvoDenuncia.commentId || "N/A",
+        textoComentario: alvoDenuncia.extraText || "", 
         motivo: motivoDenuncia,
         detalhes: detalhesDenuncia,
         denuncianteId: user ? user.uid : "Anônimo", 
         status: "pendente",
         data: serverTimestamp() 
       });
-      alert("Denúncia enviada com sucesso! A nossa equipa analisará em breve.");
+      alert("Denúncia enviada com sucesso! A nossa equipe analisará em breve.");
       fecharModal();
     } catch (error) {
-      console.error("Erro ao enviar denúncia:", error);
-      alert("Erro ao enviar denúncia. Tenta novamente.");
+      alert("Erro ao enviar denúncia. Tente novamente.");
     }
   };
 
@@ -277,220 +276,160 @@ const Forum = () => {
         <main className={styles.feedSection}>
           <div className={styles.headerBlock}>
             <h1 className={styles.pageTitle}>Fórum de Discussões</h1>
-            <p className={styles.pageSubtitle}>Conecta-te com especialistas e tira as tuas dúvidas.</p>
+            <p className={styles.pageSubtitle}>Conecte-se com especialistas e tire suas dúvidas.</p>
             
-            <div className={styles.searchBar}>
-              <div className={styles.searchIcon}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </div>
-              <input 
-                type="text" 
-                placeholder="Procurar por título ou assunto..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            <div className={styles.categoryFilterContainer}>
-              {mainCategories.map((cat) => (
-                <button 
-                  key={cat} 
-                  className={`${styles.categoryPill} ${activeFilter === cat ? styles.activePill : ''}`}
-                  onClick={() => handleCategoryClick(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
+            {/* BOTÃO PARA ALTERNAR ENTRE FEED E CRIAÇÃO */}
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                {viewMode === 'feed' ? (
+                    <button 
+                        onClick={() => setViewMode('create')}
+                        style={{ background: '#095e8b', color: 'white', padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                        Nova Discussão
+                    </button>
+                ) : (
+                    <button 
+                        onClick={() => setViewMode('feed')}
+                        style={{ background: 'transparent', color: '#095e8b', border: '1px solid #2563EB', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                        Voltar para o Feed
+                    </button>
+                )}
             </div>
           </div>
 
-          <div className={styles.newQuestionArea}>
-            <h3>Iniciar nova discussão</h3>
-            {!auth.currentUser ? (
-              <p className={styles.loginWarn}>Faz login para participares.</p>
-            ) : (
-              <form onSubmit={handlePublish} className={styles.inputGroup}>
-                <input 
-                  type="text" 
-                  placeholder="Título da discussão" 
-                  value={newTitle} 
-                  onChange={(e) => setNewTitle(e.target.value)} 
-                  disabled={isSubmitting} 
-                  className={styles.cleanInput} 
-                />
-                
-                <div className={styles.tagInputContainer}>
-                  <div className={styles.tagsWrapper}>
-                    {selectedTags.map(tag => (
-                      <span key={tag} className={styles.cleanTag}>{tag} <button type="button" onClick={() => removeTag(tag)}>×</button></span>
-                    ))}
-                    <input 
-                      type="text" 
-                      list="tagSuggestions" 
-                      placeholder="Tags (ex: Tecnologia, React)" 
-                      value={tagInput} 
-                      onChange={(e) => setTagInput(e.target.value)} 
-                      onKeyDown={handleTagKeyDown} 
-                      className={styles.tagTextInput} 
-                    />
-                    <datalist id="tagSuggestions">{tagSuggestions.map(tag => <option key={tag} value={tag} />)}</datalist>
-                    <button type="button" onClick={handleManualAddTag} className={styles.addTagBtn}>+</button>
-                  </div>
-                </div>
-
-                <div className={styles.imageInputContainer}>
-                  <input 
-                    type="url" 
-                    placeholder="Cola aqui o link da imagem (http://...)" 
-                    value={imageLink} 
-                    onChange={(e) => setImageLink(e.target.value)} 
-                    disabled={isSubmitting} 
-                    className={styles.cleanInput}
-                  />
-                  {imageLink && (
-                    <div className={styles.miniPreview}>
-                      <span className={styles.previewLabel}>Pré-visualização:</span>
-                      <img src={imageLink} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
+          {/* RENDERIZA O FORMULÁRIO APENAS SE VIEWMODE FOR 'CREATE' */}
+          {viewMode === 'create' && (
+            <div className={styles.newQuestionArea} style={{ marginTop: '20px' }}>
+              <h3>Criar Nova Publicação</h3>
+              {!auth.currentUser ? (
+                <p className={styles.loginWarn}>Faça login para publicar no fórum.</p>
+              ) : (
+                <form onSubmit={handlePublish} className={styles.inputGroup}>
+                  <input type="text" placeholder="Título da discussão" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} disabled={isSubmitting} className={styles.cleanInput} />
+                  
+                  <div className={styles.tagInputContainer}>
+                    <div className={styles.tagsWrapper}>
+                      {selectedTags.map(tag => (
+                        <span key={tag} className={styles.cleanTag}>{tag} <button type="button" onClick={() => removeTag(tag)}>×</button></span>
+                      ))}
+                      <input type="text" list="tagSuggestions" placeholder="Tags (ex: Tecnologia, React)" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleTagKeyDown} className={styles.tagTextInput} />
+                      <datalist id="tagSuggestions">{tagSuggestions.map(tag => <option key={tag} value={tag} />)}</datalist>
+                      <button type="button" onClick={handleManualAddTag} className={styles.addTagBtn}>+</button>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <textarea 
-                  rows="3" 
-                  placeholder="No que estás a pensar?" 
-                  value={newContent} 
-                  onChange={(e) => setNewContent(e.target.value)} 
-                  disabled={isSubmitting} 
-                  className={styles.cleanTextarea} 
-                />
-                <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                  {isSubmitting ? 'A analisar...' : 'Publicar'}
-                </button>
-              </form>
-            )}
-          </div>
+                  <div className={styles.imageInputContainer}>
+                    <input type="url" placeholder="Cole aqui o link da imagem (opcional)" value={imageLink} onChange={(e) => setImageLink(e.target.value)} disabled={isSubmitting} className={styles.cleanInput} />
+                    {imageLink && (
+                      <div className={styles.miniPreview}>
+                        <img src={imageLink} alt="Preview" onError={(e) => e.target.style.display = 'none'} style={{ maxHeight: '150px' }} />
+                      </div>
+                    )}
+                  </div>
 
-          {loading && <p className={styles.loadingMsg}>A carregar...</p>}
-
-          {!loading && displayedPosts.length === 0 && (
-            <div className={styles.emptyState}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <h3>Nenhuma discussão encontrada</h3>
-              <p>Não encontrámos posts para <strong>{activeFilter}</strong> com esse termo.</p>
+                  <textarea rows="5" placeholder="Desenvolva sua ideia aqui..." value={newContent} onChange={(e) => setNewContent(e.target.value)} disabled={isSubmitting} className={styles.cleanTextarea} />
+                  <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                    {isSubmitting ? 'A analisar...' : 'Publicar'}
+                  </button>
+                </form>
+              )}
             </div>
           )}
-          
-          {displayedPosts.map((post) => {
-            const likedBy = post.likedBy || [];
-            const userHasLiked = auth.currentUser && likedBy.includes(auth.currentUser.uid);
 
-            return (
-              <div key={post.id} className={styles.postCard}>
-                <div className={styles.postHeader}>
-                  <div className={styles.authorBadge}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                  </div>
-                  <div className={styles.authorInfo}>
-                    <h4>{post.author}</h4>
-                    <span>{formatTime(post.createdAt)}</span>
-                  </div>
-                </div>
-
-                <div className={styles.postContent}>
-                  <h3>{post.title}</h3>
-                  <p>{post.content}</p>
-                  
-                  {post.imageUrl && (
-                    <div className={styles.postImageWrapper}>
-                      <img src={post.imageUrl} alt="Anexo" onError={(e) => e.target.style.display = 'none'} />
-                    </div>
-                  )}
-
-                  <div className={styles.tags}>
-                    {post.tags?.map((tag, idx) => (
-                      <span key={idx} className={styles.tag}>#{tag}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className={styles.postFooter}>
-                  <button className={`${styles.actionBtn} ${userHasLiked ? styles.liked : ''}`} onClick={() => handleLike(post.id, likedBy)}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={userHasLiked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    {likedBy.length} Relevância
-                  </button>
-                  <button className={styles.actionBtn}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                    {post.comments?.length || 0} Comentários
-                  </button>
-                  
-                  <button 
-                    className={styles.actionBtn} 
-                    style={{marginLeft: 'auto', color: '#ef4444'}} 
-                    onClick={() => abrirModalDenuncia(post.id)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                    Denunciar
-                  </button>
-                </div>
-
-                <div className={styles.commentsSection}>
-                  {post.comments?.map((comment, idx) => (
-                    <div key={idx} className={styles.comment}>
-                      <span className={styles.commentAuthor}>{comment.author}:</span>
-                      <span className={styles.commentText}>{comment.text}</span>
-                    </div>
-                  ))}
-                  <div className={styles.commentInputGroup}>
-                    <input 
-                      type="text" 
-                      placeholder="Adicionar resposta..." 
-                      value={commentInputs[post.id] || ""} 
-                      onChange={(e) => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })} 
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddComment(post.id); }}} 
-                    />
-                    <button className={styles.sendBtn} onClick={() => handleAddComment(post.id)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
-                  </div>
-                </div>
+          {/* RENDERIZA O FEED APENAS SE VIEWMODE FOR 'FEED' */}
+          {viewMode === 'feed' && (
+            <>
+              <div className={styles.searchBar} style={{ marginTop: '20px' }}>
+                <input type="text" placeholder="Procurar por título ou assunto..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}/>
               </div>
-            );
-          })}
+
+              <div className={styles.categoryFilterContainer} style={{ marginTop: '15px' }}>
+                {mainCategories.map((cat) => (
+                  <button key={cat} className={`${styles.categoryPill} ${activeFilter === cat ? styles.activePill : ''}`} onClick={() => handleCategoryClick(cat)}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {loading && <p className={styles.loadingMsg}>A carregar...</p>}
+              {!loading && displayedPosts.length === 0 && <p style={{ marginTop: '20px' }}>Nenhuma discussão encontrada.</p>}
+              
+              {displayedPosts.map((post) => {
+                const likedBy = post.likedBy || [];
+                const userHasLiked = auth.currentUser && likedBy.includes(auth.currentUser.uid);
+
+                return (
+                  <div key={post.id} className={styles.postCard}>
+                    <div className={styles.postHeader}>
+                      <div className={styles.authorBadge}>
+                        <div style={{ width: '30px', height: '30px', background: '#e2e8f0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                            {post.authorInitial}
+                        </div>
+                      </div>
+                      <div className={styles.authorInfo}>
+                        <h4>{post.author}</h4>
+                        <span>{formatTime(post.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    <div className={styles.postContent}>
+                      <h3>{post.title}</h3>
+                      <p>{post.content}</p>
+                      {post.imageUrl && (
+                        <div className={styles.postImageWrapper}>
+                          <img src={post.imageUrl} alt="Anexo" onError={(e) => e.target.style.display = 'none'} />
+                        </div>
+                      )}
+                      <div className={styles.tags}>
+                        {post.tags?.map((tag, idx) => ( <span key={idx} className={styles.tag}>#{tag}</span> ))}
+                      </div>
+                    </div>
+
+                    <div className={styles.postFooter}>
+                      <button className={`${styles.actionBtn} ${userHasLiked ? styles.liked : ''}`} onClick={() => handleLike(post.id, likedBy)}>
+                        Relevância ({likedBy.length})
+                      </button>
+                      
+                      <button className={styles.actionBtn} style={{marginLeft: 'auto', color: '#ef4444'}} onClick={() => abrirModalDenunciaPost(post.id)}>
+                        Denunciar Post
+                      </button>
+                    </div>
+
+                    <div className={styles.commentsSection}>
+                      {post.comments?.map((comment, idx) => (
+                        <div key={idx} className={styles.comment} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div>
+                            <span className={styles.commentAuthor}>{comment.author}:</span>
+                            <span className={styles.commentText}>{comment.text}</span>
+                          </div>
+                          <button 
+                            onClick={() => abrirModalDenunciaComentario(post.id, comment)}
+                            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '10px' }}
+                          >
+                            Denunciar
+                          </button>
+                        </div>
+                      ))}
+                      <div className={styles.commentInputGroup}>
+                        <input type="text" placeholder="Adicionar resposta..." value={commentInputs[post.id] || ""} onChange={(e) => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddComment(post.id); }}} />
+                        <button className={styles.sendBtn} onClick={() => handleAddComment(post.id)}>Enviar</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </main>
         
         <aside className={styles.sidebarSection}>
           <div className={styles.sidebarCard}>
-            <div className={styles.sidebarHeader}>
-              <div className={styles.iconBox} style={{backgroundColor: '#e0e7ff', color: '#2563EB'}}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              </div>
-              <div>
-                <h3>Comunidade</h3>
-                <p>Conecta-te e evolui.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.sidebarCard}>
-            <div className={styles.sidebarTitle}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg>
-              Em Alta
-            </div>
+            <div className={styles.sidebarTitle}>Em Alta</div>
             {trendingTags.length === 0 ? <p className={styles.emptyMsg}>Sem dados recentes</p> : (
               <ul className={styles.topicList}>
                 {trendingTags.map((item) => (
-                  <li key={item.tag} className={styles.topicItem} onClick={() => {
-                    setSearchQuery(item.tag); 
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}>
+                  <li key={item.tag} className={styles.topicItem} onClick={() => { setSearchQuery(item.tag); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                     <div className={styles.topicHeader}>
                       <span className={styles.topicName}>#{item.tag}</span>
                       <span className={styles.topicCount}>{item.count}</span>
@@ -501,72 +440,41 @@ const Forum = () => {
               </ul>
             )}
           </div>
-
           <div className={styles.sidebarCard}>
-            <div className={styles.sidebarTitle}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-              Regras
-            </div>
-            <ul className={styles.rulesList}>
-              <li>Respeito mútuo sempre.</li>
-              <li>Mantém o foco do tópico.</li>
-              <li>Não partilhes dados sensíveis.</li>
-            </ul>
-            
-            <button 
-              className={styles.btnDenunciaGeral} 
-              onClick={abrirModalDenunciaGeral}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+            <button className={styles.btnDenunciaGeral} onClick={abrirModalDenunciaGeral}>
               Relatar Problema Geral
             </button>
           </div>
         </aside>
-
       </div>
 
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={fecharModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h3 style={{marginTop: 0, color: '#f8fafc', marginBottom: '20px', fontSize: '1.3rem'}}>
-              {postIdParaDenuncia ? "Relatar Publicação" : "Relatar Problema Geral"}
+              {alvoDenuncia.tipo === "post" ? "Relatar Publicação" : alvoDenuncia.tipo === "comentario" ? "Relatar Comentário" : "Relatar Problema Geral"}
             </h3>
             
+            {alvoDenuncia.tipo === "comentario" && (
+                <div style={{ background: '#1e293b', padding: '10px', borderRadius: '6px', marginBottom: '15px', borderLeft: '3px solid #ef4444' }}>
+                    <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, fontStyle: 'italic' }}>"{alvoDenuncia.extraText}"</p>
+                </div>
+            )}
+
             <form onSubmit={handleEnviarDenuncia}>
-              <label style={{display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem'}}>
-                {postIdParaDenuncia ? "Qual o problema desta publicação?" : "Qual a natureza do problema?"}
-              </label>
-              <select 
-                value={motivoDenuncia} 
-                onChange={(e) => setMotivoDenuncia(e.target.value)}
-                style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', boxSizing: 'border-box'}}
-              >
+              <select value={motivoDenuncia} onChange={(e) => setMotivoDenuncia(e.target.value)} style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', boxSizing: 'border-box'}}>
                 <option value="Conteúdo Inadequado/Ofensivo">Conteúdo Inadequado / Ofensivo</option>
                 <option value="Spam ou Propaganda">Spam ou Propaganda</option>
                 <option value="Assédio ou Bullying">Assédio ou Bullying</option>
-                {!postIdParaDenuncia && (
-                  <option value="Problema Técnico/Bug">Problema Técnico / Bug no Site</option>
-                )}
+                {alvoDenuncia.tipo === "geral" && <option value="Problema Técnico/Bug">Problema Técnico / Bug no Site</option>}
                 <option value="Outros">Outros</option>
               </select>
 
-              <label style={{display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem'}}>Detalhes adicionais (obrigatório para melhor análise):</label>
-              <textarea 
-                required
-                rows="4" 
-                placeholder="Descreve com detalhes o que está a acontecer..."
-                value={detalhesDenuncia}
-                onChange={(e) => setDetalhesDenuncia(e.target.value)}
-                style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', resize: 'vertical', boxSizing: 'border-box'}}
-              />
+              <textarea required rows="4" placeholder="Descreva com detalhes o que está acontecendo..." value={detalhesDenuncia} onChange={(e) => setDetalhesDenuncia(e.target.value)} style={{width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', background: '#0f172a', color: 'white', border: '1px solid #475569', resize: 'vertical', boxSizing: 'border-box'}} />
 
               <div style={{display: 'flex', justifyContent: 'flex-end', gap: '12px'}}>
-                <button type="button" onClick={fecharModal} style={{background: 'transparent', color: '#cbd5e1', border: '1px solid #475569', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: '0.2s'}}>
-                  Cancelar
-                </button>
-                <button type="submit" style={{background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s'}}>
-                  Enviar Denúncia
-                </button>
+                <button type="button" onClick={fecharModal} style={{background: 'transparent', color: '#cbd5e1', border: '1px solid #475569', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer'}}>Cancelar</button>
+                <button type="submit" style={{background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>Enviar Denúncia</button>
               </div>
             </form>
           </div>

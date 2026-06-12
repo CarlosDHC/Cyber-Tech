@@ -17,7 +17,7 @@
   --color-text-muted: #64748b;
   --color-primary-blue: #4a82f3;
   --color-primary-hover: #3a71e2;
-  --color-text-warning: #ef4444;
+  --color-text-warning: #e99090;
   --color-light-bg: #f1f5f9;
   --color-primary-light: #0d6e9e;
   --color-success: #22c55e;
@@ -512,7 +512,7 @@ body {
 }
 
 .btnReopen {
-  background-color: #d97706;
+  background-color: #0d6e9e;
   color: var(--color-white);
   border: none;
   padding: 7px 14px;
@@ -524,7 +524,7 @@ body {
 }
 
 .btnReopen:hover {
-  opacity: 0.85;
+  background-color: var(--color-primary-hover);
 }
 
 .btnView {
@@ -560,7 +560,7 @@ body {
 }
 
 .btnDeleteRecord {
-  background: transparent;
+  background: #0d6e9e;
   border: none;
   color: var(--color-text-warning);
   cursor: pointer;
@@ -571,7 +571,7 @@ body {
 }
 
 .btnDeleteRecord:hover {
-  opacity: 0.75;
+  background-color: var(--color-primary-hover);
   text-decoration: underline;
 }
 

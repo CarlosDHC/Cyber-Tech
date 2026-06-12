@@ -6,7 +6,7 @@ import {
     query, orderBy, getDoc 
 } from 'firebase/firestore';
 
-// Usa o seu CSS padrão
+import { analisarDenunciaComIA } from '../../services/moderacao';
 import styles from '../Admin.module.css';
 
 const Denuncia = () => {
@@ -14,16 +14,14 @@ const Denuncia = () => {
     const [loading, setLoading] = useState(true);
     const [collapsed, setCollapsed] = useState(false);
     const [postsOriginais, setPostsOriginais] = useState({});
+    const [isAnalisandoIA, setIsAnalisandoIA] = useState(false);
 
     const fetchDenuncias = async () => {
         setLoading(true);
         try {
             const q = query(collection(db, "denuncias"), orderBy("data", "desc"));
             const querySnapshot = await getDocs(q);
-            const data = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setDenuncias(data);
         } catch (error) {
             console.error("Erro ao buscar denúncias:", error);
@@ -51,36 +49,67 @@ const Denuncia = () => {
                 
                 setPostsOriginais(prev => ({
                     ...prev,
-                    [postId]: {
-                        encontrado: true,
-                        texto: textoExibicao,
-                        imagem: dados.imageUrl || dados.imagem || ""
-                    }
+                    [postId]: { encontrado: true, texto: textoExibicao, imagem: dados.imageUrl || dados.imagem || "" }
                 }));
             } else {
-                setPostsOriginais(prev => ({ 
-                    ...prev, 
-                    [postId]: { encontrado: false, erro: "O conteúdo original já foi removido." } 
-                }));
+                setPostsOriginais(prev => ({ ...prev, [postId]: { encontrado: false, erro: "O conteúdo original já foi removido." } }));
             }
         } catch (error) {
             setPostsOriginais(prev => ({ ...prev, [postId]: { encontrado: false, erro: "Erro ao carregar original." } }));
         }
     };
 
-    const handleDeleteOriginalContent = async (postId, denunciaId) => {
-        if (window.confirm("ATENÇÃO: Você deseja excluir PERMANENTEMENTE o post/comentário original do fórum?")) {
-            try {
-                await deleteDoc(doc(db, "forum_posts", postId));
-                await deleteDoc(doc(db, "forum_messages", postId));
-                await handleUpdateStatus(denunciaId, 'solucionado');
-                alert("Conteúdo original removido com sucesso!");
-                setPostsOriginais(prev => ({
-                    ...prev,
-                    [postId]: { encontrado: false, erro: "Conteúdo removido pelo administrador." }
-                }));
-            } catch (error) {
-                alert("Erro ao tentar excluir o conteúdo original.");
+    // --- FUNÇÃO AGRESSIVA DE EXCLUSÃO (BLINDADA CONTRA ERROS DE ID) ---
+    const executarExclusaoNoBanco = async (denuncia) => {
+        try {
+            if (!denuncia.postId || denuncia.postId === "N/A") return false;
+
+            const postRef = doc(db, "forum_posts", denuncia.postId);
+            const isComment = denuncia.tipo === "Denúncia de Comentário";
+
+            if (isComment) {
+                const postSnap = await getDoc(postRef);
+                if (postSnap.exists()) {
+                    const postData = postSnap.data();
+                    if (postData.comments && postData.comments.length > 0) {
+                        // Remove o comentário pelo ID OU pelo texto exato (para não haver hipótese de falha)
+                        const novosComentarios = postData.comments.filter(c => 
+                            String(c.id) !== String(denuncia.commentId) && 
+                            c.text !== denuncia.textoComentario
+                        );
+                        await updateDoc(postRef, { comments: novosComentarios });
+                    }
+                }
+            } else {
+                // Deleta o post inteiro se a denúncia for de Post
+                await deleteDoc(postRef);
+            }
+            
+            // Retira o visual do ecrã do Administrador
+            setPostsOriginais(prev => ({
+                ...prev,
+                [denuncia.postId]: { encontrado: false, erro: "Conteúdo removido pela IA de moderação." }
+            }));
+
+            return true; 
+        } catch (error) {
+            console.error("Erro interno do Firebase ao excluir:", error);
+            return false;
+        }
+    };
+
+    const handleDeleteOriginalContent = async (denuncia) => {
+        const msg = denuncia.tipo === "Denúncia de Comentário" 
+            ? "ATENÇÃO: Deseja excluir PERMANENTEMENTE este comentário?" 
+            : "ATENÇÃO: Deseja excluir PERMANENTEMENTE o post inteiro do fórum?";
+
+        if (window.confirm(msg)) {
+            const sucesso = await executarExclusaoNoBanco(denuncia);
+            if (sucesso) {
+                await handleUpdateStatus(denuncia.id, 'solucionado');
+                alert("Conteúdo removido com sucesso!");
+            } else {
+                alert("Falha ao remover. O conteúdo já pode ter sido apagado ou não tens permissões.");
             }
         }
     };
@@ -88,21 +117,64 @@ const Denuncia = () => {
     const handleUpdateStatus = async (id, novoStatus) => {
         try {
             await updateDoc(doc(db, "denuncias", id), { status: novoStatus });
-            setDenuncias(denuncias.map(d => d.id === id ? { ...d, status: novoStatus } : d));
-        } catch (error) {
-            alert("Erro ao atualizar status.");
-        }
+            setDenuncias(prev => prev.map(d => d.id === id ? { ...d, status: novoStatus } : d));
+        } catch (error) { console.error("Erro ao atualizar status."); }
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("Deseja excluir este registro de denúncia do histórico?")) {
             try {
                 await deleteDoc(doc(db, "denuncias", id));
-                setDenuncias(denuncias.filter(d => d.id !== id));
+                setDenuncias(prev => prev.filter(d => d.id !== id));
+            } catch (error) { alert("Erro ao excluir."); }
+        }
+    };
+
+    const rodarTriagemIA = async () => {
+        setIsAnalisandoIA(true);
+        const denunciasPendentes = denuncias.filter(d => d.status === "pendente");
+
+        if (denunciasPendentes.length === 0) {
+            alert("Não existem denúncias pendentes para a IA analisar no momento.");
+            setIsAnalisandoIA(false);
+            return;
+        }
+
+        let atualizadas = 0;
+        let excluidas = 0;
+
+        for (let denuncia of denunciasPendentes) {
+            try {
+                // Passamos o texto original do comentário para a IA ler as ofensas reais
+                const veredicto = await analisarDenunciaComIA(denuncia.motivo, denuncia.detalhes, denuncia.textoComentario || "");
+                const denunciaRef = doc(db, "denuncias", denuncia.id);
+
+                if (veredicto === "GRAVE") {
+                    const deletadoComSucesso = await executarExclusaoNoBanco(denuncia);
+                    
+                    if (deletadoComSucesso) {
+                        await updateDoc(denunciaRef, { statusIA: "GRAVE - EXCLUÍDO PELA IA", status: "solucionado" });
+                        excluidas++;
+                    } else {
+                        await updateDoc(denunciaRef, { statusIA: "GRAVE - ERRO AO EXCLUIR", status: "pendente" });
+                    }
+                } 
+                else if (veredicto === "DESCARTAR") {
+                    await updateDoc(denunciaRef, { statusIA: "DESCARTAR", status: "solucionado" });
+                } 
+                else {
+                    await updateDoc(denunciaRef, { statusIA: "ANALISAR", status: "pendente" });
+                }
+                
+                atualizadas++;
             } catch (error) {
-                alert("Erro ao excluir.");
+                console.error("Erro ao analisar a denúncia " + denuncia.id, error);
             }
         }
+
+        alert(`Triagem concluída! A IA avaliou ${atualizadas} denúncia(s) e deletou ${excluidas} conteúdo(s) automaticamente.`);
+        setIsAnalisandoIA(false);
+        fetchDenuncias(); 
     };
 
     if (loading) return <div className={styles.loading}>Carregando central de moderação...</div>;
@@ -110,9 +182,7 @@ const Denuncia = () => {
     return (
         <div className={styles.container}>
             <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
-                <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
-                    <img src="/menu.png" alt="menu" />
-                </button>
+                <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}><img src="/menu.png" alt="menu" /></button>
                 <h2 className={styles.title}>ADMIN</h2>
                 <ul className={styles.navList}>
                     <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
@@ -127,48 +197,71 @@ const Denuncia = () => {
 
             <main className={styles.main}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h1 className={styles.mainTitle}>Moderação & Revisão</h1>
-                    <span style={{ color: '#666' }}>{denuncias.length} registros</span>
+                    <div>
+                        <h1 className={styles.mainTitle}>Moderação & Revisão</h1>
+                        <span style={{ color: '#666' }}>{denuncias.length} registros</span>
+                    </div>
+                    
+                    <button 
+                        onClick={rodarTriagemIA} disabled={isAnalisandoIA}
+                        style={{
+                            backgroundColor: isAnalisandoIA ? '#94a3b8' : '#0d6e9e', color: 'white', border: 'none', padding: '12px 24px',
+                            borderRadius: '8px', fontWeight: 'bold', cursor: isAnalisandoIA ? 'not-allowed' : 'pointer',
+                            display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(139, 92, 246, 0.25)', transition: 'all 0.2s'
+                        }}
+                    >
+                        {isAnalisandoIA ? "A IA está a analisar..." : <><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Triagem Automática (IA)</>}
+                    </button>
                 </div>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
                     {denuncias.map((denuncia) => (
                         <div key={denuncia.id} style={{ 
                             backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                            borderLeft: denuncia.status === 'pendente' ? '6px solid #ffa940' : '6px solid #52c41a',
+                            borderLeft: denuncia.statusIA?.includes('GRAVE') ? '6px solid #d04343' : denuncia.status === 'pendente' ? '6px solid #ffa940' : '6px solid #52c41a',
                             overflow: 'hidden'
                         }}>
-                            {/* Cabeçalho do Card */}
                             <div style={{ padding: '15px 20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
-                                    <strong style={{ display: 'block', fontSize: '1.1rem', color: '#333' }}>{denuncia.motivo}</strong>
+                                    <strong style={{ display: 'block', fontSize: '1.1rem', color: '#333' }}>
+                                        {denuncia.motivo} 
+                                        {denuncia.statusIA && (
+                                            <span style={{ marginLeft: '10px', fontSize: '0.75rem', padding: '3px 8px', borderRadius: '4px',
+                                                backgroundColor: denuncia.statusIA?.includes('GRAVE') ? '#fee2e2' : denuncia.statusIA?.includes('DESCARTAR') ? '#f1f5f9' : '#fef3c7',
+                                                color: denuncia.statusIA?.includes('GRAVE') ? '#ef4444' : denuncia.statusIA?.includes('DESCARTAR') ? '#64748b' : '#d97706'
+                                            }}>
+                                                IA: {denuncia.statusIA}
+                                            </span>
+                                        )}
+                                    </strong>
                                     <small style={{ color: '#888' }}>{denuncia.tipo}</small>
                                 </div>
-                                <span style={{ 
-                                    padding: '5px 15px', borderRadius: '15px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase',
-                                    backgroundColor: denuncia.status === 'pendente' ? '#fff7e6' : '#f6ffed',
-                                    color: denuncia.status === 'pendente' ? '#ffa940' : '#52c41a', border: '1px solid'
+                                <span style={{ padding: '5px 15px', borderRadius: '15px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase',
+                                    backgroundColor: denuncia.status === 'pendente' ? '#fff7e6' : '#f6ffed', color: denuncia.status === 'pendente' ? '#ffa940' : '#52c41a', border: '1px solid'
                                 }}>
                                     {denuncia.status}
                                 </span>
                             </div>
 
-                            {/* Corpo do Card */}
                             <div style={{ padding: '20px' }}>
                                 <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#aaa', textTransform: 'uppercase' }}>Relato do Usuário:</label>
                                 <p style={{ margin: '5px 0 15px 0', color: '#444', lineHeight: '1.5' }}>{denuncia.detalhes}</p>
 
-                                {/* Área de Revisão do Fórum */}
+                                {denuncia.tipo === "Denúncia de Comentário" && denuncia.textoComentario && (
+                                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '6px', marginBottom: '15px', borderLeft: '3px solid #3b82f6' }}>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#64748b', display: 'block', marginBottom: '4px' }}>COMENTÁRIO DENUNCIADO:</label>
+                                        <p style={{ margin: 0, color: '#334155', fontStyle: 'italic' }}>"{denuncia.textoComentario}"</p>
+                                    </div>
+                                )}
+
                                 {denuncia.postId !== "N/A" && (
                                     <div style={{ backgroundColor: '#f0f2f5', padding: '15px', borderRadius: '8px', marginTop: '15px' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555' }}>CONTEÚDO ORIGINAL DO FÓRUM</label>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#555' }}>POST ORIGINAL ASSOCIADO</label>
                                             <div style={{ display: 'flex', gap: '8px' }}>
-                                                <button onClick={() => buscarPostOriginal(denuncia.postId)} className={styles.btnView}>
-                                                    Ver Conteúdo
-                                                </button>
-                                                <button onClick={() => handleDeleteOriginalContent(denuncia.postId, denuncia.id)} className={styles.btnDeleteOriginal}>
-                                                    Apagar Post Original
+                                                <button onClick={() => buscarPostOriginal(denuncia.postId)} className={styles.btnView}>Ver Post</button>
+                                                <button onClick={() => handleDeleteOriginalContent(denuncia)} className={styles.btnDeleteOriginal}>
+                                                    {denuncia.tipo === "Denúncia de Comentário" ? "Apagar Apenas Comentário" : "Apagar Post Original"}
                                                 </button>
                                             </div>
                                         </div>
@@ -184,11 +277,7 @@ const Denuncia = () => {
                                                         </p>
                                                         {postsOriginais[denuncia.postId].imagem && (
                                                             <div style={{ textAlign: 'center' }}>
-                                                                <img 
-                                                                    src={postsOriginais[denuncia.postId].imagem} 
-                                                                    alt="Post" 
-                                                                    style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '4px', border: '1px solid #eee', objectFit: 'contain' }} 
-                                                                />
+                                                                <img src={postsOriginais[denuncia.postId].imagem} alt="Post" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '4px', border: '1px solid #eee', objectFit: 'contain' }} />
                                                             </div>
                                                         )}
                                                     </>
@@ -199,19 +288,13 @@ const Denuncia = () => {
                                 )}
                             </div>
 
-                            {/* Rodapé do Card */}
                             <div style={{ padding: '15px 20px', backgroundColor: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eee' }}>
                                 <small style={{ color: '#999' }}>Registrado em: {denuncia.data?.toDate().toLocaleString('pt-BR')}</small>
                                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    <button 
-                                        onClick={() => handleUpdateStatus(denuncia.id, denuncia.status === 'pendente' ? 'solucionado' : 'pendente')}
-                                        className={denuncia.status === 'pendente' ? styles.btnResolve : styles.btnReopen}
-                                    >
+                                    <button onClick={() => handleUpdateStatus(denuncia.id, denuncia.status === 'pendente' ? 'solucionado' : 'pendente')} className={denuncia.status === 'pendente' ? styles.btnResolve : styles.btnReopen}>
                                         {denuncia.status === 'pendente' ? 'Resolver' : 'Reabrir'}
                                     </button>
-                                    <button onClick={() => handleDelete(denuncia.id)} className={styles.btnDeleteRecord}>
-                                        Excluir Registro
-                                    </button>
+                                    <button onClick={() => handleDelete(denuncia.id)} className={styles.btnDeleteRecord}>Excluir Registro</button>
                                 </div>
                             </div>
                         </div>
