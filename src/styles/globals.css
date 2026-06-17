@@ -140,26 +140,68 @@ footer {
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* RESPONSIVIDADE */
-@media (max-width: 768px) {
+/*RESPONSIVIDADE GLOBAL*/
+
+/* 1. MOBILE (Telas Pequenas: Celulares em pé e deitados - até 767px) */
+@media (max-width: 767px) {
   main {
-    padding-top: 60px;
+    padding-top: 60px; /* Ajuste para o header mobile */
   }
 
   .container {
     padding: 1rem;
-    margin: 4rem auto; /* Ajuste para mobile */
-    width: 95%;
+    margin: 3rem auto;
+    width: 95%; /* Ocupa quase toda a tela lateralmente */
+    border-radius: 8px;
+    margin-top: 4rem;
   }
   
-  h1 { font-size: 1.8rem;
-    margin: 5px;
-  }
-  
-  h2 { font-size: 1.5rem; }
+  h1 { font-size: 1.5rem; margin-top: 10px; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
 }
 
+/* 2. TABLET / TELAS MÉDIAS (Tablets e Laptops pequenos - 768px a 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  main {
+    padding-top: calc(var(--header-height) + 10px);
+  }
+
+  .container {
+    padding: 1.5rem;
+    margin: 4rem auto;
+    width: 90%; 
+    border-radius: 12px;
+  }
+  
+  h1 { font-size: 2rem; margin-top: 15px; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
+
+/* 3. DESKTOP / TELAS GRANDES (Monitores - acima de 1024px) */
+/* (Muitas dessas regras já são herdadas do padrão, mas é bom fixá-las para os títulos) */
+@media (min-width: 1025px) {
+  main {
+    padding-top: calc(var(--header-height) + 20px);
+  }
+
+  .container {
+    padding: 2rem;
+    margin: 50px auto;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 5rem;
+  }
+
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 1.75rem; }
+  h3 { font-size: 1.5rem; }
+}
+
+/* Regra Global para mídias (garante que imagens não quebrem o layout) */
 img, video, iframe {
   max-width: 100%;
   height: auto;
+  object-fit: cover; /* Evita achatamento de imagens */
 }

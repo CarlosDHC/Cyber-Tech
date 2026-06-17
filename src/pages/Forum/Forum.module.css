@@ -1,13 +1,10 @@
-/* --- ESTILO GLOBAL DO FÓRUM (MODERNO) --- */
 .forumPage {
-  background-color: #f8fafc;
-  /* Cinza muito suave, quase branco */
+  background-color: #f8fafc; /* Cinza muito suave, quase branco */
   min-height: 100vh;
   padding-bottom: 80px;
   padding-top: 100px;
   margin-top: -60px;
-  /* Fonte profissional do sistema (Inter/San Francisco/Roboto) */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   color: #1e293b;
 }
 
@@ -19,10 +16,7 @@ main {
 }
 
 .contentWrapper {
-  max-width: 1100px;
-  /* Leitura mais confortável */
   margin: 0 auto;
-  padding: 0 20px;
   display: flex;
   gap: 20px;
   position: relative;
@@ -36,13 +30,12 @@ main {
   gap: 24px;
 }
 
-/* --- CABEÇALHO E BUSCA --- */
+/* CABEÇALHO E BUSCA */
 .headerBlock {
   margin-bottom: 10px;
 }
 
 .pageTitle {
-  font-size: 1.75rem;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.02em;
@@ -88,19 +81,17 @@ main {
   background: transparent;
 }
 
-/* --- FILTRO POR CATEGORIAS (PÍLULAS) --- */
+/* FILTRO POR CATEGORIAS (PÍLULAS) */
 .categoryFilterContainer {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 5px;
-  scrollbar-width: none;
-  /* Esconde scroll no Firefox */
+  scrollbar-width: none; /* Esconde scroll no Firefox */
 }
 
 .categoryFilterContainer::-webkit-scrollbar {
-  display: none;
-  /* Esconde scroll no Chrome */
+  display: none; /* Esconde scroll no Chrome */
 }
 
 .categoryPill {
@@ -132,12 +123,11 @@ main {
   color: white;
 }
 
-/* --- POST CARD (CLEAN) --- */
+/* POST CARD (CLEAN) */
 .postCard {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 24px;
   transition: box-shadow 0.2s;
 }
 
@@ -177,7 +167,6 @@ main {
 
 .postContent h3 {
   margin: 0 0 8px 0;
-  font-size: 1.25rem;
   color: #1e293b;
   font-weight: 700;
   line-height: 1.4;
@@ -308,12 +297,12 @@ main {
   border-radius: 50px;
 }
 
-/* --- ÁREA DE CRIAÇÃO (MINIMALISTA) --- */
+/* ÁREA DE CRIAÇÃO (MINIMALISTA) */
 .newQuestionArea {
   background: rgb(255, 255, 255);
   border-radius: 16px;
   padding: 20px;
-  border: 1px solid #6f6f6f6d;
+  border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
@@ -349,67 +338,6 @@ main {
   min-height: 100px;
 }
 
-.tagsWrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px;
-  margin: 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #fcfcfc;
-  align-items: center;
-}
-
-.tagTextInput {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.9rem;
-  flex: 1;
-  min-width: 100px;
-}
-
-.cleanTag {
-  background: #e0e7ff;
-  color: #3730a3;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.cleanTag button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: #3730a3;
-  padding: 0;
-  line-height: 1;
-}
-
-.addTagBtn {
-  border: none;
-  background: #2563EB;
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.miniPreview img {
-  height: 60px;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
-  margin-top: 8px;
-}
-
 .submitBtn {
   margin-top: 12px;
   background-color: #2563EB;
@@ -427,46 +355,14 @@ main {
   background-color: #1d4ed8;
 }
 
-/* --- SIDEBAR --- */
-.sidebarSection {
-  width: 300px;
-  position: sticky;
-  top: 120px;
-}
-
+/* SIDEBAR */
 .sidebarCard {
   background: white;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
   padding: 20px;
   margin-bottom: 20px;
-}
-
-.sidebarHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.iconBox {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebarHeader h3 {
-  margin: 0;
-  font-size: 1rem;
-  color: #0f172a;
-}
-
-.sidebarHeader p {
-  margin: 0;
-  font-size: 0.8rem;
-  color: #64748b;
+  margin-top: 3rem;
 }
 
 .sidebarTitle {
@@ -505,23 +401,6 @@ main {
   color: #2563EB;
 }
 
-.topicHighlight {
-  font-size: 0.8rem;
-  color: #64748b;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.topicCount {
-  background: #f1f5f9;
-  color: #64748b;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
-
 .rulesList {
   padding-left: 15px;
   font-size: 0.9rem;
@@ -529,31 +408,7 @@ main {
   line-height: 1.6;
 }
 
-.emptyState {
-  text-align: center;
-  padding: 40px 0;
-  color: #94a3b8;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .contentWrapper {
-    flex-direction: column;
-  }
-
-  .sidebarSection {
-    width: 100%;
-    position: static;
-    order: -1;
-  }
-
-  .pageTitle {
-    font-size: 1.5rem;
-  }
-}
-
-/* Adicione no final do seu Forum.module.css */
-
+/* MODAIS E BOTÕES ESPECIAIS */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -561,13 +416,10 @@ main {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
-  /* Fundo um pouco mais escuro */
   backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
-  /* Centraliza horizontalmente */
   align-items: center;
-  /* Centraliza verticalmente */
   z-index: 10000;
 }
 
@@ -575,17 +427,12 @@ main {
   background-color: #1e3355;
   padding: 30px;
   border-radius: 12px;
-  width: 50%;
-  max-width: 650px;
   color: white;
   box-sizing: border-box;
-  /* Garante que o padding não quebre o tamanho */
-  /* Sombra elegante (box-shadow) e uma borda sutil */
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
   border: 1px solid #334155;
 }
 
-/* Botão de Denúncia Geral na Sidebar */
 .btnDenunciaGeral {
   width: 100%;
   margin-top: 15px;
@@ -606,4 +453,102 @@ main {
 .btnDenunciaGeral:hover {
   background-color: #ef4444;
   color: white;
+}
+
+/*RESPONSIVIDADE (MOBILE / MEDIA QUERIES)*/
+
+/* 1. MOBILE (Telas Pequenas: até 767px) */
+@media (max-width: 767px) {
+  .forumPage {
+    padding-top: 80px;
+  }
+  
+  .contentWrapper {
+    flex-direction: column;
+    padding: 0 12px;
+    max-width: 100%;
+  }
+
+  .sidebarSection {
+    width: 100%;
+    position: static;
+    order: -1; /* Sidebar fica acima do feed no mobile */
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+  
+  .postContent h3 { font-size: 1.15rem; }
+
+  .postCard {
+    padding: 16px; /* Menos padding lateral para não espremer o texto */
+  }
+
+  .modalContent {
+    width: 95%; /* Modal ocupa quase a tela toda no celular */
+    padding: 20px;
+  }
+}
+
+/* 2. TABLET / TELAS MÉDIAS (768px a 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .contentWrapper {
+    flex-direction: column;
+    padding: 0 20px;
+    max-width: 100%;
+  }
+
+  .sidebarSection {
+    width: 100%;
+    position: static;
+    order: -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide a sidebar em 2 colunas se houver mais de um card */
+    gap: 20px;
+  }
+
+  .pageTitle {
+    font-size: 1.6rem;
+  }
+  
+  .postContent h3 { font-size: 1.25rem; }
+
+  .postCard {
+    padding: 20px;
+  }
+
+  .modalContent {
+    width: 80%; /* Modal ocupa 80% do Tablet */
+  }
+}
+
+/* 3. DESKTOP / TELAS GRANDES (Acima de 1024px) */
+@media (min-width: 1025px) {
+  .contentWrapper {
+    flex-direction: row;
+    max-width: 1200px; 
+    padding: 0 20px;
+  }
+
+  .sidebarSection {
+    width: 320px; 
+    position: sticky;
+    top: 120px; 
+  }
+
+  .pageTitle {
+    font-size: 1.75rem;
+  }
+
+  .postContent h3 { font-size: 1.35rem; }
+
+  .postCard {
+    padding: 24px;
+  }
+
+  .modalContent {
+    width: 50%; 
+    max-width: 650px;
+  }
 }
