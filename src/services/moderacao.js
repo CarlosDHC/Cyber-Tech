@@ -1,74 +1,70 @@
 // src/services/moderacao.js
 
 // ============================================================================
-// FUNÇÃO 1: MODERAÇÃO DE POSTS E COMENTÁRIOS
+// FUNÇÃO 1: MODERAÇÃO DE POSTS E COMENTÁRIOS NO FÓRUM
 // ============================================================================
 export const moderarConteudo = async (titulo = "", texto = "", linkImagem = "") => {
   const apiKey = import.meta.env.VITE_GROQ_API_KEY;
   if (!apiKey) return true;
 
-  // --- CENÁRIO 1: Imagem e Texto ---
-  if (linkImagem && linkImagem.trim() !== "") {
-    const promptVisao = `
-      Analise a imagem e o texto: Título: "${titulo}" | Texto: "${texto}"
-      Se houver nudez, violência, armas, pornografia, racismo, palavras de baixo calão ou gestos obscenos: responda APENAS "BLOQUEADO".
-      Se for inofensivo e seguro: responda APENAS "APROVADO".
-    `;
-    try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: "meta-llama/llama-4-scout-17b-16e-instruct", 
-          messages: [{ role: "user", content: [ { type: "text", text: promptVisao }, { type: "image_url", image_url: { url: linkImagem } } ] }],
-          temperature: 0, max_tokens: 10
-        })
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-      
-      const resultadoIA = data.choices[0].message.content.trim().toUpperCase();
-      console.log("Moderação (Visão):", resultadoIA);
-      
-      // LÓGICA RIGOROSA: Só permite se a resposta tiver "APROVADO".
-      if (resultadoIA.includes("APROVADO")) return true;
-      return false; // Bloqueia tudo o resto (palavrões, recusas da IA, etc.)
+  // Prompt atualizado para apanhar palavrões disfarçados e abreviações
+  const promptTexto = `Aja como um moderador implacável.
+Analise o seguinte conteúdo:
+Título: "${titulo}"
+Texto: "${texto}"
+Regras:
+Se contiver palavrões (mesmo disfarçados, censurados ou abreviados como 'merd@', 'Caralh=o', 'fdp', etc.), discurso de ódio, racismo, apologia a crimes, assédio, violência, pornografia ou golpes, responda APENAS com o número 1.
+Se for inofensivo, seguro ou uma dúvida educacional normal sem linguagem ofensiva, responda APENAS com o número 0.
+NÃO ESCREVA NENHUMA OUTRA PALAVRA. APENAS 0 OU 1.`;
 
-    } catch (error) { 
-      console.error("Erro na API Groq (Visão):", error);
-      return false; // Se a imagem for inválida ou der erro, bloqueamos a publicação por segurança.
-    }
-  }
+  // Prompt atualizado para apanhar gestos com as mãos e símbolos de ódio nas imagens
+  const promptVisao = `Aja como um moderador implacável.
+Analise a imagem e o texto associado:
+Título: "${titulo}"
+Texto: "${texto}"
+Regras:
+Se a imagem ou o texto contiverem nudez, pornografia, hentai, ecchi, imagens de anime com conotação sexual, violência, racismo, palavras de baixo calão (mesmo disfarçadas como 'merd@'), ou gestos obscenos (como o dedo do meio, símbolos de ódio ou apologias raciais/nazistas), responda APENAS com o número 1.
+Se a imagem e o texto forem totalmente inofensivos e seguros, responda APENAS com o número 0.
+NÃO ESCREVA NENHUMA OUTRA PALAVRA. APENAS 0 OU 1.`;
 
-  // --- CENÁRIO 2: Apenas Texto ---
-  const promptTexto = `
-    Analise o seguinte texto: Título: ${titulo} | Texto: ${texto}
-    Se contiver palavrões, xingamentos, ódio, assédio ou insultos, responda APENAS "BLOQUEADO".
-    Se for inofensivo e normal, responda APENAS "APROVADO".
-  `;
   try {
+    let payload;
+
+    if (linkImagem && linkImagem.trim() !== "") {
+      payload = {
+        model: "llama-3.2-11b-vision-preview", 
+        messages: [{ role: "user", content: [ { type: "text", text: promptVisao }, { type: "image_url", image_url: { url: linkImagem } } ] }],
+        temperature: 0, 
+        max_tokens: 2
+      };
+    } else {
+      payload = {
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: promptTexto }],
+        temperature: 0, 
+        max_tokens: 2
+      };
+    }
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: [{ role: "user", content: promptTexto }],
-        temperature: 0, max_tokens: 10
-      })
+      body: JSON.stringify(payload)
     });
+
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
 
-    const resultadoIA = data.choices[0].message.content.trim().toUpperCase();
-    console.log("Moderação (Texto):", resultadoIA);
+    const resultadoIA = data.choices[0].message.content.trim();
     
-    // LÓGICA RIGOROSA
-    if (resultadoIA.includes("APROVADO")) return true;
-    return false; 
+    // Se a IA responder "1", bloqueamos.
+    if (resultadoIA === "1") return false;
+    
+    // Se responder "0", aprovamos.
+    return true; 
 
   } catch (error) { 
-    console.error("Erro na API Groq (Texto):", error);
-    return false; 
+    return true; // Fail-safe: aprova em caso de erro da API para não travar o fórum
   }
 };
 
@@ -80,33 +76,34 @@ export const analisarDenunciaComIA = async (motivo, detalhes, textoOriginal = ""
   const apiKey = import.meta.env.VITE_GROQ_API_KEY;
   if (!apiKey) return "ANALISAR";
 
-  const prompt = `
-    Avalie esta denúncia:
-    Motivo: "${motivo}"
-    Detalhes: "${detalhes}"
-    CONTEÚDO DENUNCIADO: "${textoOriginal}"
-    
-    Regras estritas (APENAS 1 PALAVRA):
-    - Se o CONTEÚDO DENUNCIADO ou os detalhes contiverem xingamentos, nudez, violência,hentai/ecchi,gestos obsenos, racismo, assédio ou golpes: responda "GRAVE".
-    - Se for apenas spam sem sentido ou denúncia falsa: responda "DESCARTAR".
-    - Se for inofensivo ou dúvida: responda "ANALISAR".
-  `;
+  // Regras de triagem apertadas para o Admin
+  const prompt = `Aja como o Administrador de Moderação.
+Avalie esta denúncia:
+Motivo: "${motivo}"
+Detalhes da Denúncia: "${detalhes}"
+CONTEÚDO ORIGINAL DENUNCIADO: "${textoOriginal}"
+
+Regras de punição (RESPONDA APENAS 1 PALAVRA, NADA MAIS):
+- Se o CONTEÚDO (texto ou imagem) mostrar xingamentos (incluindo palavras disfarçadas ou abreviadas como 'merd@', 'Caralh=o'), nudez, hentai, ecchi, animes obscenos, gestos obscenos (como dedo do meio, símbolos de ódio, apologias raciais), racismo, violência extrema ou golpes: responda "GRAVE".
+- Se a denúncia for falsa, um engano do usuário, ou o conteúdo for inofensivo e adequado: responda "DESCARTAR".
+- Se for uma dúvida técnica ou precisar de verificação humana: responda "ANALISAR".`;
 
   try {
     let payload;
     
-    // Se a denúncia tiver uma imagem, ativamos o modelo de visão!
     if (linkImagem && linkImagem.trim() !== "") {
       payload = {
-        model: "meta-llama/llama-4-scout-17b-16e-instruct", 
+        model: "llama-3.2-11b-vision-preview", 
         messages: [{ role: "user", content: [ { type: "text", text: prompt }, { type: "image_url", image_url: { url: linkImagem } } ] }],
-        temperature: 0, max_tokens: 10
+        temperature: 0, 
+        max_tokens: 10
       };
     } else {
       payload = {
         model: "llama-3.1-8b-instant", 
         messages: [{ role: "user", content: prompt }],
-        temperature: 0, max_tokens: 10
+        temperature: 0, 
+        max_tokens: 10
       };
     }
 
@@ -120,11 +117,10 @@ export const analisarDenunciaComIA = async (motivo, detalhes, textoOriginal = ""
     if (data.error) throw new Error(data.error.message);
 
     const resultadoIA = data.choices[0].message.content.trim().toUpperCase();
-    console.log("Veredicto Denúncia:", resultadoIA);
 
     if (resultadoIA.includes("GRAVE")) return "GRAVE";
     if (resultadoIA.includes("DESCARTAR")) return "DESCARTAR";
-    if (resultadoIA.includes("CANNOT") || resultadoIA.includes("SORRY")) return "GRAVE"; // Recusou avaliar por ser nojento = GRAVE
+    if (resultadoIA.includes("CANNOT") || resultadoIA.includes("SORRY")) return "GRAVE"; 
 
     return "ANALISAR"; 
   } catch (error) { 
