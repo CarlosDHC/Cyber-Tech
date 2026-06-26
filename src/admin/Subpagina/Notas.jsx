@@ -112,17 +112,17 @@ export default function Notas() {
         <h2 className={styles.title}>Administrador</h2>
         <ul className={styles.navList}>
           <li><Link to="/admin" className={styles.navLink}><img src="/casa.png" alt="H" /><span className={styles.linkText}>Home</span></Link></li>
-          <li><Link to="/admin/notas" className={styles.navLink}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão de Notas</span></Link></li>
+          <li><Link to="/admin/notas" className={`${styles.navLink} ${styles.active}`}><img src="/blog.png" alt="N" /><span className={styles.linkText}>Gestão de Notas</span></Link></li>
           <li><Link to="/admin/newblog" className={styles.navLink}><img src="/inotas.png" alt="B" /><span className={styles.linkText}>Criar Blog</span></Link></li>
           <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
-          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Historico de curtidas</span></Link></li>
-          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentarios Forum</span></Link></li>
-          <li><Link to="/admin/denuncia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denuncia</span></Link></li>
+          <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Histórico de curtidas</span></Link></li>
+          <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentários Forum</span></Link></li>
+          <li><Link to="/admin/denuncia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denúncia</span></Link></li>
         </ul>
       </aside>
 
       <main className={styles.main}>
-        <h1>Desempenho dos Alunos</h1>
+        <h1 style={{ marginBottom: '20px' }}>Desempenho dos Alunos</h1>
 
         {loading ? (
           <p>Carregando notas...</p>
@@ -130,23 +130,27 @@ export default function Notas() {
           <p>Nenhuma nota registrada ainda.</p>
         ) : (
           <>
+            {/* 🟢 GRID SUPERIOR: ALUNOS DESTAQUE E RISCO */}
             <div className={notasStyles.metricsGrid}>
 
-              <div className={styles.card}>
-                <h3 style={{ borderBottom: '2px solid #00C49F', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em Destaque</h3>
+              {/* CARD DESTAQUE */}
+              <div className={notasStyles.alunoCard}>
+                <h3 className={notasStyles.sectionTitleDestaque}>Alunos em Destaque</h3>
                 <div className={notasStyles.tableWrapper}>
-                  <table className={notasStyles.responsiveTable}>
+                  <table className={notasStyles.notasTable}>
                     <thead>
-                      <tr style={{ textAlign: 'left', color: '#999' }}>
-                        <th style={{ padding: '8px' }}>Aluno</th>
-                        <th style={{ padding: '8px', textAlign: 'right' }}>Média Geral</th>
+                      <tr>
+                        <th>Aluno</th>
+                        <th className={notasStyles.alignRight}>Média Geral</th>
                       </tr>
                     </thead>
                     <tbody>
                       {topStudents.map((aluno, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                          <td style={{ padding: '8px' }}>{aluno.nome}</td>
-                          <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold', color: '#00C49F' }}>{aluno.media.toFixed(1)}</td>
+                        <tr key={`top-${i}`}>
+                          <td>{aluno.nome}</td>
+                          <td className={`${notasStyles.alignRight} ${notasStyles.mediaDestaque}`}>
+                            <strong>{aluno.media.toFixed(1)}</strong>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -154,55 +158,62 @@ export default function Notas() {
                 </div>
               </div>
 
-              <div className={styles.card} style={{ borderLeft: '4px solid #FF8042' }}>
-                <h3 style={{ borderBottom: '2px solid #FF8042', paddingBottom: '10px', marginBottom: '15px' }}>Alunos em risco</h3>
+              {/* CARD RISCO */}
+              <div className={`${notasStyles.alunoCard} ${notasStyles.cardRisco}`}>
+                <h3 className={notasStyles.sectionTitleRisco}>Alunos em Risco</h3>
                 {riskStudents.length > 0 ? (
                   <div className={notasStyles.tableWrapper}>
-                    <table className={notasStyles.responsiveTable}>
+                    <table className={notasStyles.notasTable}>
                       <thead>
-                        <tr style={{ textAlign: 'left', color: '#999' }}>
-                          <th style={{ padding: '8px' }}>Aluno</th>
-                          <th style={{ padding: '8px', textAlign: 'right' }}>Média Geral</th>
+                        <tr>
+                          <th>Aluno</th>
+                          <th className={notasStyles.alignRight}>Média Geral</th>
                         </tr>
                       </thead>
                       <tbody>
                         {riskStudents.map((aluno, i) => (
-                          <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                            <td style={{ padding: '8px' }}>{aluno.nome}</td>
-                            <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold', color: '#FF8042' }}>{aluno.media.toFixed(1)}</td>
+                          <tr key={`risk-${i}`}>
+                            <td>{aluno.nome}</td>
+                            <td className={`${notasStyles.alignRight} ${notasStyles.mediaRisco}`}>
+                              <strong>{aluno.media.toFixed(1)}</strong>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                ) : <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Tudo certo por aqui!</p>}
+                ) : (
+                  <p className={notasStyles.centerTd} style={{ marginTop: '20px' }}>Tudo certo por aqui!</p>
+                )}
               </div>
 
             </div>
 
+            {/* 🟢 LISTA DETALHADA DE TODOS OS ALUNOS */}
             <div className={styles.cards}>
               {alunos.map((aluno) => (
-                <div key={aluno.email} className={styles.card} style={{ display: 'block' }}>
-                  <div style={{ borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h3 style={{ color: '#095e8b', marginBottom: '5px' }}>{aluno.nome}</h3>
-                      <p style={{ fontSize: '0.9rem', color: '#666' }}>{aluno.email}</p>
+                <div key={aluno.email} className={notasStyles.alunoCard}>
+                  
+                  <div className={notasStyles.alunoHeader}>
+                    <div className={notasStyles.alunoInfo}>
+                      <h3 className={notasStyles.alunoNome}>{aluno.nome}</h3>
+                      <p className={notasStyles.alunoEmail}>{aluno.email}</p>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#999' }}>Média Geral</span>
-                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#333' }}>{aluno.media.toFixed(1)}</span>
+                    <div className={notasStyles.mediaContainer}>
+                      <span className={notasStyles.mediaLabel}>Média Geral</span>
+                      <span className={notasStyles.mediaValue}>{aluno.media.toFixed(1)}</span>
                     </div>
                   </div>
 
-                  <div className={notasStyles.tableWrapper} style={{ maxHeight: '300px' }}>
-                    <table className={notasStyles.responsiveTable}>
+                  <div className={notasStyles.tableWrapper}>
+                    <table className={notasStyles.notasTable}>
                       <thead>
-                        <tr style={{ textAlign: 'left', color: '#999', borderBottom: '1px solid #eee' }}>
-                          <th style={{ padding: '8px' }}>Desafio</th>
-                          <th style={{ padding: '8px' }}>Categoria</th>
-                          <th style={{ padding: '8px' }}>Melhor Nota</th>
-                          <th style={{ padding: '8px', textAlign: 'center' }}>Tentativas</th>
-                          <th style={{ padding: '8px' }}>Última Data</th>
+                        <tr>
+                          <th>Desafio</th>
+                          <th>Categoria</th>
+                          <th>Melhor Nota</th>
+                          <th className={notasStyles.centerTd}>Tentativas</th>
+                          <th>Última Data</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -211,28 +222,22 @@ export default function Notas() {
                           const aprovado = porcentagem >= 0.6;
 
                           return (
-                            <tr key={item.id} style={{ borderBottom: '1px solid #f9f9f9' }}>
-                              <td style={{ padding: '8px', color: '#333' }}>
+                            <tr key={item.id}>
+                              <td>
                                 {item.desafio ? item.desafio.replace("Desafio ", "") : "Sem nome"}
                               </td>
-                              <td style={{ padding: '8px', fontSize: '0.85rem', color: '#666' }}>
+                              <td className={notasStyles.categoriaTd}>
                                 {item.categoria}
                               </td>
-                              <td style={{ padding: '8px' }}>
-                                <span style={{
-                                  fontWeight: "bold",
-                                  color: aprovado ? "green" : "red",
-                                  backgroundColor: aprovado ? "#e6fffa" : "#fff5f5",
-                                  padding: "2px 6px",
-                                  borderRadius: "4px"
-                                }}>
+                              <td>
+                                <span className={`${notasStyles.badge} ${aprovado ? notasStyles.badgeAprovado : notasStyles.badgeReprovado}`}>
                                   {item.nota} / {item.total}
                                 </span>
                               </td>
-                              <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>
+                              <td className={notasStyles.centerTd}>
                                 {item.tentativas}
                               </td>
-                              <td style={{ padding: '8px', fontSize: '0.75rem', color: '#777' }}>
+                              <td className={notasStyles.dataTd}>
                                 {formatarData(item.data).split(' às ')[0]}
                                 <br />
                                 {formatarData(item.data).split(' às ')[1]}

@@ -1,6 +1,5 @@
-/* =========================================
-   VARIÁVEIS GLOBAIS
-========================================= */
+/*
+   VARIÁVEIS GLOBAIS */
 :root {
   --sidebar-width-open: 250px;
   --sidebar-width-collapsed: 70px;
@@ -44,9 +43,8 @@
   --font-size-2xl: 2rem;
 }
 
-/* =========================================
-   RESET E BASE
-========================================= */
+/*
+   RESET E BASE */
 *,
 *::before,
 *::after {
@@ -68,9 +66,8 @@ body {
   line-height: 1.6;
 }
 
-/* =========================================
-   LAYOUT PRINCIPAL
-========================================= */
+/*
+   LAYOUT PRINCIPAL */
 .container {
   display: flex;
   min-height: 100vh;
@@ -78,9 +75,8 @@ body {
   overflow-x: hidden;
 }
 
-/* =========================================
-   SIDEBAR
-========================================= */
+/*
+   SIDEBAR */
 .sidebar {
   width: var(--sidebar-width-open);
   background: var(--color-primary-light);
@@ -206,9 +202,8 @@ body {
   transition: opacity var(--transition-speed), visibility var(--transition-speed);
 }
 
-/* =========================================
-   CONTEÚDO PRINCIPAL
-========================================= */
+/*
+   CONTEÚDO PRINCIPAL */
 .main {
   flex: 1;
   min-height: 100vh;
@@ -225,9 +220,8 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* =========================================
-   MÉTRICAS / CARDS
-========================================= */
+/*
+   MÉTRICAS / CARDS */
 .metricsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -314,9 +308,8 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* =========================================
-   FORMULÁRIOS E EDITOR
-========================================= */
+/*
+   FORMULÁRIOS E EDITOR */
 .headerFlex {
   display: flex;
   justify-content: space-between;
@@ -378,9 +371,8 @@ body {
   resize: vertical;
 }
 
-/* =========================================
-   BOTÕES
-========================================= */
+/*
+   BOTÕES */
 .publishBtn,
 .btnDeletePost,
 .btnDeleteComment {
@@ -464,9 +456,8 @@ body {
   font-weight: 600;
 }
 
-/* =========================================
-   BLOCOS DO BLOG E COMENTÁRIOS
-========================================= */
+/*
+   BLOCOS DO BLOG E COMENTÁRIOS */
 .blocksList { display: flex; flex-direction: column; gap: 18px; }
 .blockItem {
   background: var(--color-bg-block);
@@ -509,9 +500,7 @@ body {
 .warning { color: var(--color-text-warning); font-weight: 500; }
 
 
-/* =========================================
-   RESPONSIVIDADE PADRONIZADA (MOBILE FIRST)
-========================================= */
+/*RESPONSIVIDADE PADRONIZADA (MOBILE FIRST) */
 
 /* 1. MOBILE (Telas Pequenas: até 767px) */
 @media (max-width: 767px) {

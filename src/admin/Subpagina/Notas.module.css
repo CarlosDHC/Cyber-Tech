@@ -1,31 +1,231 @@
-/* src/admin/Subpagina/Notas.module.css */
+/* Notas.module.css */
 
-/* Controla o grid do topo (Destaques e Risco) */
+/* =========================================
+   ESTRUTURA GERAL
+   ========================================= */
 .metricsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
   gap: 20px;
-  margin-bottom: 2rem;
+  margin-bottom: 30px;
 }
 
-/* Garante que a tabela tenha scroll horizontal no celular em vez de quebrar a tela */
-.tableWrapper {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Suaviza o scroll no iPhone/iOS */
+.alunoCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
 }
 
-/* Impede que a tabela esprema muito as colunas no celular */
-.responsiveTable {
-  width: 100%;
-  min-width: 40px; 
-  border-collapse: collapse;
+.alunoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+}
+
+.cardRisco {
+  border-left: 4px solid #FF8042;
+}
+
+/* =========================================
+   CABEÇALHO DOS CARDS E TÍTULOS
+   ========================================= */
+.sectionTitleDestaque {
+  color: #00C49F;
+  border-bottom: 2px solid #00C49F;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.sectionTitleRisco {
+  color: #FF8042;
+  border-bottom: 2px solid #FF8042;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.alunoHeader {
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.alunoInfo {
+  flex: 1;
+}
+
+.alunoNome {
+  color: #095e8b;
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.alunoEmail {
   font-size: 0.9rem;
+  color: #666;
+  word-break: break-all;
 }
 
-/* Quando a tela for menor que 768px (Celulares e Tablets menores) */
-@media (max-width: 768px) {
+.mediaContainer {
+  text-align: right;
+  min-width: 90px;
+}
+
+.mediaLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.mediaValue {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.mediaDestaque {
+  color: #00C49F;
+}
+
+.mediaRisco {
+  color: #FF8042;
+}
+
+/* =========================================
+   TABELAS
+   ========================================= */
+.tableWrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: auto; /* Rolagem lateral para não quebrar a tela */
+  width: 100%;
+  scrollbar-width: thin; /* Deixa o scroll mais bonito no Firefox */
+}
+
+.notasTable {
+  width: 100%;
+  font-size: 0.9rem;
+  border-collapse: collapse;
+  min-width: 450px; /* Limite antes de ativar o scroll horizontal */
+}
+
+.notasTable th {
+  padding: 10px 8px;
+  text-align: left;
+  color: #999;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* Fundo sólido para o header sticky */
+  z-index: 1;
+}
+
+.notasTable td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f9f9f9;
+  color: #333;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.centerTd {
+  text-align: center;
+  color: #555;
+}
+
+.categoriaTd {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.dataTd {
+  font-size: 0.75rem;
+  color: #777;
+}
+
+/* =========================================
+   BADGES
+   ========================================= */
+.badge {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.badgeAprovado {
+  color: #0f5132;
+  background-color: #d1fae5;
+}
+
+.badgeReprovado {
+  color: #9b2c2c;
+  background-color: #fed7d7;
+}
+
+/* =========================================
+   RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================= */
+
+/* Telas Médias (Tablets) - Até 900px */
+@media (max-width: 900px) {
   .metricsGrid {
-    grid-template-columns: 1fr; /* Coloca um card embaixo do outro */
+    grid-template-columns: 1fr; /* Ocupa linha inteira */
+  }
+
+  .alunoCard {
+    padding: 20px;
+  }
+  
+  .alunoNome {
+    font-size: 1.05rem;
+  }
+
+  .mediaValue {
+    font-size: 1.2rem;
+  }
+}
+
+/* Telas Pequenas (Smartphones) - Até 600px */
+@media (max-width: 600px) {
+  .alunoCard {
+    padding: 15px;
+    max-width: 350px; /* Limita a largura do card para telas muito pequenas */
+  }
+
+  .alunoHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .mediaContainer {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .notasTable {
+    font-size: 0.85rem;
+    min-width: 380px; /* Aciona o scroll lateral mais cedo */
+  }
+
+  .notasTable th, 
+  .notasTable td {
+    padding: 8px 6px;
   }
 }
