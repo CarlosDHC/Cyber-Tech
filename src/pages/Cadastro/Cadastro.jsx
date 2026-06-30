@@ -75,6 +75,7 @@ const Cadastro = () => {
         telefone,
         email,
         criadoEm: new Date().toISOString(),
+        role: "aluno", 
       });
 
       // 5. Faz o logout imediatamente para impedir o acesso sem verificação

@@ -1,68 +1,105 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../../FirebaseConfig'; // Verifique se o caminho para o FirebaseConfig está correto
 import styles from './Tutorial.module.css';
 
-function Tutorial() {
+const Tutorial = () => {
+  const [tipoUsuario, setTipoUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const auth = getAuth();
+    
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            
+            const roleDoUsuario = userData.role || 'aluno'; 
+            setTipoUsuario(roleDoUsuario.toLowerCase());
+          }
+        } catch (error) {
+          console.error("Erro ao buscar dados no Firestore:", error);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'black' }}>
+        <p>A carregar o tutorial...</p>
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      className={styles.tutorialContainer}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
+    <div className={styles.tutorialContainer}>
+      
+      {/* Cabeçalho da Página */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Tutoriais da Plataforma</h1>
+        <h1 className={styles.title}>Tutorial da Plataforma Cyber Tech</h1>
         <p className={styles.description}>
-          Assista aos vídeos abaixo para aprender como utilizar todos os recursos da plataforma, seja você um aluno ou um administrador.
+          Assista ao vídeo de introdução para saber como utilizar todas as ferramentas e funcionalidades do seu perfil.
         </p>
       </div>
 
       <div className={styles.videoGrid}>
-        {/* Vídeo 1 - Para Usuários/Alunos */}
-        <motion.div 
-          className={styles.videoCard}
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          <div className={styles.iframeContainer}>
-            <iframe
-              src="https://www.youtube.com/embed/COLOQUE_O_ID_DO_VIDEO_DOS_USUARIOS_AQUI"
-              title="Tutorial para Usuários"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className={styles.iframe}
-            ></iframe>
+        {/* Lógica condicional: Exibe um vídeo diferente dependendo do cargo */}
+        {tipoUsuario === 'admin' ? (
+          <div className={styles.videoCard}>
+            <div className={styles.iframeContainer}>
+              <iframe 
+                className={styles.iframe}
+                // ATENÇÃO: Substitua apenas o "ID_DO_VIDEO_AQUI" pelo código real do seu vídeo do YouTube
+                src="https://www.youtube.com/embed/ID_DO_VIDEO_AQUI" 
+                title="Tutorial Administrador" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            </div>
+            <h2 className={styles.videoTitle}>Visão Geral para Administradores</h2>
+            <p className={styles.videoText}>
+              Aprenda a gerir os alunos, adicionar novos desafios e moderar o blog.
+            </p>
           </div>
-          <h3 className={styles.videoTitle}>Tutorial do Aluno</h3>
-          <p className={styles.videoText}>
-            Aprenda a navegar pela plataforma, resolver desafios, interagir no fórum da comunidade e resgatar seus certificados.
-          </p>
-        </motion.div>
-
-        {/* Vídeo 2 - Para Administradores */}
-        <motion.div 
-          className={styles.videoCard}
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          <div className={styles.iframeContainer}>
-            <iframe
-              src="https://www.youtube.com/embed/COLOQUE_O_ID_DO_VIDEO_DO_ADMIN_AQUI"
-              title="Tutorial para Administradores"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className={styles.iframe}
-            ></iframe>
+        ) : tipoUsuario === 'aluno' ? (
+          <div className={styles.videoCard}>
+            <div className={styles.iframeContainer}>
+              <iframe 
+                className={styles.iframe}
+                // ATENÇÃO: Substitua apenas o "ID_DO_VIDEO_AQUI" pelo código real do seu vídeo do YouTube
+                src="https://www.youtube.com/embed/NxJaQ8z3DUM" 
+                title="Tutorial Aluno" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            </div>
+            <h2 className={styles.videoTitle}>Bem-vindo(a) à Cyber Tech!</h2>
+            <p className={styles.videoText}>
+              Veja como resolver os desafios práticos, aceder ao blog e interagir no fórum.
+            </p>
           </div>
-          <h3 className={styles.videoTitle}>Tutorial do Administrador</h3>
-          <p className={styles.videoText}>
-            Veja como acessar o painel de controle, gerenciar os usuários da plataforma, moderar o fórum e acompanhar as métricas gerais.
-          </p>
-        </motion.div>
+        ) : (
+          <div className={styles.videoCard} style={{ backgroundColor: '#fee2e2', borderColor: '#f87171' }}>
+            <p style={{ color: '#dc2626', textAlign: 'center', fontWeight: 'bold' }}>
+              Não foi possível determinar o seu tipo de perfil. Por favor, contacte o suporte técnico.
+            </p>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   );
-}
+};
 
 export default Tutorial;
