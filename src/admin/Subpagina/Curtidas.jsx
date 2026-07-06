@@ -94,7 +94,7 @@ export default function Curtidas() {
           <li><Link to="/admin/curtidas" className={`${styles.navLink} ${styles.active}`}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Histórico de curtidas</span></Link></li>
           
           <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentários Forum</span></Link></li>
-          <li><Link to="/admin/denuncias" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denúncias</span></Link></li>
+          <li><Link to="/admin/denuncia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denuncia</span></Link></li>
         </ul>
       </aside>
 

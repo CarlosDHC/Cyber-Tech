@@ -11,7 +11,7 @@
   /* --- PALETA DE CORES GLOBAL --- */
   --color-primary: #095e8b;       /* Azul principal da marca */
   --color-primary-light: #3b9dff; /* Azul claro para hover/detalhes */
-  --color-secondary: #003bb5;     /* Azul escuro */
+  --color-secondary: #3b9dff;     /* Azul claro */
   
   --color-bg-body: #f0f2f5;       /* Fundo geral da página (cinza bem claro) */
   --color-surface: #ffffff;       /* Fundo de cards e containers */
@@ -71,9 +71,9 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 12px;
   
   /* Centralização */
-  width: 90%;             /* Ocupa 90% da largura disponível */
-  max-width: 1200px;      /* Trava a largura máxima */
-  margin: 50px auto;      /* 50px em cima/baixo, AUTO nas laterais para centralizar */
+  width: 90%;            
+  max-width: 1200px;      
+  margin: 50px auto;   
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(6px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
@@ -151,7 +151,7 @@ footer {
   .container {
     padding: 1rem;
     margin: 3rem auto;
-    width: 95%; /* Ocupa quase toda a tela lateralmente */
+    width: 95%; 
     border-radius: 8px;
     margin-top: 4rem;
   }

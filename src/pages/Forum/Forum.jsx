@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Forum.module.css';
-import { moderarConteudo } from "../../services/moderacao"; 
+import { verificarSeguranca } from "../../services/moderacaoForum"; 
 import { db, auth } from "../../../FirebaseConfig";
 import { 
   collection, addDoc, query, orderBy, onSnapshot, 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../../FirebaseConfig';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy, getDoc } from 'firebase/firestore';
-import { analisarDenunciaComIA } from '../../services/moderacao';
+import { classificarDenuncia } from '../../services/moderacaoAdmin';
 import styles from '../Admin.module.css';
 
 const Denuncia = () => {
@@ -111,7 +111,6 @@ const Denuncia = () => {
         }
     };
 
-    // 🔥 O SEGREDO ESTÁ AQUI: A IA AGORA VÊ A IMAGEM ANTES DE JULGAR
     const rodarTriagemIA = async () => {
         setIsAnalisandoIA(true);
         const denunciasPendentes = denuncias.filter(d => d.status === "pendente");
@@ -130,19 +129,17 @@ const Denuncia = () => {
                 let linkDaImagemParaIA = "";
                 let textoParaIA = denuncia.textoComentario || "";
 
-                // Se a denúncia for de um Post Inteiro, vamos buscar a imagem dele à base de dados primeiro!
                 if (denuncia.tipo === "Denúncia de Post" && denuncia.postId && denuncia.postId !== "N/A") {
                     const postRef = doc(db, "forum_posts", denuncia.postId);
                     const postSnap = await getDoc(postRef);
                     
                     if (postSnap.exists()) {
                         const data = postSnap.data();
-                        linkDaImagemParaIA = data.imageUrl || ""; // Pegamos a imagem!
-                        textoParaIA = `${data.title}\n${data.content}`; // Pegamos o texto exato do post
+                        linkDaImagemParaIA = data.imageUrl || ""; 
+                        textoParaIA = `${data.title}\n${data.content}`; 
                     }
                 }
 
-                // Agora sim enviamos tudo para a IA avaliar
                 const veredicto = await analisarDenunciaComIA(denuncia.motivo, denuncia.detalhes, textoParaIA, linkDaImagemParaIA);
                 const denunciaRef = doc(db, "denuncias", denuncia.id);
 
@@ -186,7 +183,7 @@ const Denuncia = () => {
                     <li><Link to="/admin/newdesafios" className={styles.navLink}><img src="/idesafio.png" alt="D" /><span className={styles.linkText}>Criar Desafios</span></Link></li>
                     <li><Link to="/admin/curtidas" className={styles.navLink}><img src="/curti.png" alt="L" /><span className={styles.linkText}>Histórico de curtidas</span></Link></li>
                     <li><Link to="/admin/comentarios" className={styles.navLink}><img src="/icomentarios.png" alt="L" /><span className={styles.linkText}>Comentários Forum</span></Link></li>
-                    <li><Link to="/admin/denuncias" className={`${styles.navLink} ${styles.active}`}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denúncias</span></Link></li>
+                    <li><Link to="/admin/denuncia" className={styles.navLink}><img src="/denuncia.png" alt="U" /><span className={styles.linkText}>Denuncia</span></Link></li>
                 </ul>
             </aside>
 
@@ -197,7 +194,8 @@ const Denuncia = () => {
                         <span className={styles.warning}>{denuncias.length} registros encontrados</span>
                     </div>
                     
-                    <button onClick={rodarTriagemIA} disabled={isAnalisandoIA} className={styles.publishBtn} style={isAnalisandoIA ? {} : { backgroundColor: '#8b5cf6' }}>
+                    {/* Botão padronizado da IA */}
+                    <button onClick={rodarTriagemIA} disabled={isAnalisandoIA} className={styles.publishBtn}>
                         {isAnalisandoIA ? "A IA está a analisar..." : (
                             <>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
