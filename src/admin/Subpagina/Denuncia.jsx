@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../../FirebaseConfig';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy, getDoc } from 'firebase/firestore';
-import { classificarDenuncia } from '../../services/moderacaoAdmin';
+import { analisarDenunciaComIA } from '../../services/moderacaoAdmin';
 import styles from '../Admin.module.css';
 
 const Denuncia = () => {
@@ -112,62 +112,76 @@ const Denuncia = () => {
     };
 
     const rodarTriagemIA = async () => {
-        setIsAnalisandoIA(true);
-        const denunciasPendentes = denuncias.filter(d => d.status === "pendente");
+    setIsAnalisandoIA(true);
+    const denunciasPendentes = denuncias.filter(d => d.status === "pendente");
 
-        if (denunciasPendentes.length === 0) {
-            alert("Não existem denúncias pendentes para a IA analisar no momento.");
-            setIsAnalisandoIA(false);
-            return;
-        }
-
-        let atualizadas = 0;
-        let excluidas = 0;
-
-        for (let denuncia of denunciasPendentes) {
-            try {
-                let linkDaImagemParaIA = "";
-                let textoParaIA = denuncia.textoComentario || "";
-
-                if (denuncia.tipo === "Denúncia de Post" && denuncia.postId && denuncia.postId !== "N/A") {
-                    const postRef = doc(db, "forum_posts", denuncia.postId);
-                    const postSnap = await getDoc(postRef);
-                    
-                    if (postSnap.exists()) {
-                        const data = postSnap.data();
-                        linkDaImagemParaIA = data.imageUrl || ""; 
-                        textoParaIA = `${data.title}\n${data.content}`; 
-                    }
-                }
-
-                const veredicto = await analisarDenunciaComIA(denuncia.motivo, denuncia.detalhes, textoParaIA, linkDaImagemParaIA);
-                const denunciaRef = doc(db, "denuncias", denuncia.id);
-
-                if (veredicto === "GRAVE") {
-                    const deletadoComSucesso = await executarExclusaoNoBanco(denuncia);
-                    if (deletadoComSucesso) {
-                        await updateDoc(denunciaRef, { statusIA: "GRAVE - EXCLUÍDO", status: "solucionado" });
-                        excluidas++;
-                    } else {
-                        await updateDoc(denunciaRef, { statusIA: "GRAVE - ERRO AO EXCLUIR", status: "pendente" });
-                    }
-                } 
-                else if (veredicto === "DESCARTAR") {
-                    await updateDoc(denunciaRef, { statusIA: "DESCARTAR (SEGURO)", status: "solucionado" });
-                } 
-                else {
-                    await updateDoc(denunciaRef, { statusIA: "ANALISAR (DÚVIDA)", status: "pendente" });
-                }
-                atualizadas++;
-            } catch (error) {
-                console.error("Erro ao analisar a denúncia " + denuncia.id, error);
-            }
-        }
-
-        alert(`Triagem concluída! A IA avaliou ${atualizadas} denúncia(s) e deletou ${excluidas} conteúdo(s) explicitamente obscenos.`);
+    if (denunciasPendentes.length === 0) {
+        alert("Não existem denúncias pendentes para a IA analisar no momento.");
         setIsAnalisandoIA(false);
-        fetchDenuncias(); 
-    };
+        return;
+    }
+
+    let atualizadas = 0;
+    let excluidas = 0;
+
+    for (let denuncia of denunciasPendentes) {
+        try {
+            // 1. EXTRAI OS DADOS (Definindo as variáveis que causaram o erro)
+            let linkDaImagemParaIA = "";
+            let textoParaIA = denuncia.textoComentario || "";
+
+            // Se for denúncia de post, busca o conteúdo completo lá no Firebase
+            if (denuncia.tipo === "Denúncia de Post" && denuncia.postId && denuncia.postId !== "N/A") {
+                const postRef = doc(db, "forum_posts", denuncia.postId);
+                const postSnap = await getDoc(postRef);
+                
+                if (postSnap.exists()) {
+                    const data = postSnap.data();
+                    linkDaImagemParaIA = data.imageUrl || ""; 
+                    textoParaIA = `${data.title || ''}\n${data.content || ''}`; 
+                }
+            }
+
+            console.log(`--- Iniciando Análise da Denúncia ID: ${denuncia.id} ---`);
+            console.log("1. Enviando para IA. Texto:", textoParaIA, "| Imagem URL:", linkDaImagemParaIA);
+
+            // 2. CHAMA A IA
+            const veredicto = await analisarDenunciaComIA(denuncia.motivo, denuncia.detalhes, textoParaIA, linkDaImagemParaIA);
+            
+            console.log("2. Resposta exata da IA:", veredicto);
+            
+            const denunciaRef = doc(db, "denuncias", denuncia.id);
+
+            // 3. EXECUTA A DECISÃO
+            if (veredicto === "GRAVE") {
+                console.log("3. IA mandou deletar! Acionando banco de dados...");
+                const deletadoComSucesso = await executarExclusaoNoBanco(denuncia);
+                
+                if (deletadoComSucesso) {
+                    console.log("4. SUCESSO! Conteúdo deletado do Firebase.");
+                    await updateDoc(denunciaRef, { statusIA: "GRAVE - EXCLUÍDO", status: "solucionado" });
+                    excluidas++;
+                } else {
+                    console.warn("ALERTA: IA mandou deletar, mas o Firebase não encontrou o arquivo (pode já ter sido apagado).");
+                    await updateDoc(denunciaRef, { statusIA: "GRAVE - ERRO AO EXCLUIR", status: "pendente" });
+                }
+            } 
+            else if (veredicto === "DESCARTAR") {
+                await updateDoc(denunciaRef, { statusIA: "DESCARTAR (SEGURO)", status: "solucionado" });
+            } 
+            else {
+                await updateDoc(denunciaRef, { statusIA: "ANALISAR (DÚVIDA)", status: "pendente" });
+            }
+            atualizadas++;
+        } catch (error) {
+            console.error("Erro ao analisar a denúncia " + denuncia.id, error);
+        }
+    }
+
+    alert(`Triagem concluída! A IA avaliou ${atualizadas} denúncia(s) e deletou ${excluidas} conteúdo(s) irregulares.`);
+    setIsAnalisandoIA(false);
+    fetchDenuncias(); // Recarrega a tela com os status novos
+};
 
     if (loading) return <div className={styles.emptyMessage}>Carregando central de moderação...</div>;
 

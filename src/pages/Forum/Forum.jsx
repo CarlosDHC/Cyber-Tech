@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Forum.module.css';
-import { verificarSeguranca } from "../../services/moderacaoForum"; 
+import { moderarConteudo } from "../../services/moderacaoForum"; 
 import { db, auth } from "../../../FirebaseConfig";
 import { 
   collection, addDoc, query, orderBy, onSnapshot, 
@@ -138,10 +138,11 @@ const Forum = () => {
 
     setIsSubmitting(true);
     
+    // CHAMADA DA IA CORRIGIDA
     const ehSeguro = await moderarConteudo(newTitle, newContent, imageLink);
 
     if (!ehSeguro) {
-      alert("Conteúdo impróprio ou link não seguro detectado. Revise sua publicação.");
+      alert("Conteúdo impróprio ou link não seguro detetado. Reveja a sua publicação.");
       setIsSubmitting(false);
       return; 
     }
@@ -167,7 +168,7 @@ const Forum = () => {
       setViewMode('feed'); // Volta para o feed após publicar com sucesso
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) { 
-      alert("Erro ao publicar. Verifique sua conexão.");
+      alert("Erro ao publicar. Verifique a sua ligação.");
     } finally { 
       setIsSubmitting(false); 
     }
@@ -192,7 +193,9 @@ const Forum = () => {
     const user = auth.currentUser;
     if (!user) { alert("Faça login para comentar."); return; }
 
+    // CHAMADA DA IA CORRIGIDA (Utilizando a variável "text")
     const ehSeguro = await moderarConteudo("", text, "");
+    
     if (!ehSeguro) {
       alert("Comentário bloqueado por violar as diretrizes de segurança da comunidade.");
       return;
@@ -256,7 +259,7 @@ const Forum = () => {
         status: "pendente",
         data: serverTimestamp() 
       });
-      alert("Denúncia enviada com sucesso! A nossa equipe analisará em breve.");
+      alert("Denúncia enviada com sucesso! A nossa equipa analisará em breve.");
       fecharModal();
     } catch (error) {
       alert("Erro ao enviar denúncia. Tente novamente.");
@@ -266,7 +269,7 @@ const Forum = () => {
   const formatTime = (timestamp) => {
     if (!timestamp) return "...";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -276,7 +279,7 @@ const Forum = () => {
         <main className={styles.feedSection}>
           <div className={styles.headerBlock}>
             <h1 className={styles.pageTitle}>Fórum de Discussões</h1>
-            <p className={styles.pageSubtitle}>Conecte-se com especialistas e tire suas dúvidas.</p>
+            <p className={styles.pageSubtitle}>Conecte-se com especialistas e tire as suas dúvidas.</p>
             
             {/* BOTÃO PARA ALTERNAR ENTRE FEED E CRIAÇÃO */}
             <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
@@ -328,7 +331,7 @@ const Forum = () => {
                     )}
                   </div>
 
-                  <textarea rows="5" placeholder="Desenvolva sua ideia aqui..." value={newContent} onChange={(e) => setNewContent(e.target.value)} disabled={isSubmitting} className={styles.cleanTextarea} />
+                  <textarea rows="5" placeholder="Desenvolva a sua ideia aqui..." value={newContent} onChange={(e) => setNewContent(e.target.value)} disabled={isSubmitting} className={styles.cleanTextarea} />
                   <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
                     {isSubmitting ? 'A analisar...' : 'Publicar'}
                   </button>
